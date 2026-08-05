@@ -1,0 +1,31 @@
+{
+  "name": "artwork-backend",
+  "version": "1.0.0",
+  "description": "ARTWORK furniture backend API.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node --check src/server.js",
+    "admin:create": "node scripts/create-admin.js",
+    "catalog:sync-room-products": "node scripts/sync-room-products.js",
+    "catalog:cleanup-room-products": "node scripts/cleanup-room-products.js",
+    "database:optimize": "node scripts/optimize-database.js",
+    "email:test": "node scripts/test-admin-email.js",
+    "email:test-order": "node scripts/test-order-email.js",
+    "gmail:auth-url": "node scripts/gmail-auth-url.js",
+    "gmail:token": "node scripts/gmail-token.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "googleapis": "^173.0.0",
+    "mongodb": "^7.3.0",
+    "web-push": "^3.6.7"
+  }
+}

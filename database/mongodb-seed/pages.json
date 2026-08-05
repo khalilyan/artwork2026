@@ -1,0 +1,54 @@
+[
+  {
+    "_id": "page_home",
+    "slug": "home",
+    "type": "landing",
+    "heroSlides": [
+      {
+        "title": "ARTWORK FURNITURE",
+        "subtitle": "THE WALNUT & GOLD COLLECTION",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDde5DxRcfKhPmfRd713rQ9Ju9zoxMCiwafMQrh0gTZck2ovnnjgkrLfGxAjuOh5ddARMoNBKh2l60BskAHMs5iPPk-kHjRQFBpSOwMnKzmUI39X0Zom6tg3Y-FOzISnf2bzzGEFtpByHo-BCHGtZcodDZ5pK0i3AwSuHBBj87MB-5WMbzd6uynDsSxeZ9r1QKP2TmVvIxA42R6t_HbmRy4lVV1q-LrqlVD8gEQx8J78G9YJEdtwUUWCupTFlzubUUMvlzYjR8MCA"
+      },
+      {
+        "title": "LIVING QUARTERS",
+        "subtitle": "ARCHITECTURAL SEATING & COMFORT",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAQvPa4-s_1zVoBCQhXdX13CoOuP0oJg0tD8u-ogVGPM2l36814pyp255QAraFx2egLOpCwqHp_Vcy6KSFrNhjaaoqhU2riDbVGdhBMm0NwqKyUZ7IGmEf0j74nlZRwtlEeRcUeTQXiwK_zwJeLPjEQeK7IIqZX4I5QZgPJW9r5ZXxOHDYm15AlGnBg0GJwaEVh9MgoKqTe6vVJFEkHl5xLe5NnqZLaUFEU-gSMDuGvWsAmMFzGkKUercGj0RhuWfrGYK-CyXf9Ow"
+      }
+    ],
+    "statement": {
+      "title": "A dialogue between matter and void. Each piece is a curated artifact designed for the architectural home.",
+      "body": "In an era of disposable luxury, ARTWORK proposes permanence. Our materials are sourced with ethical precision, crafted by generational artisans.",
+      "buttonText": "OUR PHILOSOPHY",
+      "buttonHref": "/about"
+    },
+    "shopCta": {
+      "eyebrow": "READY TO TRANSFORM",
+      "title": "Curation & Context.",
+      "buttonText": "SHOP",
+      "href": "/rooms"
+    },
+    "adminEditable": ["heroSlides", "statement", "shopCta"]
+  },
+  {
+    "_id": "page_about",
+    "slug": "about",
+    "type": "content",
+    "hero": {
+      "title": "The Art of Living Interrupted.",
+      "body": "We don't just furnish spaces; we construct pauses. ARTWORK is an exploration of the physical boundary where discipline meets desire."
+    },
+    "sections": [
+      {
+        "key": "creed",
+        "title": "A curation of disciplined forms and unapologetic craftsmanship.",
+        "body": "True luxury is not loud. It is the silent weight of a solid walnut frame, the grain that tells a century-old story, and the precision of a joint that feels seamless to the touch."
+      },
+      {
+        "key": "heritage",
+        "title": "From Armenian Roots to Global Modernity.",
+        "body": "Born from a lineage of Armenian master woodworkers, ARTWORK carries the soul of ancient craftsmanship into the digital age."
+      }
+    ],
+    "adminEditable": ["hero", "sections"]
+  }
+]

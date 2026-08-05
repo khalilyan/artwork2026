@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "col_the_sculptural_series",
+    "slug": "the-sculptural-series",
+    "title": "The Sculptural Series",
+    "subtitle": "Sculptural Forms",
+    "description": "Objects defined by fluid transitions and organic geometry. Each piece is hand-carved from solid walnut, blurring the line between utility and fine art.",
+    "detailDescription": "A curation of silhouettes that challenge the boundary between functional utility and pure artistic form. Crafted from raw walnut and hand-finished bronze.",
+    "heroImage": "https://lh3.googleusercontent.com/aida-public/AB6AXuD-cibcSy8HqTkiLfEdsRiD0c8pN9rPeMcZs1kKp5TCvqRd6EJswyVXDyLKDM4aP44o95GUGjPKgYDU5NjCOhBXR4r-IPLTq7yZT5W4xfGDsEHOLsbaoGycaYLO4GGaOROHVsSkDxAOg1Gd3JuROJkgdtWvE1sQmdE2OonG7IgchHiKk9rJt_4PgxSYxysnxAWuYQId20Mt_7CSgPNDGMlWgXrMJU2v6FadwNxqk-UiEJSVevyWTnhxajSNj0CUqr9J05VSbK3pNg",
+    "price": { "amount": 5900, "currency": "AMD", "display": "5,900 ֏" },
+    "productSlugs": ["the-sculptors-chair", "linear-lounge-chair"],
+    "sortOrder": 1,
+    "isActive": true,
+    "adminEditable": ["title", "subtitle", "description", "detailDescription", "heroImage", "price", "productSlugs", "isActive"]
+  },
+  {
+    "_id": "col_architectural_monoliths",
+    "slug": "architectural-monoliths",
+    "title": "Architectural Monoliths",
+    "subtitle": "Architectural Monoliths",
+    "description": "Inspired by brutalist structural integrity. Materials like cast concrete and raw travertine are refined into silhouettes of absolute permanence.",
+    "detailDescription": "A collection of weight, silence, and architectural discipline.",
+    "heroImage": "https://lh3.googleusercontent.com/aida-public/AB6AXuD7_7_iW1A208swmmEw-dNV1e15WgFWIb5-KmkpX2NQf-xBRzCQ8RUfLvXYC7_17TDAQzLtjGo8y_BRrNjWVa_C42m9_NeV_ea-G8cuYIPuMRhBRoNbsYT0ec05LyrHIwVCED77HdMVUObZPBO0Qnq2Mwwk4iIWooqIfHj3nTb_f5gvoLXMNWcMHzxczqj8LHW6GDQwqq9Eoc8ujErrm4hkGxOAWy6eXUxMXUOFz6EjULDvIUfdWV1cBUJbXcTe3ccXlyoMq3sqpg",
+    "price": { "amount": 1050, "currency": "AMD", "display": "1,050 ֏" },
+    "productSlugs": ["obelisk-lamp"],
+    "sortOrder": 2,
+    "isActive": true,
+    "adminEditable": ["title", "subtitle", "description", "detailDescription", "heroImage", "price", "productSlugs", "isActive"]
+  },
+  {
+    "_id": "col_modern_heritage",
+    "slug": "modern-heritage",
+    "title": "Modern Heritage",
+    "subtitle": "Modern Heritage",
+    "description": "A bridge between ancestral craftsmanship and digital-age precision. We revisit classical proportions through a lens of ultra-minimalist discipline.",
+    "detailDescription": "Traditional craft, digitally refined for the modern domestic landscape.",
+    "heroImage": "https://lh3.googleusercontent.com/aida-public/AB6AXuByfEg8itBMWpOAc27iGGH9pLfH-arSNS1W70qsyb1ROfA8J3o9E0iHIgJy-vcXw2WU17g8vXJt9BFqdIXHyBNuWcG3LNHSQQN8yKAAxlQBwja8fhE-_i_Xbx7K8aysOUVQVuB25rAHKV3vy2kmxey3TvxfB6h_F7D-E5FFDDQ9elfRcF94OhtRQPDga34Ym7E5Jqjd-kxruR_r63B_XIiPHAIzMHZlOHwcxU5JpAX-I-xyauh7pa9ydhYGujjBRT95H0PpAuaIAw",
+    "price": { "amount": 3800, "currency": "AMD", "display": "3,800 ֏" },
+    "productSlugs": ["cloud-modular-sofa"],
+    "sortOrder": 3,
+    "isActive": true,
+    "adminEditable": ["title", "subtitle", "description", "detailDescription", "heroImage", "price", "productSlugs", "isActive"]
+  }
+]

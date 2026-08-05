@@ -1,0 +1,114 @@
+[
+  {
+    "email": "adrian@sterling.design",
+    "emailNormalized": "adrian@sterling.design",
+    "fullName": "Adrian Sterling",
+    "role": "customer",
+    "status": "active",
+    "password": {
+      "algorithm": "scrypt",
+      "hash": "2b66z5zG01ADkoC45vz78j0FBmHCjj+PwEMQGZJkypTHeF/3u0qxRFXuaQALT7ZK2MVKLe6fufQk8/EXXjPVZQ==",
+      "salt": "EgJz9QwJDHvGo7XpWB5Uwg==",
+      "params": { "N": 16384, "r": 8, "p": 1, "keyLength": 64 },
+      "mustChangePassword": true
+    },
+    "profile": {
+      "phone": null,
+      "defaultShippingAddress": "1204 Broadway, 4th Floor, New York, NY 10001"
+    },
+    "saved_items": [
+      {
+        "productSlug": "cloud-modular-sofa",
+        "productSku": "ART-SOFA-001",
+        "name": "Cloud Modular Sofa",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCkGT_Iv9RyUPGQXQiW7BAvHQbe_IsZ3PMzA27ThcTEymU_vGibcy54BmsVtOsQJSLhKmKSZmro8g0zIGAzR5CRHZTqRnHGhsV7q7dmYnx_pbAyP5uDvwhYI71mT9Pu28xPqJFUMdV9VszAyMucPx5oGWuauMxAyA5cBDYvxvCad2ASR_3reCYkn2SnRrHpXaVf_9KnRIGyy4_WMD8zJ7hGeyZPz829B-4koGNKf8qXaB-Vr2pEq0dzjCt5e3twjuHNBfzZsWDHKA",
+        "savedAt": "2026-06-11T00:00:00.000Z"
+      },
+      {
+        "productSlug": "the-sculptors-chair",
+        "productSku": "ART-SEAT-004",
+        "name": "THE SCULPTOR'S CHAIR",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuACoj4-HbMFclJQTxixfx_JeymiDkChaVV-wH9guY62x9fZF8ThHmmcbv0rSW3a-DVqNft6_6pZyhtj1HFu3Xn9erbbb3wy4ysdqHrbefxHSv8M-sI5M6fkCgLdqoscWBy3HLZyq0IGQvIKSmOEMYlMuTS10iJ2_L4pxDk6ME0wXKcvrPaQWgHkT6-_OEzFVF4MuRGbGokTcFclbnDQS0iduCfLdavnjq-nxtrmas-XDvTRd1GiCDGpVR8T0oBsp-v4L5G6yTv_rQ",
+        "savedAt": "2026-06-11T00:00:00.000Z"
+      }
+    ],
+    "cart": [
+      {
+        "productSlug": "the-sculptors-chair",
+        "productSku": "ART-SEAT-004",
+        "quantity": 1,
+        "snapshot": {
+          "name": "THE SCULPTOR'S CHAIR",
+          "price": { "amount": 3450, "currency": "USD", "display": "$3,450.00" },
+          "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuACoj4-HbMFclJQTxixfx_JeymiDkChaVV-wH9guY62x9fZF8ThHmmcbv0rSW3a-DVqNft6_6pZyhtj1HFu3Xn9erbbb3wy4ysdqHrbefxHSv8M-sI5M6fkCgLdqoscWBy3HLZyq0IGQvIKSmOEMYlMuTS10iJ2_L4pxDk6ME0wXKcvrPaQWgHkT6-_OEzFVF4MuRGbGokTcFclbnDQS0iduCfLdavnjq-nxtrmas-XDvTRd1GiCDGpVR8T0oBsp-v4L5G6yTv_rQ"
+        },
+        "addedAt": "2026-06-11T00:00:00.000Z"
+      }
+    ],
+    "orders": [
+      {
+        "orderNumber": "ART-92102",
+        "status": "delivered",
+        "items": [
+          {
+            "productSlug": "linear-lounge-chair",
+            "productSku": "ART-SEAT-001",
+            "name": "Linear Lounge Chair",
+            "quantity": 1,
+            "unitPrice": { "amount": 2850, "currency": "USD" }
+          }
+        ],
+        "shippingAddress": "1204 Broadway, 4th Floor, New York, NY 10001",
+        "pricing": {
+          "subtotal": 2850,
+          "shipping": 0,
+          "tax": 0,
+          "total": 2850,
+          "currency": "USD",
+          "requiresManualFinalPrice": false
+        },
+        "notes": "Seed order for account page demo.",
+        "createdAt": "2024-03-12T00:00:00.000Z",
+        "updatedAt": "2024-03-12T00:00:00.000Z"
+      },
+      {
+        "orderNumber": "PENDING-MANUAL-PRICE",
+        "status": "quote_requested",
+        "items": [],
+        "pricing": {
+          "subtotal": null,
+          "shipping": null,
+          "tax": null,
+          "total": null,
+          "currency": "USD",
+          "requiresManualFinalPrice": true
+        },
+        "notes": "Use this structure for orders where customer collects products and ARTWORK finalizes price manually.",
+        "createdAt": "2026-06-11T00:00:00.000Z",
+        "updatedAt": "2026-06-11T00:00:00.000Z"
+      }
+    ],
+    "createdAt": "2026-06-11T00:00:00.000Z",
+    "updatedAt": "2026-06-11T00:00:00.000Z"
+  },
+  {
+    "email": "admin@artwork.local",
+    "emailNormalized": "admin@artwork.local",
+    "fullName": "ARTWORK Admin",
+    "role": "admin",
+    "status": "active",
+    "password": {
+      "algorithm": "scrypt",
+      "hash": "2b66z5zG01ADkoC45vz78j0FBmHCjj+PwEMQGZJkypTHeF/3u0qxRFXuaQALT7ZK2MVKLe6fufQk8/EXXjPVZQ==",
+      "salt": "EgJz9QwJDHvGo7XpWB5Uwg==",
+      "params": { "N": 16384, "r": 8, "p": 1, "keyLength": 64 },
+      "mustChangePassword": true
+    },
+    "permissions": ["manage_products", "manage_collections", "manage_rooms", "manage_pages", "manage_orders", "manage_users"],
+    "saved_items": [],
+    "cart": [],
+    "orders": [],
+    "createdAt": "2026-06-11T00:00:00.000Z",
+    "updatedAt": "2026-06-11T00:00:00.000Z"
+  }
+]

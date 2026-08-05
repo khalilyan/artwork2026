@@ -1,0 +1,186 @@
+[
+  {
+    "_id": "room_lobby",
+    "slug": "lobby",
+    "name": "Lobby",
+    "eyebrow": "PROLOGUE — 08 PIECES",
+    "title": "ՆԱԽԱՍՐԱՀ",
+    "description": "The art of the entrance. Sculptural forms that welcome and define the threshold of the home.",
+    "cta": "EXPLORE LOBBY",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAWyenOu5xz_RLC8KS1nKppSGodO6bMQup7Kwf_L8fAu_HZJrzZgFrli6D-PGmlSveU-nc2GTD2OkWbbzC7Ua3t0WFaMoeKBlXPLjXQcnrZxMbmz_lr2VEZzOpnLHwvzIin5QBRVx6rsEzcueho2VOoQ9ym32grbiLNDlOq_6vsvRWzP_3OJa5s1eoWFKh73MlWEN-Vx3YPYNY2COqbv99nKo7j79bFjORlTr2FJnaK3iNw1AoaRhi9gzJAdIaRr7eLqrVyhU3O6g",
+    "align": "right",
+    "tone": "light",
+    "imageClass": "is-muted",
+    "italicDescription": false,
+    "tall": false,
+    "furnitureTypes": [
+      {
+        "slug": "seating",
+        "title": "Seating",
+        "label": "CATEGORY 01",
+        "description": "Sculptural silhouettes engineered for rest and conversation.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuA36m97bZbs2IzC5-uYuHu_bMOzdA8WY28taGWmm3xsToXAxoSCiIJDCSqG1Ter-KmEIw8-AiA1uZnZr-Vmf2nyb5ZexI7tm9KM4OCqdY7Wjkmfa4nMJq0oBBmne4yQon5XGpVROtnbxeckw_LXDF09XNWwipXobQTSu9d2pRqt0yV-SAy9pS4YNzGXQyiY_QtAaC_pANjccwzJNT-O1Lxm0he_0d-LBSkTB6236MHzwBMqTTE-Mz_NsoVaokA0W3cWIp9GPSoFSw",
+        "sortOrder": 1,
+        "isActive": true
+      },
+      {
+        "slug": "lighting",
+        "title": "Lighting",
+        "label": "CATEGORY 02",
+        "description": "Luminous objects that define the first impression of the home.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCtFWLMwqwe8KyFnMmlvZnd8IgJggFqDaBlBripGb9ef65-HHcs9ySHYAvf6vgQzndkYLU3LaZyBKDwNgftXKozeeJztRwW8QvNrW3Hb-tj47mhf23nAzq8blTs6aOrni_LKwPy2X9Fnufr9bLBsPOEqEpQ3Y47g0PknW2hSY_A4PEZFqHxsG-M1VSgwlCJLplMHPvK2egf7Jf_aoCboWw75wdHqc5b63UIFFVoOZT9KlUgiDzMMbh-yTxLfgp6erRrwpKL3eFVIA",
+        "sortOrder": 2,
+        "isActive": true
+      }
+    ],
+    "sortOrder": 1,
+    "isActive": true
+  },
+  {
+    "_id": "room_living_room",
+    "slug": "living-room",
+    "name": "Living Room",
+    "eyebrow": "CHAPTER ONE — 24 PIECES",
+    "title": "ՀՅՈՒՐԱՍԵՆՅԱԿ",
+    "description": "\"A sanctuary for connection and repose, defined by tectonic balance.\"",
+    "cta": "VIEW COLLECTION",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuB6IB_eyOLGHgVmP_-NCSCfwoKsvJdNZITEH9_4MhnRg0_bVmaHUrCX6b-35tFdnP2uaNFvfDWDsh4t_RdTLxutkY_Xww7CgTx_LKzBRYbnSVfcToNtAJ9Og26-cG1zNiuh1cf47bY_wPUDvNWL4HQqsy0fKq8lHcXf55Xpk9Uk4TgTaNjKTw2p8J7-ORv8DAG5CR-c9IA5mS6a19z-sliMqnuIp1YxhrqwkB5cPMn-i-I0COJakbGJeWdzQ4H18MacYU-Sptj9Cg",
+    "align": "left",
+    "tone": "light",
+    "imageClass": null,
+    "italicDescription": true,
+    "tall": false,
+    "furnitureTypes": [
+      {
+        "slug": "seating",
+        "title": "Seating",
+        "label": "CATEGORY 01",
+        "description": "Sculptural silhouettes engineered for rest and conversation.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuA36m97bZbs2IzC5-uYuHu_bMOzdA8WY28taGWmm3xsToXAxoSCiIJDCSqG1Ter-KmEIw8-AiA1uZnZr-Vmf2nyb5ZexI7tm9KM4OCqdY7Wjkmfa4nMJq0oBBmne4yQon5XGpVROtnbxeckw_LXDF09XNWwipXobQTSu9d2pRqt0yV-SAy9pS4YNzGXQyiY_QtAaC_pANjccwzJNT-O1Lxm0he_0d-LBSkTB6236MHzwBMqTTE-Mz_NsoVaokA0W3cWIp9GPSoFSw",
+        "sortOrder": 1,
+        "isActive": true
+      },
+      {
+        "slug": "sofas",
+        "title": "Sofas",
+        "label": "CATEGORY 02",
+        "description": "Architectural comfort systems for connection, rest, and daily ritual.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCkGT_Iv9RyUPGQXQiW7BAvHQbe_IsZ3PMzA27ThcTEymU_vGibcy54BmsVtOsQJSLhKmKSZmro8g0zIGAzR5CRHZTqRnHGhsV7q7dmYnx_pbAyP5uDvwhYI71mT9Pu28xPqJFUMdV9VszAyMucPx5oGWuauMxAyA5cBDYvxvCad2ASR_3reCYkn2SnRrHpXaVf_9KnRIGyy4_WMD8zJ7hGeyZPz829B-4koGNKf8qXaB-Vr2pEq0dzjCt5e3twjuHNBfzZsWDHKA",
+        "sortOrder": 2,
+        "isActive": true
+      },
+      {
+        "slug": "tables",
+        "title": "Tables",
+        "label": "CATEGORY 03",
+        "description": "Grounding surfaces crafted for gathering and display.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCycWigSoLHGWqgZCHQx4Ip6bCF2cPy-AokcAgGj5aA9Wyh_oNWVXuk5UWNlwhJFOBtBB2YFp_Yjek7Xa1lgApsoWT2mfhaM3hw7ItsTG3DdzzGGgHfJ3TxSRoCkZjesE4C4GMSZaN3b3ZrIDdCFeg36VIhoPzgL6dVsyjCxAWNxTockYHLm76OEV3BSCUpAjyTN2_rRUZC5a4bOZc0lJbi30jomeoWirPPBIafpykJNCLM5RVC2mcdF4nRswd1uvpzReHxesCkpg",
+        "sortOrder": 3,
+        "isActive": true
+      },
+      {
+        "slug": "lighting",
+        "title": "Lighting",
+        "label": "CATEGORY 04",
+        "description": "Sculptural illumination for layered atmosphere.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCtFWLMwqwe8KyFnMmlvZnd8IgJggFqDaBlBripGb9ef65-HHcs9ySHYAvf6vgQzndkYLU3LaZyBKDwNgftXKozeeJztRwW8QvNrW3Hb-tj47mhf23nAzq8blTs6aOrni_LKwPy2X9Fnufr9bLBsPOEqEpQ3Y47g0PknW2hSY_A4PEZFqHxsG-M1VSgwlCJLplMHPvK2egf7Jf_aoCboWw75wdHqc5b63UIFFVoOZT9KlUgiDzMMbh-yTxLfgp6erRrwpKL3eFVIA",
+        "sortOrder": 4,
+        "isActive": true
+      }
+    ],
+    "sortOrder": 2,
+    "isActive": true
+  },
+  {
+    "_id": "room_kitchen",
+    "slug": "kitchen",
+    "name": "Kitchen",
+    "eyebrow": "CHAPTER TWO — 18 PIECES",
+    "title": "ԽՈՀԱՆՈՑ",
+    "description": "Functional sculpture for the culinary heart of the home.",
+    "cta": "SHOP PIECES",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBH02Dl9QQALlsNhnpX-_9u8HgUHSNqr1DH6NFTR5P_MD6GjNuULPtrV8X0QAsnL5skLb-LDeHnUzqTkN7juKudjfA0SKgiJcbsv1cLSGHCj5xykuvO8QQ24wHufdeN6JPqlTtAyo25iu_Wadz0FZTbG0spB2M5dDDRjSF5ZyGYdbNvoi3YJRkJuokQcghqYYpxfEfF14Gm_GehHZDWtPNJzx7HXynSl9d89u5_IzgYUSPhZ1xtXunoPE1uEXTSTEntxoF5kHAGKg",
+    "align": "right",
+    "tone": "primary",
+    "imageClass": "is-grayscale",
+    "italicDescription": false,
+    "tall": false,
+    "furnitureTypes": [
+      {
+        "slug": "tables",
+        "title": "Tables",
+        "label": "CATEGORY 01",
+        "description": "Functional tables for culinary preparation and shared meals.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCycWigSoLHGWqgZCHQx4Ip6bCF2cPy-AokcAgGj5aA9Wyh_oNWVXuk5UWNlwhJFOBtBB2YFp_Yjek7Xa1lgApsoWT2mfhaM3hw7ItsTG3DdzzGGgHfJ3TxSRoCkZjesE4C4GMSZaN3b3ZrIDdCFeg36VIhoPzgL6dVsyjCxAWNxTockYHLm76OEV3BSCUpAjyTN2_rRUZC5a4bOZc0lJbi30jomeoWirPPBIafpykJNCLM5RVC2mcdF4nRswd1uvpzReHxesCkpg",
+        "sortOrder": 1,
+        "isActive": true
+      },
+      {
+        "slug": "storage",
+        "title": "Storage",
+        "label": "CATEGORY 02",
+        "description": "Refined storage forms that hide utility behind architectural calm.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCI9-jcDBqYRF5GbTY3cOKrn8UnMpEb8dv7oaobOUMlMbvM1TfzXs2Yly36cXApH9hLu-DfU6yQzWTUkBjKpHV-jqSjfp4xo9zkK0yOX3Dxc9XwCBiatkZaRK15MrkbJByXvITEJtK-E2CQS_uthAJMuGlHdaFtIvMTi8rxZCuZRmJF-Ue72c8qwygmVy0S81_V2DEBANkFHzxv_xS_FxMWnpDRcXjYonp42VV4YB2ZlLAGfSn-sOZffVx8s4fsBxHhKAWquxo_xg",
+        "sortOrder": 2,
+        "isActive": true
+      },
+      {
+        "slug": "lighting",
+        "title": "Lighting",
+        "label": "CATEGORY 03",
+        "description": "Precision illumination for counters, islands, and dining zones.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCtFWLMwqwe8KyFnMmlvZnd8IgJggFqDaBlBripGb9ef65-HHcs9ySHYAvf6vgQzndkYLU3LaZyBKDwNgftXKozeeJztRwW8QvNrW3Hb-tj47mhf23nAzq8blTs6aOrni_LKwPy2X9Fnufr9bLBsPOEqEpQ3Y47g0PknW2hSY_A4PEZFqHxsG-M1VSgwlCJLplMHPvK2egf7Jf_aoCboWw75wdHqc5b63UIFFVoOZT9KlUgiDzMMbh-yTxLfgp6erRrwpKL3eFVIA",
+        "sortOrder": 3,
+        "isActive": true
+      }
+    ],
+    "sortOrder": 3,
+    "isActive": true
+  },
+  {
+    "_id": "room_bedroom",
+    "slug": "bedroom",
+    "name": "Bedroom",
+    "eyebrow": "CHAPTER THREE — 12 PIECES",
+    "title": "ՆՆՋԱՍԵՆՅԱԿ",
+    "description": "Quiet luxury tailored for private moments.",
+    "cta": "DISCOVER",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuC5ifo7yywzMkm4NQrPbj03O6RkzB0SKfwdJ5Clr07FQ_OT93TvV6QdpYh6f_OwZ-dGr5m6_piisPDeqF69xbthTd3G8vF34M4ebWbChI1NerlPY-w0ImlHPLtN3gkyL7ZeWq848basKscaqEHYI_z_fAGrP1aFG7XTgHDkkhzJqoSE345qVnRxaKUoyI9GNmsenauPrrdQDvrklsTvuHnAV_9jcWujgFrcIvfQa1GF3SPuE53KlZtZ-kL5s0ePwhh-B0utBueB1g",
+    "align": "left",
+    "tone": "walnut",
+    "imageClass": null,
+    "italicDescription": false,
+    "tall": true,
+    "furnitureTypes": [
+      {
+        "slug": "beds",
+        "title": "Beds",
+        "label": "CATEGORY 01",
+        "description": "Sculptural silhouettes engineered for restoration. Explore our collection of hand-finished frames.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuA36m97bZbs2IzC5-uYuHu_bMOzdA8WY28taGWmm3xsToXAxoSCiIJDCSqG1Ter-KmEIw8-AiA1uZnZr-Vmf2nyb5ZexI7tm9KM4OCqdY7Wjkmfa4nMJq0oBBmne4yQon5XGpVROtnbxeckw_LXDF09XNWwipXobQTSu9d2pRqt0yV-SAy9pS4YNzGXQyiY_QtAaC_pANjccwzJNT-O1Lxm0he_0d-LBSkTB6236MHzwBMqTTE-Mz_NsoVaokA0W3cWIp9GPSoFSw",
+        "sortOrder": 1,
+        "isActive": true
+      },
+      {
+        "slug": "closets",
+        "title": "Closets",
+        "label": "CATEGORY 02",
+        "description": "Modular systems designed for invisibility. Intelligent storage meeting architectural precision.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCI9-jcDBqYRF5GbTY3cOKrn8UnMpEb8dv7oaobOUMlMbvM1TfzXs2Yly36cXApH9hLu-DfU6yQzWTUkBjKpHV-jqSjfp4xo9zkK0yOX3Dxc9XwCBiatkZaRK15MrkbJByXvITEJtK-E2CQS_uthAJMuGlHdaFtIvMTi8rxZCuZRmJF-Ue72c8qwygmVy0S81_V2DEBANkFHzxv_xS_FxMWnpDRcXjYonp42VV4YB2ZlLAGfSn-sOZffVx8s4fsBxHhKAWquxo_xg",
+        "sortOrder": 2,
+        "isActive": true
+      },
+      {
+        "slug": "nightstands",
+        "title": "Nightstands",
+        "label": "CATEGORY 03",
+        "description": "Functional monoliths that ground the space. Materiality in its purest, most essential form.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCycWigSoLHGWqgZCHQx4Ip6bCF2cPy-AokcAgGj5aA9Wyh_oNWVXuk5UWNlwhJFOBtBB2YFp_Yjek7Xa1lgApsoWT2mfhaM3hw7ItsTG3DdzzGGgHfJ3TxSRoCkZjesE4C4GMSZaN3b3ZrIDdCFeg36VIhoPzgL6dVsyjCxAWNxTockYHLm76OEV3BSCUpAjyTN2_rRUZC5a4bOZc0lJbi30jomeoWirPPBIafpykJNCLM5RVC2mcdF4nRswd1uvpzReHxesCkpg",
+        "sortOrder": 3,
+        "isActive": true
+      }
+    ],
+    "sortOrder": 4,
+    "isActive": true
+  }
+]
