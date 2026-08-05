@@ -4,6 +4,12 @@ import { api } from '../services/api.js';
 const permissionPromptDelayMs = 1800;
 const pushPromptAttemptKey = 'artwork-push-prompt-attempted';
 
+function getPushServiceWorkerPath() {
+  const basePath = import.meta.env.BASE_URL || '/';
+  const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+  return `${normalizedBasePath}artwork-push-sw.js`;
+}
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = `${base64String}${padding}`.replace(/-/g, '+').replace(/_/g, '/');
@@ -25,7 +31,7 @@ async function subscribeToPush() {
   const { enabled, publicKey } = await api.pushPublicKey();
   if (!enabled || !publicKey) return;
 
-  const registration = await navigator.serviceWorker.register('/artwork-push-sw.js');
+  const registration = await navigator.serviceWorker.register(getPushServiceWorkerPath());
   const permission = Notification.permission === 'default'
     ? await Notification.requestPermission()
     : Notification.permission;

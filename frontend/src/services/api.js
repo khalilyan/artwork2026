@@ -1,10 +1,48 @@
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : 'http://localhost:4000/api');
+const configuredApiBaseUrl = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : 'http://localhost:4000/api');
 const authTokenKey = 'artworkAuthToken';
 const authUserKey = 'artworkAuthUser';
 const guestCartKey = 'artworkGuestCart';
 const guestIdKey = 'artworkGuestId';
+let resolvedApiBaseUrl = null;
+
+function normalizeBaseUrl(value) {
+  if (!value) return '';
+  return String(value).replace(/\/+$/, '');
+}
+
+function createBaseCandidates(baseUrl) {
+  const normalizedBase = normalizeBaseUrl(baseUrl);
+  const candidates = [];
+  const pushCandidate = (candidate) => {
+    const normalized = normalizeBaseUrl(candidate);
+    if (!candidates.includes(normalized)) candidates.push(normalized);
+  };
+
+  pushCandidate(normalizedBase);
+
+  if (normalizedBase.endsWith('/api')) {
+    pushCandidate(normalizedBase.slice(0, -4));
+  } else {
+    pushCandidate(`${normalizedBase}/api`);
+  }
+
+  return candidates.filter((candidate) => candidate || candidate === '');
+}
+
+function composeRequestUrl(baseUrl, path) {
+  const normalizedBase = normalizeBaseUrl(baseUrl);
+  if (!normalizedBase) return path;
+  return `${normalizedBase}${path}`;
+}
+
+function toRequestError(response, data) {
+  const error = new Error(data.error?.message ?? 'Request failed.');
+  error.status = response.status;
+  error.data = data;
+  return error;
+}
 
 function createGuestId() {
   if (window.crypto?.randomUUID) return window.crypto.randomUUID();
@@ -133,25 +171,41 @@ async function cartRequest(request) {
 
 async function apiRequest(path, options = {}) {
   const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Artwork-Guest-Id': getGuestId(),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers ?? {}),
-    },
-  });
-  const data = await response.json().catch(() => ({}));
+  const baseCandidates = createBaseCandidates(resolvedApiBaseUrl ?? configuredApiBaseUrl);
 
-  if (!response.ok) {
-    const error = new Error(data.error?.message ?? 'Request failed.');
-    error.status = response.status;
-    error.data = data;
-    throw error;
+  for (let index = 0; index < baseCandidates.length; index += 1) {
+    const candidate = baseCandidates[index];
+
+    try {
+      const response = await fetch(composeRequestUrl(candidate, path), {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Artwork-Guest-Id': getGuestId(),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(options.headers ?? {}),
+        },
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        resolvedApiBaseUrl = candidate;
+        return data;
+      }
+
+      const canRetryOn404 = response.status === 404 && index < baseCandidates.length - 1;
+      if (!canRetryOn404) {
+        throw toRequestError(response, data);
+      }
+    } catch (error) {
+      const canRetry = index < baseCandidates.length - 1;
+      if (!canRetry) {
+        throw error;
+      }
+    }
   }
 
-  return data;
+  throw new Error('Request failed.');
 }
 
 export const api = {
