@@ -4,15 +4,84 @@ import { easeOutExpo } from '../../utils/motion.js';
 
 const heroLoadingDelay = 0.8;
 
+function wrapSlideIndex(index, total) {
+  if (!total) return 0;
+  return ((index % total) + total) % total;
+}
+
 export default function Hero({ slides = [] }) {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [loadedSlideIndices, setLoadedSlideIndices] = useState(() => new Set([0]));
   const heroRef = useRef(null);
   const heroIntroDelayRef = useRef(heroLoadingDelay);
+  const slidePreloadPromisesRef = useRef(new Map());
   const hasSlides = slides.length > 0;
   const boundedSlideIndex = hasSlides ? Math.min(activeSlideIndex, slides.length - 1) : 0;
   const activeSlide = hasSlides ? slides[boundedSlideIndex] : null;
+  const slideSignature = slides.map((slide) => slide.image).join('|');
   const reduceMotion = useReducedMotion();
   const introDelay = reduceMotion ? 0 : heroIntroDelayRef.current;
+
+  const markSlideLoaded = (index) => {
+    setLoadedSlideIndices((current) => {
+      if (current.has(index)) return current;
+      const next = new Set(current);
+      next.add(index);
+      return next;
+    });
+  };
+
+  const preloadSlide = (index, priority = 'auto') => {
+    if (!hasSlides) return Promise.resolve();
+    if (loadedSlideIndices.has(index)) return Promise.resolve();
+
+    const existingPromise = slidePreloadPromisesRef.current.get(index);
+    if (existingPromise) return existingPromise;
+
+    const image = new Image();
+    image.decoding = 'async';
+    if ('fetchPriority' in image) {
+      image.fetchPriority = priority;
+    }
+
+    const preloadPromise = new Promise((resolve) => {
+      image.onload = () => {
+        markSlideLoaded(index);
+        resolve();
+      };
+
+      image.onerror = () => {
+        resolve();
+      };
+
+      image.src = slides[index]?.image ?? '';
+    }).finally(() => {
+      slidePreloadPromisesRef.current.delete(index);
+    });
+
+    slidePreloadPromisesRef.current.set(index, preloadPromise);
+    return preloadPromise;
+  };
+
+  const navigateToSlide = (nextIndex) => {
+    if (!hasSlides) return;
+    const wrappedIndex = wrapSlideIndex(nextIndex, slides.length);
+
+    if (loadedSlideIndices.has(wrappedIndex)) {
+      setActiveSlideIndex(wrappedIndex);
+      return;
+    }
+
+    preloadSlide(wrappedIndex, 'high').finally(() => {
+      setActiveSlideIndex(wrappedIndex);
+    });
+  };
+
+  useEffect(() => {
+    if (!hasSlides) return;
+    setLoadedSlideIndices(new Set([boundedSlideIndex]));
+    slidePreloadPromisesRef.current.clear();
+  }, [hasSlides, slideSignature]);
 
   useEffect(() => {
     if (!hasSlides) return undefined;
@@ -45,9 +114,7 @@ export default function Hero({ slides = [] }) {
       if (!isVisible) return;
 
       const parallaxY = (scrollPosition - heroTop) * 0.15;
-      hero.querySelectorAll('.hero-slide-image').forEach((image) => {
-        image.style.setProperty('--hero-parallax-y', `${parallaxY}px`);
-      });
+      hero.style.setProperty('--hero-parallax-y', `${parallaxY}px`);
     };
 
     const requestHeroParallax = () => {
@@ -67,16 +134,36 @@ export default function Hero({ slides = [] }) {
       window.removeEventListener('resize', requestHeroParallax);
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
-  }, [hasSlides, slides]);
+  }, [hasSlides, slideSignature]);
+
+  useEffect(() => {
+    if (!hasSlides) return undefined;
+
+    const activeIndex = wrapSlideIndex(activeSlideIndex, slides.length);
+    markSlideLoaded(activeIndex);
+
+    const preloadNeighbors = () => {
+      const nextIndex = wrapSlideIndex(activeIndex + 1, slides.length);
+      const previousIndex = wrapSlideIndex(activeIndex - 1, slides.length);
+      preloadSlide(nextIndex, 'low');
+      preloadSlide(previousIndex, 'low');
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(preloadNeighbors, { timeout: 1200 });
+      return () => window.cancelIdleCallback?.(idleId);
+    }
+
+    const timer = window.setTimeout(preloadNeighbors, 450);
+    return () => window.clearTimeout(timer);
+  }, [activeSlideIndex, hasSlides, slides.length]);
 
   const showPreviousSlide = () => {
-    if (!hasSlides) return;
-    setActiveSlideIndex((currentIndex) => (currentIndex === 0 ? slides.length - 1 : currentIndex - 1));
+    navigateToSlide(activeSlideIndex - 1);
   };
 
   const showNextSlide = () => {
-    if (!hasSlides) return;
-    setActiveSlideIndex((currentIndex) => (currentIndex + 1) % slides.length);
+    navigateToSlide(activeSlideIndex + 1);
   };
 
   if (!activeSlide) return null;
@@ -92,9 +179,13 @@ export default function Hero({ slides = [] }) {
       {slides.map((slide, index) => (
         <motion.img
           className={`parallax-image hero-slide-image ${index === activeSlideIndex ? 'is-active' : ''}`}
-          src={slide.image}
+          src={loadedSlideIndices.has(index) || index === activeSlideIndex ? slide.image : undefined}
           alt={slide.title}
           key={slide.title}
+          loading={index === activeSlideIndex ? 'eager' : 'lazy'}
+          fetchPriority={index === activeSlideIndex ? 'high' : 'low'}
+          decoding="async"
+          onLoad={() => markSlideLoaded(index)}
           initial={false}
           animate={{
             opacity: index === activeSlideIndex ? 1 : 0,

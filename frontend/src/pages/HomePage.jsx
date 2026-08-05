@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Hero from '../components/sections/Hero.jsx';
 import Collections from '../components/sections/Collections.jsx';
 import { RestorationSection, TradeInSection } from '../components/sections/HomeServices.jsx';
@@ -13,10 +13,10 @@ export default function HomePage() {
   const [homePage, setHomePage] = useState(null);
   const pageImages = usePageAssets('home');
   const baseSlides = homePage?.heroSlides?.length ? homePage.heroSlides : [];
-  const slides = baseSlides.map((slide, index) => ({
+  const slides = useMemo(() => baseSlides.map((slide, index) => ({
     ...slide,
     image: pageImages[`heroSlide${index + 1}`] ?? pageImages[`hero${index + 1}`] ?? slide.image,
-  }));
+  })), [baseSlides, pageImages]);
   const restorationImages = [
     pageImages.restorationBefore ?? pageImages.restorationMain,
     pageImages.restorationAfter ?? pageImages.restorationDetail,
