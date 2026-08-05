@@ -103,6 +103,8 @@ export function createApp() {
   app.use(jsonMiddleware);
   app.use('/uploads', express.static(path.join(backendRoot, 'uploads')));
   app.use('/api', apiRoutes);
+  // Some cPanel proxy setups strip '/api' before forwarding to Node.
+  app.use(apiRoutes);
   if (fs.existsSync(frontendIndex)) {
     app.use(express.static(frontendDist, { index: false }));
     app.use(async (request, response, next) => {
