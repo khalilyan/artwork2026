@@ -255,6 +255,92 @@ function normalizeOrderCustomer(body, fallbackUser) {
   return { name, phone, email: email || null, shippingAddress: shippingAddress || null, notes: notes || null };
 }
 
+function normalizeItemPrice(item) {
+  const amount = getMoneyAmount(item.unitPrice ?? item.price ?? item.snapshot?.price);
+  const display = toCleanString(
+    item.unitPrice?.display
+      ?? item.price?.display
+      ?? item.snapshot?.price?.display,
+    amount ? formatAmdAmount(amount) : 'Գինը հարցումով',
+  );
+
+  return {
+    amount: amount || null,
+    currency: toCleanString(
+      item.unitPrice?.currency
+        ?? item.price?.currency
+        ?? item.snapshot?.price?.currency,
+      'AMD',
+    ),
+    display,
+  };
+}
+
+function normalizeSnapshotProducts(products) {
+  if (!Array.isArray(products)) return [];
+
+  return products
+    .map((product, index) => {
+      const productSlug = toCleanString(product.productSlug ?? product.slug ?? product.id, `snapshot-product-${index + 1}`);
+      const productPrice = normalizeItemPrice(product);
+
+      return {
+        productSlug,
+        productSku: toCleanString(product.productSku ?? product.sku) || null,
+        name: toCleanString(product.name, productSlug),
+        image: toCleanString(product.image ?? product.snapshot?.image) || null,
+        gallery: Array.isArray(product.gallery ?? product.snapshot?.gallery) ? (product.gallery ?? product.snapshot?.gallery) : [],
+        price: productPrice,
+        roomSlugs: Array.isArray(product.roomSlugs ?? product.snapshot?.roomSlugs) ? (product.roomSlugs ?? product.snapshot?.roomSlugs) : [],
+        categorySlug: toCleanString(product.categorySlug ?? product.snapshot?.categorySlug) || null,
+        type: toCleanString(product.type ?? product.snapshot?.type) || null,
+      };
+    })
+    .filter((product) => product.name);
+}
+
+function createFallbackSnapshotFromItem(item, { collectionSlug = '', productSlug = '' } = {}) {
+  const price = normalizeItemPrice(item);
+  const name = toCleanString(item.name ?? item.snapshot?.name, productSlug || collectionSlug);
+  const image = toCleanString(item.image ?? item.snapshot?.image) || null;
+
+  if (!name) {
+    return null;
+  }
+
+  if (item.itemType === 'collection' || String(productSlug).startsWith('collection:')) {
+    const resolvedCollectionSlug = toCleanString(collectionSlug || String(productSlug).replace(/^collection:/, ''));
+    const normalizedProducts = normalizeSnapshotProducts(item.products ?? item.snapshot?.products);
+    const resolvedProductSlugs = normalizedProducts.map((product) => product.productSlug);
+
+    return {
+      productSlug: `collection:${resolvedCollectionSlug}`,
+      itemType: 'collection',
+      collectionSlug: resolvedCollectionSlug,
+      name,
+      image,
+      price,
+      productSlugs: Array.isArray(item.productSlugs ?? item.snapshot?.productSlugs)
+        ? (item.productSlugs ?? item.snapshot?.productSlugs)
+        : resolvedProductSlugs,
+      products: normalizedProducts,
+    };
+  }
+
+  const resolvedProductSlug = toCleanString(productSlug || item.productSlug);
+  return {
+    productSlug: resolvedProductSlug,
+    productSku: toCleanString(item.productSku ?? item.sku ?? item.snapshot?.productSku) || null,
+    name,
+    image,
+    gallery: Array.isArray(item.gallery ?? item.snapshot?.gallery) ? (item.gallery ?? item.snapshot?.gallery) : [],
+    price,
+    roomSlugs: Array.isArray(item.roomSlugs ?? item.snapshot?.roomSlugs) ? (item.roomSlugs ?? item.snapshot?.roomSlugs) : [],
+    categorySlug: toCleanString(item.categorySlug ?? item.snapshot?.categorySlug) || null,
+    type: toCleanString(item.type ?? item.snapshot?.type) || null,
+  };
+}
+
 async function normalizeOrderItems(items) {
   assertRequest(Array.isArray(items) && items.length > 0, 400, 'Order must include at least one product.');
 
@@ -267,16 +353,36 @@ async function normalizeOrderItems(items) {
 
     assertRequest(productSlug, 400, 'Product slug is required.');
     if (item.itemType === 'collection' || productSlug.startsWith('collection:')) {
-      const collection = await getCollectionOrFail(collectionSlug);
-      const snapshot = createCollectionSnapshot(collection, await getCollectionProducts(collection));
+      let snapshot;
+
+      try {
+        const collection = await getCollectionOrFail(collectionSlug);
+        snapshot = createCollectionSnapshot(collection, await getCollectionProducts(collection));
+      } catch (error) {
+        if (error.status !== 404) throw error;
+
+        snapshot = createFallbackSnapshotFromItem(item, { collectionSlug, productSlug });
+        if (!snapshot) throw error;
+      }
+
       normalizedItems.push({
         ...snapshot,
         quantity,
         unitPrice: snapshot.price ?? null,
       });
     } else {
-      const product = await getProductOrFail(productSlug);
-      const snapshot = createProductSnapshot(product);
+      let snapshot;
+
+      try {
+        const product = await getProductOrFail(productSlug);
+        snapshot = createProductSnapshot(product);
+      } catch (error) {
+        if (error.status !== 404) throw error;
+
+        snapshot = createFallbackSnapshotFromItem(item, { productSlug });
+        if (!snapshot) throw error;
+      }
+
       normalizedItems.push({
         ...snapshot,
         quantity,

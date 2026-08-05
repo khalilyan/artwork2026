@@ -8,9 +8,6 @@ export default function PageTransition() {
   const [animationKey, setAnimationKey] = useState(0);
 
   useEffect(() => {
-<<<<<<< HEAD
-    const entranceTimer = window.setTimeout(() => {
-=======
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) {
       setIsActive(false);
@@ -18,9 +15,26 @@ export default function PageTransition() {
     }
 
     let entranceTimer = window.setTimeout(() => {
->>>>>>> d3d045b (Remove DB fallbacks and stabilize mobile/assistant UX)
       setIsActive(false);
     }, entranceHold);
+    let leaveTimer = null;
+
+    const hideTransition = () => {
+      setIsActive(false);
+
+      if (leaveTimer) {
+        window.clearTimeout(leaveTimer);
+        leaveTimer = null;
+      }
+
+      if (entranceTimer) {
+        window.clearTimeout(entranceTimer);
+      }
+
+      entranceTimer = window.setTimeout(() => {
+        setIsActive(false);
+      }, 50);
+    };
 
     const handleInternalLink = (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -41,16 +55,41 @@ export default function PageTransition() {
       setAnimationKey((key) => key + 1);
       setIsActive(true);
 
-      window.setTimeout(() => {
+      leaveTimer = window.setTimeout(() => {
         window.location.href = nextUrl.href;
       }, transitionOutDelay);
     };
 
+    const handlePageShow = () => {
+      hideTransition();
+    };
+
+    const handlePopState = () => {
+      hideTransition();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        hideTransition();
+      }
+    };
+
     document.addEventListener('click', handleInternalLink);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', handlePopState);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      window.clearTimeout(entranceTimer);
+      if (entranceTimer) {
+        window.clearTimeout(entranceTimer);
+      }
+      if (leaveTimer) {
+        window.clearTimeout(leaveTimer);
+      }
       document.removeEventListener('click', handleInternalLink);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', handlePopState);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
