@@ -5,7 +5,6 @@ import { RestorationSection, TradeInSection } from '../components/sections/HomeS
 import Studio from '../components/sections/Studio.jsx';
 import ShopCta from '../components/sections/ShopCta.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
-import { heroSlides } from '../data/homepage.js';
 import usePageAssets from '../hooks/usePageAssets.js';
 import { api } from '../services/api.js';
 import { createOrganizationSchema, createWebsiteSchema, defaultSeoImage } from '../utils/seo.js';
@@ -13,7 +12,7 @@ import { createOrganizationSchema, createWebsiteSchema, defaultSeoImage } from '
 export default function HomePage() {
   const [homePage, setHomePage] = useState(null);
   const pageImages = usePageAssets('home');
-  const baseSlides = homePage?.heroSlides?.length ? homePage.heroSlides : heroSlides;
+  const baseSlides = homePage?.heroSlides?.length ? homePage.heroSlides : [];
   const slides = baseSlides.map((slide, index) => ({
     ...slide,
     image: pageImages[`heroSlide${index + 1}`] ?? pageImages[`hero${index + 1}`] ?? slide.image,
@@ -45,7 +44,7 @@ export default function HomePage() {
         keywords="ARTWORK Furniture, designer furniture Armenia, custom furniture Yerevan, luxury furniture Armenia, interior design furniture, furniture restoration Armenia"
         jsonLd={[createWebsiteSchema('/'), createOrganizationSchema('/')]}
       />
-      <Hero slides={slides} />
+      {slides.length ? <Hero slides={slides} /> : null}
       <Collections />
       <RestorationSection images={hasRestorationImages ? restorationImages : undefined} />
       <Studio />

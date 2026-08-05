@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { api } from '../services/api.js';
 
 const permissionPromptDelayMs = 1800;
+const pushPromptAttemptKey = 'artwork-push-prompt-attempted';
 
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -43,6 +44,9 @@ async function subscribeToPush() {
 export function usePushNotifications(enabled = true) {
   useEffect(() => {
     if (!enabled || typeof window === 'undefined') return undefined;
+    if (window.sessionStorage.getItem(pushPromptAttemptKey) === '1') return undefined;
+
+    window.sessionStorage.setItem(pushPromptAttemptKey, '1');
 
     const timer = window.setTimeout(() => {
       subscribeToPush().catch(() => {

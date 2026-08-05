@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { heroSlides } from '../../data/homepage.js';
 import { easeOutExpo } from '../../utils/motion.js';
 
 const heroLoadingDelay = 0.8;
 
-export default function Hero({ slides = heroSlides }) {
+export default function Hero({ slides = [] }) {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const heroRef = useRef(null);
   const heroIntroDelayRef = useRef(heroLoadingDelay);
-  const activeSlide = slides[activeSlideIndex];
+  const hasSlides = slides.length > 0;
+  const boundedSlideIndex = hasSlides ? Math.min(activeSlideIndex, slides.length - 1) : 0;
+  const activeSlide = hasSlides ? slides[boundedSlideIndex] : null;
   const reduceMotion = useReducedMotion();
   const introDelay = reduceMotion ? 0 : heroIntroDelayRef.current;
 
   useEffect(() => {
+    if (!hasSlides) return undefined;
+
     if (reduceMotion) {
       heroIntroDelayRef.current = 0;
       return undefined;
@@ -24,9 +27,11 @@ export default function Hero({ slides = heroSlides }) {
     }, (heroLoadingDelay + 1.2) * 1000);
 
     return () => window.clearTimeout(timer);
-  }, [reduceMotion]);
+  }, [hasSlides, reduceMotion]);
 
   useEffect(() => {
+    if (!hasSlides) return undefined;
+
     const hero = heroRef.current;
     if (!hero) return undefined;
 
@@ -62,15 +67,19 @@ export default function Hero({ slides = heroSlides }) {
       window.removeEventListener('resize', requestHeroParallax);
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
-  }, [slides]);
+  }, [hasSlides, slides]);
 
   const showPreviousSlide = () => {
+    if (!hasSlides) return;
     setActiveSlideIndex((currentIndex) => (currentIndex === 0 ? slides.length - 1 : currentIndex - 1));
   };
 
   const showNextSlide = () => {
+    if (!hasSlides) return;
     setActiveSlideIndex((currentIndex) => (currentIndex + 1) % slides.length);
   };
+
+  if (!activeSlide) return null;
 
   return (
     <motion.section

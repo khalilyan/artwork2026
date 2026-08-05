@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { collections as fallbackCollections } from '../data/collections.js';
 import ShopCta from '../components/sections/ShopCta.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
@@ -80,14 +79,14 @@ function CollectionEditorial({ section }) {
 }
 
 export default function CollectionsPage() {
-  const [collections, setCollections] = useState(fallbackCollections);
+  const [collections, setCollections] = useState([]);
   const pageImages = usePageAssets('collections', { hero: collectionsHeroImage });
   const collectionSections = useMemo(() => normalizeCollectionSections(collections), [collections]);
 
   useEffect(() => {
     api.collections()
-      .then(({ collections: nextCollections }) => setCollections(nextCollections.length ? nextCollections : fallbackCollections))
-      .catch(() => setCollections(fallbackCollections));
+      .then(({ collections: nextCollections }) => setCollections(nextCollections.length ? nextCollections : []))
+      .catch(() => setCollections([]));
   }, []);
 
   return (

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { rooms as fallbackRooms } from '../data/shopByRooms.js';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../utils/motion.js';
@@ -37,7 +36,7 @@ function normalizeRooms(rooms) {
     title: room.title ?? room.name ?? room.roomName ?? `Սենյակ ${index + 1}`,
     eyebrow: room.eyebrow ?? `ԳԼՈՒԽ ${index + 1}`,
     description: room.description ?? 'Բացահայտեք այս սենյակի համար ընտրված կահույքը։',
-    image: room.image ?? fallbackRooms[index % fallbackRooms.length]?.image,
+    image: room.image ?? '',
   }));
 }
 
@@ -76,7 +75,7 @@ function RoomFeature({ room, index }) {
       viewport={viewportReveal}
     >
       <motion.a className={`room-background parallax-container reveal-section is-active ${patternedRoom.imageClass ?? ''}`} href={roomHref} data-reveal aria-label={`Բացել ${title}`} variants={fadeUp}>
-        <img className="room-parallax-image" data-room-parallax src={patternedRoom.image} alt={title} />
+        {patternedRoom.image ? <img className="room-parallax-image" data-room-parallax src={patternedRoom.image} alt={title} /> : null}
       </motion.a>
       <div className="room-content-grid">
         <motion.a className={`room-card is-${align} tone-${tone} reveal-section is-active`} href={roomHref} data-reveal variants={fadeUp}>
@@ -91,14 +90,14 @@ function RoomFeature({ room, index }) {
 }
 
 export default function ShopByRoomsPage() {
-  const [rooms, setRooms] = useState(() => normalizeRooms(fallbackRooms));
+  const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
     api.rooms()
       .then(({ rooms: nextRooms }) => {
-        setRooms(nextRooms?.length ? normalizeRooms(nextRooms) : normalizeRooms(fallbackRooms));
+        setRooms(nextRooms?.length ? normalizeRooms(nextRooms) : []);
       })
-      .catch(() => setRooms(normalizeRooms(fallbackRooms)));
+      .catch(() => setRooms([]));
   }, []);
 
   return (

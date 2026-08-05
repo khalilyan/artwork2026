@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { addGuestCartItem, api, isAuthorized } from '../../services/api.js';
 import { formatAmdPrice, getPriceAmount } from '../../utils/currency.js';
-import { collections as fallbackCollections } from '../../data/collections.js';
-import { products as fallbackProducts } from '../../data/products.js';
-import { rooms as fallbackRooms } from '../../data/shopByRooms.js';
 import Icon from './Icon.jsx';
 import { showArtworkNotification } from './ToastNotifications.jsx';
 
@@ -46,6 +43,8 @@ const defaultAssistantMessage = {
   role: 'assistant',
   text: 'Բարեւ, ես ARTWORK-ի AI օգնականն եմ։ Կարող եմ օգնել ընտրել կահույք, համեմատել գները եւ արագ ավելացնել ընտրված ապրանքը զամբյուղ։ Ի՞նչ տարածքի կամ ոճի համար եք փնտրում։',
 };
+
+const assistantIntroKey = 'artwork-ai-intro-shown';
 
 function normalizeText(value) {
   return String(value ?? '').toLowerCase().trim();
@@ -409,14 +408,20 @@ export default function AiChatAssistant() {
   const [messages, setMessages] = useState([defaultAssistantMessage]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [products, setProducts] = useState(fallbackProducts);
-  const [collections, setCollections] = useState(fallbackCollections);
-  const [rooms, setRooms] = useState(() => normalizeRooms(fallbackRooms));
+  const [products, setProducts] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [pendingRoomSlug, setPendingRoomSlug] = useState('');
   const messageListRef = useRef(null);
 
   useEffect(() => {
+    if (window.sessionStorage.getItem(assistantIntroKey) === '1') {
+      setShowIntroNote(false);
+      return undefined;
+    }
+
     const openTimer = window.setTimeout(() => {
+      window.sessionStorage.setItem(assistantIntroKey, '1');
       setShowIntroNote(true);
     }, 4000);
     const closeTimer = window.setTimeout(() => {
@@ -430,7 +435,10 @@ export default function AiChatAssistant() {
   }, []);
 
   useEffect(() => {
-    if (isOpen) setShowIntroNote(false);
+    if (isOpen) {
+      window.sessionStorage.setItem(assistantIntroKey, '1');
+      setShowIntroNote(false);
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -439,15 +447,9 @@ export default function AiChatAssistant() {
     Promise.allSettled([api.products(), api.collections(), api.rooms()])
       .then(([productsResult, collectionsResult, roomsResult]) => {
         if (!isMounted) return;
-        if (productsResult.status === 'fulfilled' && productsResult.value.products?.length) {
-          setProducts(productsResult.value.products);
-        }
-        if (collectionsResult.status === 'fulfilled' && collectionsResult.value.collections?.length) {
-          setCollections(collectionsResult.value.collections);
-        }
-        if (roomsResult.status === 'fulfilled' && roomsResult.value.rooms?.length) {
-          setRooms(normalizeRooms(roomsResult.value.rooms));
-        }
+        setProducts(productsResult.status === 'fulfilled' ? (productsResult.value.products ?? []) : []);
+        setCollections(collectionsResult.status === 'fulfilled' ? (collectionsResult.value.collections ?? []) : []);
+        setRooms(roomsResult.status === 'fulfilled' ? normalizeRooms(roomsResult.value.rooms ?? []) : []);
       });
 
     return () => {

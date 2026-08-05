@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { collections as fallbackCollections } from '../../data/homepage.js';
 import { api } from '../../services/api.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../../utils/motion.js';
 
@@ -8,7 +7,7 @@ function normalizeCollection(collection, index) {
   return {
     title: collection.title ?? collection.name ?? `Հավաքածու ${index + 1}`,
     subtitle: collection.subtitle ?? collection.description ?? 'Կուրացված շարք',
-    image: collection.image ?? collection.heroImage ?? fallbackCollections[index % fallbackCollections.length]?.image,
+    image: collection.image ?? collection.heroImage ?? '',
     href: collection.href ?? `/${collection.slug}`,
   };
 }
@@ -45,11 +44,13 @@ function CollectionCard({ collection, index }) {
         variants={fadeUp}
       >
         <div className="collection-image">
-          <motion.img
-            src={collection.image}
-            alt={collection.title}
-            data-parallax-image
-          />
+          {collection.image ? (
+            <motion.img
+              src={collection.image}
+              alt={collection.title}
+              data-parallax-image
+            />
+          ) : null}
           <div className="collection-overlay">
             <span className="label-caps">ԴԻՏԵԼ</span>
           </div>
@@ -64,19 +65,21 @@ function CollectionCard({ collection, index }) {
 }
 
 export default function Collections() {
-  const [collections, setCollections] = useState(() => pickRandomCollections(fallbackCollections));
+  const [collections, setCollections] = useState([]);
 
   useEffect(() => {
     api.collections({ random: true })
       .then(({ collections: nextCollections }) => {
         const normalizedCollections = nextCollections.length
           ? nextCollections.map(normalizeCollection)
-          : fallbackCollections;
+          : [];
 
         setCollections(pickRandomCollections(normalizedCollections));
       })
-      .catch(() => setCollections(pickRandomCollections(fallbackCollections)));
+      .catch(() => setCollections([]));
   }, []);
+
+  if (!collections.length) return null;
 
   return (
     <motion.section

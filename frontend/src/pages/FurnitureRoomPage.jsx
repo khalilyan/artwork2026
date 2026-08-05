@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { images } from '../data/homepage.js';
-import { getFurnitureRoom } from '../data/furnitureRooms.js';
 import { api } from '../services/api.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../utils/motion.js';
 
@@ -37,22 +36,27 @@ function FurnitureCategory({ category, index, roomName }) {
 }
 
 export default function FurnitureRoomPage({ roomSlug }) {
-  const [room, setRoom] = useState(() => getFurnitureRoom(roomSlug));
+  const [room, setRoom] = useState(null);
 
   useEffect(() => {
     api.room(roomSlug)
       .then(({ room: nextRoom }) => setRoom({ ...nextRoom, brandLogo: images.logo, categories: nextRoom.categories ?? [] }))
-      .catch(() => setRoom(getFurnitureRoom(roomSlug)));
+      .catch(() => setRoom(null));
   }, [roomSlug]);
+
+  const roomName = room?.roomName ?? room?.title ?? room?.name ?? '';
+  const roomImage = room?.image ?? room?.categories?.[0]?.image ?? images.logo;
+  const roomBrandLogo = room?.brandLogo ?? images.logo;
+  const categories = room?.categories ?? [];
 
   return (
     <main className="furniture-room-page" lang="hy">
       <SeoMeta
-        title={`${room.roomName ?? room.title ?? room.name} Furniture | ARTWORK Furniture`}
-        description={`Explore designer furniture for ${room.roomName ?? room.title ?? room.name} spaces by ARTWORK, including curated categories, refined materials, and custom interior pieces.`}
-        image={room.image ?? room.categories?.[0]?.image ?? images.logo}
+        title={`${roomName || 'Room'} Furniture | ARTWORK Furniture`}
+        description={`Explore designer furniture for ${roomName || 'room'} spaces by ARTWORK, including curated categories, refined materials, and custom interior pieces.`}
+        image={roomImage}
         url={`/rooms/${roomSlug}`}
-        keywords={`${room.roomName ?? room.title ?? room.name} furniture, ARTWORK Furniture, designer furniture Armenia, custom room furniture`}
+        keywords={`${roomName || 'room'} furniture, ARTWORK Furniture, designer furniture Armenia, custom room furniture`}
       />
       <motion.section
         className="furniture-hero"
@@ -60,15 +64,15 @@ export default function FurnitureRoomPage({ roomSlug }) {
         initial="hidden"
         animate="visible"
       >
-        <motion.img className="furniture-brand-logo reveal-section is-active" data-reveal src={room.brandLogo} alt="ARTWORK լոգո" variants={fadeUp} />
+        <motion.img className="furniture-brand-logo reveal-section is-active" data-reveal src={roomBrandLogo} alt="ARTWORK լոգո" variants={fadeUp} />
         <motion.p className="label-caps reveal-section is-active" data-reveal variants={fadeUp}>ԿԱՀՈՒՅՔԻ ՏԵՍԱԿՆԵՐԸ</motion.p>
-        <motion.h1 className="reveal-section is-active" data-reveal variants={fadeUp}>{room.roomName}</motion.h1>
+        <motion.h1 className="reveal-section is-active" data-reveal variants={fadeUp}>{roomName}</motion.h1>
         <motion.div className="furniture-hero-line reveal-section is-active" data-reveal variants={fadeUp} />
       </motion.section>
 
       <section className="furniture-category-stack">
-        {room.categories.map((category, index) => (
-          <FurnitureCategory category={category} index={index} roomName={room.roomName} key={category.title} />
+        {categories.map((category, index) => (
+          <FurnitureCategory category={category} index={index} roomName={roomName} key={category.slug ?? category.title ?? index} />
         ))}
       </section>
 
@@ -81,7 +85,7 @@ export default function FurnitureRoomPage({ roomSlug }) {
       >
         <motion.div className="container reveal-section is-active" data-reveal variants={staggerGroup}>
           <Icon name="format_quote" className="furniture-quote-icon" />
-          <motion.p variants={fadeUp}>Մենք վերածում ենք արհեստը արվեստի, իսկ գաղափարները՝ ապրելու միջավայրի։ {room.roomName}-ի համար ընտրված յուրաքանչյուր կահույք համադրում է դիզայնը, ֆունկցիոնալությունն ու բարձր վարպետությունը</motion.p>
+          <motion.p variants={fadeUp}>Մենք վերածում ենք արհեստը արվեստի, իսկ գաղափարները՝ ապրելու միջավայրի։ {roomName}-ի համար ընտրված յուրաքանչյուր կահույք համադրում է դիզայնը, ֆունկցիոնալությունն ու բարձր վարպետությունը</motion.p>
           <motion.span className="label-caps" variants={fadeUp}>- ARTWORK ՓԻԼԻՍՈՓԱՅՈՒԹՅՈՒՆ</motion.span>
         </motion.div>
       </motion.section>

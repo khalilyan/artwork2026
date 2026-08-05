@@ -8,7 +8,17 @@ export default function PageTransition() {
   const [animationKey, setAnimationKey] = useState(0);
 
   useEffect(() => {
+<<<<<<< HEAD
     const entranceTimer = window.setTimeout(() => {
+=======
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+      setIsActive(false);
+      return undefined;
+    }
+
+    let entranceTimer = window.setTimeout(() => {
+>>>>>>> d3d045b (Remove DB fallbacks and stabilize mobile/assistant UX)
       setIsActive(false);
     }, entranceHold);
 
@@ -43,6 +53,18 @@ export default function PageTransition() {
       document.removeEventListener('click', handleInternalLink);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isActive) return undefined;
+
+    const safetyTimer = window.setTimeout(() => {
+      setIsActive(false);
+    }, 4000);
+
+    return () => {
+      window.clearTimeout(safetyTimer);
+    };
+  }, [isActive]);
 
   return (
     <div className={`page-transition ${isActive ? 'is-active' : ''}`} aria-hidden="true">

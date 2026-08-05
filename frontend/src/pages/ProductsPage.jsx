@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getFurnitureCategory, getFurnitureRoom } from '../data/furnitureRooms.js';
-import { products as fallbackProducts } from '../data/products.js';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
@@ -127,7 +126,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const searchParams = new URLSearchParams(window.location.search);
   const [room, setRoom] = useState(() => (roomSlug ? getFurnitureRoom(roomSlug) : null));
   const [category, setCategory] = useState(() => (furnitureSlug ? getFurnitureCategory(furnitureSlug) : null));
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState([]);
   const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'newest');
   const [minPrice, setMinPrice] = useState(() => clampPrice(searchParams.get('min'), defaultMinPrice));
@@ -165,10 +164,10 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     setIsProductsLoading(true);
     api.products({ roomSlug, categorySlug: furnitureSlug, q: query })
       .then(({ products: nextProducts }) => {
-        if (isCurrentRequest) setProducts(nextProducts);
+        if (isCurrentRequest) setProducts(nextProducts ?? []);
       })
       .catch(() => {
-        if (isCurrentRequest) setProducts(fallbackProducts);
+        if (isCurrentRequest) setProducts([]);
       })
       .finally(() => {
         const elapsed = performance.now() - loadingStartedAt;
