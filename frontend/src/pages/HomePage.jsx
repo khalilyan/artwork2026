@@ -37,11 +37,11 @@ export default function HomePage() {
   return (
     <main className="home-page" lang="hy">
       <SeoMeta
-        title="ARTWORK Furniture | Designer Furniture in Armenia"
-        description="Discover ARTWORK Furniture: designer furniture, curated collections, custom interior pieces, restoration, and trade-in services for refined homes in Armenia."
+        title="ARTWORK | Դիզայներական կահույք Հայաստանում"
+        description="Բացահայտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, անհատական ինտերիերի լուծումները, վերականգնումն ու trade-in ծառայությունները։"
         image={pageImages.heroSlide1 ?? pageImages.hero1 ?? slides[0]?.image ?? defaultSeoImage}
         url="/"
-        keywords="ARTWORK Furniture, designer furniture Armenia, custom furniture Yerevan, luxury furniture Armenia, interior design furniture, furniture restoration Armenia"
+        keywords="ARTWORK, դիզայներական կահույք Հայաստան, անհատական կահույք Երևան, ինտերիերի կահույք, կահույքի վերականգնում"
         jsonLd={[createWebsiteSchema('/'), createOrganizationSchema('/')]}
       />
       {slides.length ? <Hero slides={slides} /> : null}

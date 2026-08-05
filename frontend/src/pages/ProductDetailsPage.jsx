@@ -10,7 +10,7 @@ import { addGuestCartItem, api, isAuthorized } from '../services/api.js';
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 import { compressImageFiles } from '../utils/imageUpload.js';
 import { getProductBadgeLabel } from '../utils/productBadge.js';
-import { getAbsoluteUrl, siteName } from '../utils/seo.js';
+import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js';
 
 const reviews = [
   {
@@ -512,7 +512,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: productGallery.map((image) => getAbsoluteUrl(image)),
+    image: productGallery.map((image) => resolvePublicAssetUrl(image)),
     brand: {
       '@type': 'Brand',
       name: siteName,

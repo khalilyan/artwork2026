@@ -21,7 +21,7 @@ export default function NotFoundPage() {
     <main className="not-found-page" lang="hy">
       <SeoMeta
         title="404 | ARTWORK Furniture"
-        description="This ARTWORK page could not be found. Explore furniture, rooms, collections, or contact the studio."
+        description="Այս ARTWORK էջը չի գտնվել։ Դիտեք կահույքը, սենյակները, հավաքածուները կամ կապ հաստատեք արհեստանոցի հետ։"
         url={typeof window === 'undefined' ? '/404' : window.location.pathname}
         robots="noindex, follow"
       />

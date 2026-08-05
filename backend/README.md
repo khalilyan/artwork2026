@@ -17,6 +17,8 @@ Default API URL: `http://localhost:4000/api`
 
 - `PORT`: API port, defaults to `4000`
 - `MONGODB_URI`: MongoDB connection string, defaults to `mongodb://localhost:27017/artwork`
+- `PUBLIC_SITE_URL`: canonical public site URL for metadata links, e.g. `https://artwork.am`
+- `PUBLIC_API_URL`: public API URL used for absolute `/uploads/...` metadata images, e.g. `https://api.artwork.am`
 - `CLIENT_ORIGIN`: comma-separated frontend origins for CORS, defaults to common Vite localhost ports
 - `AUTH_SECRET`: HMAC secret for bearer tokens
 - `AUTH_TOKEN_TTL_SECONDS`: token lifetime, defaults to 7 days

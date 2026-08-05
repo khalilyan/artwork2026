@@ -75,10 +75,10 @@ export default function ContactPage() {
   return (
     <main className="contact-page" lang="hy">
       <SeoMeta
-        title="Contact ARTWORK Furniture | Custom Furniture Armenia"
-        description="Contact ARTWORK Furniture for designer furniture, custom interiors, restoration, trade-in services, and showroom support in Armenia."
+        title="Կապ ARTWORK-ի հետ | Անհատական կահույք"
+        description="Կապ հաստատեք ARTWORK-ի հետ դիզայներական կահույքի, անհատական ինտերիերի, վերականգնման, trade-in և սրահի խորհրդատվության համար։"
         url="/contact"
-        keywords="contact ARTWORK Furniture, custom furniture Armenia, furniture showroom Armenia, interior consultation Yerevan"
+        keywords="կապ ARTWORK-ի հետ, անհատական կահույք Հայաստան, կահույքի սրահ, ինտերիերի խորհրդատվություն Երևան"
       />
       <section className="contact-hero container">
         <div className="contact-hero-copy reveal-section is-active" data-reveal>

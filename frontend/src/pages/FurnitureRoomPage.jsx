@@ -52,11 +52,11 @@ export default function FurnitureRoomPage({ roomSlug }) {
   return (
     <main className="furniture-room-page" lang="hy">
       <SeoMeta
-        title={`${roomName || 'Room'} Furniture | ARTWORK Furniture`}
-        description={`Explore designer furniture for ${roomName || 'room'} spaces by ARTWORK, including curated categories, refined materials, and custom interior pieces.`}
+        title={`${roomName || 'Սենյակ'} | ARTWORK կահույք`}
+        description={`${roomName || 'Այս սենյակի'} համար բացահայտեք ARTWORK-ի դիզայներական կահույքը, ընտրված բաժինները, նուրբ նյութերը և անհատական ինտերիերի լուծումները։`}
         image={roomImage}
         url={`/rooms/${roomSlug}`}
-        keywords={`${roomName || 'room'} furniture, ARTWORK Furniture, designer furniture Armenia, custom room furniture`}
+        keywords={`${roomName || 'սենյակ'} կահույք, ARTWORK, դիզայներական կահույք Հայաստան, անհատական սենյակային կահույք`}
       />
       <motion.section
         className="furniture-hero"

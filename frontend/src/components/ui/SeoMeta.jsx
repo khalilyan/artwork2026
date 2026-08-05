@@ -4,6 +4,8 @@ import {
   defaultSeoImage,
   defaultSeoKeywords,
   defaultSeoTitle,
+  getAbsoluteUrl,
+  resolvePublicAssetUrl,
   siteName,
 } from '../../utils/seo.js';
 
@@ -58,16 +60,6 @@ function setLink(selector, attributes) {
   return element;
 }
 
-function toAbsoluteUrl(value) {
-  if (!value || typeof window === 'undefined') return '';
-
-  try {
-    return new URL(value, window.location.origin).href;
-  } catch {
-    return '';
-  }
-}
-
 export default function SeoMeta({
   title = defaultTitle,
   description = defaultDescription,
@@ -82,8 +74,8 @@ export default function SeoMeta({
   priceCurrency = 'AMD',
 }) {
   useEffect(() => {
-    const absoluteUrl = toAbsoluteUrl(url || window.location.href);
-    const absoluteImage = toAbsoluteUrl(image);
+    const absoluteUrl = getAbsoluteUrl(url || window.location.href);
+    const absoluteImage = resolvePublicAssetUrl(image);
     const schemas = Array.isArray(jsonLd) ? jsonLd : [jsonLd].filter(Boolean);
 
     document.title = title;
@@ -103,9 +95,11 @@ export default function SeoMeta({
 
     if (absoluteImage) {
       setMeta('meta[property="og:image"]', { property: 'og:image', content: absoluteImage });
+      setMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: title });
       setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: absoluteImage });
     } else {
       removeMeta('meta[property="og:image"]');
+      removeMeta('meta[property="og:image:alt"]');
       removeMeta('meta[name="twitter:image"]');
     }
 

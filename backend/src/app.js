@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import apiRoutes from './routes/index.js';
+import { env } from './config/env.js';
 import { corsMiddleware, jsonMiddleware } from './middleware/requestMiddleware.js';
 import { errorHandler, notFoundHandler } from './middleware/errorMiddleware.js';
 import { findProductBySlug } from './models/productModel.js';
@@ -13,9 +14,17 @@ const backendRoot = path.resolve(currentDir, '..');
 const frontendDist = path.resolve(backendRoot, '..', 'frontend', 'dist');
 const frontendIndex = path.join(frontendDist, 'index.html');
 const defaultMeta = {
-  title: 'ARTWORK | Architectural Artifacts',
-  description: 'ARTWORK Furniture - architectural furniture and curated artifacts for refined interiors.',
+  title: 'ARTWORK | Դիզայներական կահույք Հայաստանում',
+  description: 'ARTWORK-ի դիզայներական կահույք, հավաքածուներ, անհատական լուծումներ և վերականգնման ծառայություններ Հայաստանում։',
+  keywords: 'ARTWORK, կահույք, դիզայներական կահույք Հայաստան, անհատական կահույք, ինտերիերի կահույք, վերականգնում',
+  image: '/artwork-logo.png',
+  locale: 'hy_AM',
+  robots: 'index, follow',
 };
+
+function normalizeBaseUrl(value) {
+  return String(value ?? '').replace(/\/+$/, '');
+}
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -26,17 +35,23 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-function absoluteUrl(request, value) {
+function absoluteUrl(request, value, { preferApiOrigin = false } = {}) {
   if (!value) return '';
   if (/^https?:\/\//i.test(value)) return value;
 
-  const origin = `${request.protocol}://${request.get('host')}`;
-  return new URL(value, origin).href;
+  const requestOrigin = `${request.protocol}://${request.get('host')}`;
+  const publicSiteOrigin = normalizeBaseUrl(env.publicSiteUrl);
+  const publicApiOrigin = normalizeBaseUrl(env.publicApiUrl);
+  const origin = preferApiOrigin && publicApiOrigin
+    ? publicApiOrigin
+    : publicSiteOrigin || requestOrigin;
+
+  return new URL(value, `${origin}/`).href;
 }
 
 function formatAmdPrice(amount) {
   const numericAmount = Number(amount);
-  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Price on request';
+  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Գինը հարցումով';
 
   return `${Math.round(numericAmount).toLocaleString('hy-AM')} ֏`;
 }
@@ -44,21 +59,32 @@ function formatAmdPrice(amount) {
 function buildMetaTags(request, meta) {
   const title = escapeHtml(meta.title ?? defaultMeta.title);
   const description = escapeHtml(meta.description ?? defaultMeta.description);
-  const image = escapeHtml(absoluteUrl(request, meta.image));
-  const url = escapeHtml(absoluteUrl(request, request.originalUrl));
+  const imagePath = meta.image ?? defaultMeta.image;
+  const isUploadAsset = typeof imagePath === 'string' && imagePath.startsWith('/uploads/');
+  const image = escapeHtml(absoluteUrl(request, imagePath, { preferApiOrigin: isUploadAsset }));
+  const url = escapeHtml(absoluteUrl(request, meta.url ?? request.originalUrl));
+  const canonicalUrl = escapeHtml(absoluteUrl(request, meta.canonicalUrl ?? meta.url ?? request.originalUrl));
   const type = escapeHtml(meta.type ?? 'website');
+  const locale = escapeHtml(meta.locale ?? defaultMeta.locale);
+  const robots = escapeHtml(meta.robots ?? defaultMeta.robots);
+  const keywords = escapeHtml(meta.keywords ?? defaultMeta.keywords);
   const priceAmount = Number(meta.priceAmount);
   const priceCurrency = escapeHtml(meta.priceCurrency ?? 'AMD');
 
   return [
     `<title>${title}</title>`,
     `<meta name="description" content="${description}" />`,
+    `<meta name="keywords" content="${keywords}" />`,
+    `<meta name="robots" content="${robots}" />`,
+    `<link rel="canonical" href="${canonicalUrl}" />`,
     `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${description}" />`,
     `<meta property="og:type" content="${type}" />`,
     `<meta property="og:url" content="${url}" />`,
-    '<meta property="og:site_name" content="ARTWORK" />',
+    '<meta property="og:site_name" content="ARTWORK Կահույք" />',
+    `<meta property="og:locale" content="${locale}" />`,
     image ? `<meta property="og:image" content="${image}" />` : '',
+    image ? `<meta property="og:image:alt" content="${title}" />` : '',
     image ? '<meta name="twitter:card" content="summary_large_image" />' : '<meta name="twitter:card" content="summary" />',
     `<meta name="twitter:title" content="${title}" />`,
     `<meta name="twitter:description" content="${description}" />`,
@@ -71,7 +97,8 @@ function buildMetaTags(request, meta) {
 function injectMeta(html, tags) {
   return html
     .replace(/<title>.*?<\/title>/is, '')
-    .replace(/<meta\s+(?:name|property)=["'](?:description|og:[^"']+|twitter:[^"']+|product:price:[^"']+)["'][^>]*>\s*/gi, '')
+    .replace(/<meta\s+(?:name|property)=["'](?:description|keywords|robots|og:[^"']+|twitter:[^"']+|product:price:[^"']+)["'][^>]*>\s*/gi, '')
+    .replace(/<link\s+rel=["']canonical["'][^>]*>\s*/gi, '')
     .replace('</head>', `    ${tags}\n  </head>`);
 }
 
@@ -89,6 +116,7 @@ async function getRouteMeta(request) {
     description: [priceText, product.description].filter(Boolean).join(' · '),
     image: product.image ?? product.gallery?.[0] ?? '',
     type: 'product',
+    keywords: `${product.name}, ARTWORK, դիզայներական կահույք, կահույք Հայաստան`,
     priceAmount: product.priceAmount,
     priceCurrency: product.currency ?? 'AMD',
   };

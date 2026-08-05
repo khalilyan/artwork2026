@@ -26,6 +26,8 @@ function parseCsv(value) {
 export const env = {
   port: Number(process.env.PORT ?? 4000),
   mongoUri: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/artwork',
+  publicSiteUrl: process.env.PUBLIC_SITE_URL ?? '',
+  publicApiUrl: process.env.PUBLIC_API_URL ?? '',
   clientOrigins: parseClientOrigins(process.env.CLIENT_ORIGIN),
   authSecret: process.env.AUTH_SECRET ?? 'dev-only-change-this-secret',
   authTokenTtlSeconds: Number(process.env.AUTH_TOKEN_TTL_SECONDS ?? 60 * 60 * 24 * 7),

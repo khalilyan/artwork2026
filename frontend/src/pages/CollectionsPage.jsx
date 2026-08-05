@@ -92,11 +92,11 @@ export default function CollectionsPage() {
   return (
     <main className="collections-redesign-page" lang="hy">
       <SeoMeta
-        title="Curated Furniture Collections | ARTWORK Furniture"
-        description="Explore ARTWORK furniture collections: curated sets of designer pieces, refined materials, and complete interior compositions for modern homes."
+        title="ARTWORK հավաքածուներ | Դիզայներական կահույք"
+        description="Բացահայտեք ARTWORK-ի կուրացված հավաքածուները` դիզայներական առարկաներ, նուրբ նյութեր և ամբողջական ինտերիերի համադրություններ։"
         image={pageImages.hero}
         url="/collections"
-        keywords="furniture collections, curated furniture Armenia, designer furniture sets, ARTWORK collections, modern home furniture"
+        keywords="կահույքի հավաքածուներ, կուրացված կահույք Հայաստան, դիզայներական կահույքի շարքեր, ARTWORK հավաքածուներ"
       />
       <motion.section
         className="collections-redesign-hero"

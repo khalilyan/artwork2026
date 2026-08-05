@@ -1,8 +1,19 @@
-export const siteName = 'ARTWORK Furniture';
+const configuredApiBaseUrl = import.meta.env.VITE_API_URL ?? '';
+
+function normalizeBaseUrl(value) {
+  return String(value ?? '').replace(/\/+$/, '');
+}
+
+const normalizedApiBaseUrl = normalizeBaseUrl(configuredApiBaseUrl);
+const apiOrigin = normalizedApiBaseUrl.endsWith('/api')
+  ? normalizedApiBaseUrl.slice(0, -4)
+  : normalizedApiBaseUrl;
+
+export const siteName = 'ARTWORK Կահույք';
 export const siteShortName = 'ARTWORK';
-export const defaultSeoTitle = 'ARTWORK Furniture | Designer Furniture in Armenia';
-export const defaultSeoDescription = 'Shop ARTWORK Furniture for designer furniture, curated collections, custom interiors, restoration, and refined home pieces in Armenia.';
-export const defaultSeoKeywords = 'ARTWORK Furniture, designer furniture Armenia, custom furniture Yerevan, interior furniture, luxury furniture, furniture restoration, curated home decor';
+export const defaultSeoTitle = 'ARTWORK | Դիզայներական կահույք Հայաստանում';
+export const defaultSeoDescription = 'ARTWORK-ի դիզայներական կահույք, հավաքածուներ, անհատական լուծումներ և վերականգնման ծառայություններ Հայաստանում։';
+export const defaultSeoKeywords = 'ARTWORK, կահույք, դիզայներական կահույք Հայաստան, անհատական կահույք, ինտերիերի կահույք, վերականգնում';
 export const defaultSeoImage = '/artwork-logo.png';
 
 export function getAbsoluteUrl(path = '/') {
@@ -13,6 +24,17 @@ export function getAbsoluteUrl(path = '/') {
   } catch {
     return window.location.origin;
   }
+}
+
+export function resolvePublicAssetUrl(path = '') {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+
+  if (path.startsWith('/uploads/') && apiOrigin) {
+    return `${apiOrigin}${path}`;
+  }
+
+  return getAbsoluteUrl(path);
 }
 
 export function createWebsiteSchema(url = '/') {
@@ -39,7 +61,7 @@ export function createOrganizationSchema(url = '/') {
     name: siteName,
     alternateName: siteShortName,
     url: getAbsoluteUrl(url),
-    logo: getAbsoluteUrl(defaultSeoImage),
+    logo: resolvePublicAssetUrl(defaultSeoImage),
     sameAs: [],
   };
 }

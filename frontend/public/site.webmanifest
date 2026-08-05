@@ -1,7 +1,7 @@
 {
-  "name": "ARTWORK Furniture",
+  "name": "ARTWORK Կահույք",
   "short_name": "ARTWORK",
-  "description": "Architectural furniture, curated collections, and refined interior pieces by ARTWORK.",
+  "description": "ARTWORK-ի դիզայներական կահույք, հավաքածուներ և ինտերիերի նուրբ լուծումներ։",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f7f3ec",

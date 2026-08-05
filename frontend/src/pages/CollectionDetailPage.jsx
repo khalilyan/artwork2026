@@ -202,11 +202,11 @@ export default function CollectionDetailPage({ collectionSlug }) {
   return (
     <main className="spec-collection-page" lang="hy">
       <SeoMeta
-        title={`${collection.title} | ARTWORK Furniture Collection`}
-        description={collection.description ?? `Shop the ${collection.title} furniture collection from ARTWORK: curated designer pieces for refined interiors.`}
+        title={`${collection.title} | ARTWORK հավաքածու`}
+        description={collection.description ?? `Բացահայտեք ARTWORK-ի ${collection.title} հավաքածուն՝ կուրացված դիզայներական առարկաներով և նուրբ ինտերիերի լուծումներով։`}
         image={collection.image ?? collection.heroImage ?? collection.products?.[0]?.image}
         url={`/${collection.slug ?? collectionSlug}`}
-        keywords={`${collection.title}, ARTWORK Furniture collection, curated furniture, designer furniture Armenia`}
+        keywords={`${collection.title}, ARTWORK հավաքածու, կուրացված կահույք, դիզայներական կահույք Հայաստան`}
       />
       <motion.header
         className="spec-collection-header container"

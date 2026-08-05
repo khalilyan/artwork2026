@@ -103,11 +103,11 @@ export default function ShopByRoomsPage() {
   return (
     <main className="shopbyrooms-page" lang="hy">
       <SeoMeta
-        title="Shop Furniture by Room | ARTWORK Furniture"
-        description="Find designer furniture by room with ARTWORK: living room, bedroom, dining, office, and curated interior pieces made for refined spaces."
+        title="Կահույք ըստ սենյակների | ARTWORK"
+        description="Գտեք ARTWORK-ի դիզայներական կահույքը ըստ սենյակների՝ հյուրասենյակ, ննջասենյակ, ճաշասենյակ, աշխատասենյակ և այլ ինտերիերներ։"
         image={rooms[0]?.image ?? defaultSeoImage}
         url="/rooms"
-        keywords="shop furniture by room, living room furniture Armenia, bedroom furniture, dining furniture, office furniture, ARTWORK Furniture"
+        keywords="կահույք ըստ սենյակների, հյուրասենյակի կահույք, ննջասենյակի կահույք, ճաշասենյակի կահույք, ARTWORK"
       />
       <motion.header
         className="rooms-hero container"

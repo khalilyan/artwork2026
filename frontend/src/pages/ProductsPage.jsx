@@ -386,13 +386,13 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const furnitureTypeName = getFurnitureTypeName(category);
   const isRoomCategoryPage = Boolean(room && category);
   const seoTitle = query
-    ? `Search results for "${query}" | ARTWORK Furniture`
+    ? `"${query}" որոնման արդյունքներ | ARTWORK`
     : isRoomCategoryPage
-      ? `${furnitureTypeName} for ${room.roomName ?? room.title ?? room.name} | ARTWORK Furniture`
-      : 'Designer Furniture Catalog | ARTWORK Furniture';
+      ? `${room.roomName ?? room.title ?? room.name}-ի ${furnitureTypeName} | ARTWORK`
+      : 'ARTWORK | Դիզայներական կահույքի կատալոգ';
   const seoDescription = isRoomCategoryPage
-    ? `Shop ARTWORK ${furnitureTypeName} for ${room.roomName ?? room.title ?? room.name}: refined furniture with premium materials, careful craftsmanship, and modern interior design.`
-    : 'Browse ARTWORK designer furniture, curated home pieces, collections, seating, lighting, beds, sofas, and refined interior objects in Armenia.';
+    ? `${room.roomName ?? room.title ?? room.name}-ի համար ARTWORK-ի ${furnitureTypeName}՝ ընտրված նյութերով, վարպետական մշակումով և ժամանակակից ինտերիերի շեշտադրումներով։`
+    : 'Դիտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, բազկաթոռները, լուսավորությունը, մահճակալները, բազմոցները և ինտերիերի այլ առարկաները։';
   const seoUrl = typeof window === 'undefined' ? '/products' : `${window.location.pathname}${window.location.search}`;
   const seoImage = visibleProducts[0]?.image ?? visibleProducts[0]?.images?.primary ?? defaultSeoImage;
 
@@ -403,7 +403,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         description={seoDescription}
         image={seoImage}
         url={seoUrl}
-        keywords="designer furniture, furniture catalog Armenia, ARTWORK products, luxury furniture, custom furniture, home decor Armenia"
+        keywords="դիզայներական կահույք, կահույքի կատալոգ Հայաստան, ARTWORK ապրանքներ, անհատական կահույք, տան ինտերիեր"
       />
       <header className="products-header container">
         <div className="products-header-inner" data-products-header>

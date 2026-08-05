@@ -20,11 +20,11 @@ export default function AboutPage() {
   return (
     <main className="about-page" lang="hy">
       <SeoMeta
-        title="About ARTWORK Furniture | Craftsmanship and Design"
-        description="Learn about ARTWORK Furniture, an Armenian furniture studio focused on designer pieces, careful craftsmanship, premium materials, and long-lasting interiors."
+        title="ARTWORK-ի մասին | Վարպետություն և դիզայն"
+        description="Ծանոթացեք ARTWORK-ին` հայկական կահույքի արհեստանոց, որտեղ դիզայնը, բարձրորակ նյութերը և վարպետ աշխատանքը միավորվում են երկարատև արդյունքի համար։"
         image={pageImages.hero}
         url="/about"
-        keywords="about ARTWORK Furniture, Armenian furniture studio, furniture craftsmanship, designer furniture Armenia, premium materials"
+        keywords="ARTWORK-ի մասին, հայկական կահույքի արհեստանոց, կահույքի վարպետություն, դիզայներական կահույք Հայաստան, բարձրորակ նյութեր"
       />
       <motion.section
         className="about-hero"
