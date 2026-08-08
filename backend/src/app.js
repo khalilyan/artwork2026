@@ -102,11 +102,32 @@ function injectMeta(html, tags) {
     .replace('</head>', `    ${tags}\n  </head>`);
 }
 
-async function getRouteMeta(request) {
-  const productMatch = request.path.toLowerCase().match(/^\/rooms\/[^/]+\/[^/]+\/([^/]+)$/);
-  if (!productMatch) return defaultMeta;
+function extractProductSlugFromPath(requestPath) {
+  const safeDecode = (segment) => {
+    try {
+      return decodeURIComponent(segment);
+    } catch {
+      return segment;
+    }
+  };
 
-  const match = await findProductBySlug(productMatch[1]);
+  const segments = String(requestPath ?? '')
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => safeDecode(segment));
+
+  const roomsIndex = segments.findIndex((segment) => segment.toLowerCase() === 'rooms');
+  if (roomsIndex === -1) return '';
+
+  const productSlug = segments[roomsIndex + 3] ?? '';
+  return String(productSlug).trim();
+}
+
+async function getRouteMeta(request) {
+  const productSlug = extractProductSlugFromPath(request.path);
+  if (!productSlug) return defaultMeta;
+
+  const match = await findProductBySlug(productSlug);
   const product = match?.product;
   if (!product) return defaultMeta;
 

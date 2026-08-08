@@ -4,38 +4,26 @@ import Icon from '../components/ui/Icon.jsx';
 import DirectCheckoutModal from '../components/ui/DirectCheckoutModal.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
-import { getFurnitureCategory, getFurnitureRoom } from '../data/furnitureRooms.js';
-import { getProduct, productDetails, products as fallbackProducts } from '../data/products.js';
+import NotFoundPage from './NotFoundPage.jsx';
 import { addGuestCartItem, api, isAuthorized } from '../services/api.js';
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 import { compressImageFiles } from '../utils/imageUpload.js';
 import { getProductBadgeLabel } from '../utils/productBadge.js';
 import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js';
 
-const reviews = [
-  {
-    name: 'ADRIAN STERLING',
-    text: 'Այս առարկայի քանդակային որակը առանձնանում է։ Այն նույնքան գեղարվեստական ներկայություն ունի, որքան գործնական նշանակություն։',
-  },
-  {
-    name: 'ELENA ROSSI',
-    text: 'Չնայած խիստ տեսքին՝ շատ հարմարավետ է։ Էրգոնոմիկ աջակցությունը ճիշտ է նկարագրված։',
-  },
-  {
-    name: 'JULIAN VANCE',
-    text: 'Դետալների մշակումը շատ նուրբ է։ Առարկան դարձավ իմ աշխատասենյակի գլխավոր շեշտադրումը։',
-  },
-];
 const initialReviewLimit = 3;
 const minimumSkeletonMs = 1700;
-const fallbackMaterials = [
-  { id: 'walnut', name: 'Ընկուզենի', color: '#633005' },
-  { id: 'stone', name: 'Քար', color: '#d7d0c5' },
-  { id: 'brass', name: 'Պղինձ', color: '#c2a24e' },
-];
+const emptyProduct = {
+  id: '',
+  name: '',
+  description: '',
+  gallery: [],
+  roomSlugs: [],
+  price: { currency: 'AMD', amount: null },
+};
 
-function getDefaultMaterial(materials = fallbackMaterials) {
-  return materials[0] ?? fallbackMaterials[0];
+function getDefaultMaterial(materials = []) {
+  return materials[0] ?? null;
 }
 
 function normalizeReviews(nextReviews) {
@@ -168,9 +156,9 @@ function StarRating({ value, onChange }) {
 function ComplementaryProduct({ product }) {
   const productId = product.id ?? product.slug;
   const image = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
-  const roomSlug = product.roomSlugs?.[0] ?? 'living-room';
-  const furnitureSlug = product.categorySlug ?? product.type ?? 'seating';
-  const href = `/rooms/${roomSlug}/${furnitureSlug}/${productId}`;
+  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
+  const furnitureSlug = product.categorySlug ?? product.type;
+  const href = productId && roomSlug && furnitureSlug ? `/rooms/${roomSlug}/${furnitureSlug}/${productId}` : '/products';
 
   return (
     <a className="details-complementary-card" href={href}>
@@ -238,18 +226,12 @@ function ProductDetailsSkeleton() {
 }
 
 export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId }) {
-  const room = getFurnitureRoom(roomSlug);
-  const category = getFurnitureCategory(furnitureSlug);
-  const listedProduct = getProduct(productId);
-  const fallbackProduct = useMemo(
-    () => (listedProduct.gallery ? listedProduct : { ...productDetails, id: listedProduct.id, name: listedProduct.name.toUpperCase(), price: listedProduct.price }),
-    [listedProduct],
-  );
-  const [product, setProduct] = useState(fallbackProduct);
+  const [product, setProduct] = useState(emptyProduct);
+  const [isProductMissing, setIsProductMissing] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [reviewItems, setReviewItems] = useState(() => normalizeReviews(reviews));
+  const [reviewItems, setReviewItems] = useState(() => normalizeReviews([]));
   const [visibleReviewCount, setVisibleReviewCount] = useState(initialReviewLimit);
   const [selectedRating, setSelectedRating] = useState(5);
   const [reviewStatus, setReviewStatus] = useState('');
@@ -267,16 +249,16 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [roomPreviewStatus, setRoomPreviewStatus] = useState('');
   const [isGeneratingRoomPreview, setIsGeneratingRoomPreview] = useState(false);
   const [isImageGenerationEnabled, setIsImageGenerationEnabled] = useState(true);
-  const [relatedProducts, setRelatedProducts] = useState(() => uniqueProductsById(fallbackProducts).filter((item) => item.id !== productId).slice(0, 3));
-  const [materials, setMaterials] = useState(fallbackMaterials);
-  const [selectedFinish, setSelectedFinish] = useState(() => getDefaultMaterial());
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [selectedFinish, setSelectedFinish] = useState(() => getDefaultMaterial([]));
   const [isProductLoading, setIsProductLoading] = useState(true);
-  const dimensionsText = product.dimensionsText || 'Լ 60սմ x Խ 55սմ x Բ 78սմ։ Նստատեղի բարձրություն՝ 45սմ։';
-  const craftsmanshipText = product.craftsmanshipText || 'Յուրաքանչյուր առարկա մշակվում եւ հավաքվում է անհատական մոտեցմամբ՝ փորձառու վարպետների կողմից։';
-  const technicalTitle = product.technicalTitle || 'Ճշգրիտ էլեգանտություն';
-  const technicalDescription = product.technicalDescription || 'Յուրաքանչյուր անկյուն հաշվարկված է հարմարավետության համար՝ պահպանելով թեթեւ, մաքուր եւ հավասարակշռված տեսքը։';
-  const technicalNoteOne = product.technicalNoteOne || 'Ամուր ընկուզենու կառուցվածք';
-  const technicalNoteTwo = product.technicalNoteTwo || 'Իտալական անիլին կաշի';
+  const dimensionsText = product.dimensionsText ?? '';
+  const craftsmanshipText = product.craftsmanshipText ?? '';
+  const technicalTitle = product.technicalTitle ?? '';
+  const technicalDescription = product.technicalDescription ?? '';
+  const technicalNoteOne = product.technicalNoteOne ?? '';
+  const technicalNoteTwo = product.technicalNoteTwo ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
   const productPrice = formatAmdPrice(productPriceAmount);
   const oldPriceAmount = getPriceAmount(product.oldPrice?.amount, product.oldPriceAmount, product.oldPrice);
@@ -293,11 +275,14 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   useEffect(() => {
     api.materials()
       .then(({ materials: nextMaterials }) => {
-        const activeMaterials = nextMaterials?.length ? nextMaterials : fallbackMaterials;
+        const activeMaterials = nextMaterials?.length ? nextMaterials : [];
         setMaterials(activeMaterials);
-        setSelectedFinish((current) => activeMaterials.find((material) => material.id === current.id) ?? getDefaultMaterial(activeMaterials));
+        setSelectedFinish((current) => activeMaterials.find((material) => material.id === current?.id) ?? getDefaultMaterial(activeMaterials));
       })
-      .catch(() => setMaterials(fallbackMaterials));
+      .catch(() => {
+        setMaterials([]);
+        setSelectedFinish(null);
+      });
   }, [product]);
 
   useEffect(() => {
@@ -306,25 +291,30 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
     const loadingStartedAt = performance.now();
 
     setIsProductLoading(true);
+    setIsProductMissing(false);
     api.product(productId)
       .then(({ product: nextProduct }) => {
         if (!isCurrentRequest) return;
 
-        setProduct({
-          ...fallbackProduct,
-          ...nextProduct,
-          gallery: nextProduct.gallery?.length ? nextProduct.gallery : fallbackProduct.gallery,
-          description: nextProduct.description ?? fallbackProduct.description,
-        });
-        setReviewItems(normalizeReviews(nextProduct.reviews ?? reviews));
+        if (!nextProduct?.id) {
+          setProduct(emptyProduct);
+          setReviewItems(normalizeReviews([]));
+          setVisibleReviewCount(initialReviewLimit);
+          setIsProductMissing(true);
+          return;
+        }
+
+        setProduct(nextProduct);
+        setReviewItems(normalizeReviews(nextProduct.reviews ?? []));
         setVisibleReviewCount(initialReviewLimit);
       })
       .catch(() => {
         if (!isCurrentRequest) return;
 
-        setProduct(fallbackProduct);
-        setReviewItems(normalizeReviews(reviews));
+        setProduct(emptyProduct);
+        setReviewItems(normalizeReviews([]));
         setVisibleReviewCount(initialReviewLimit);
+        setIsProductMissing(true);
       })
       .finally(() => {
         const elapsed = performance.now() - loadingStartedAt;
@@ -339,10 +329,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       isCurrentRequest = false;
       if (loadingTimer) window.clearTimeout(loadingTimer);
     };
-  }, [fallbackProduct, productId]);
+  }, [productId]);
 
   useEffect(() => {
-    setSelectedFinish((current) => materials.find((material) => material.id === current.id) ?? getDefaultMaterial(materials));
+    setSelectedFinish((current) => materials.find((material) => material.id === current?.id) ?? getDefaultMaterial(materials));
   }, [materials, product.id]);
 
   useEffect(() => {
@@ -371,10 +361,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
           .filter((item) => item.id !== product.id)
           .slice(0, 3);
 
-        setRelatedProducts(nextRelatedProducts.length ? nextRelatedProducts : uniqueProductsById(fallbackProducts).filter((item) => item.id !== product.id).slice(0, 3));
+        setRelatedProducts(nextRelatedProducts);
       })
       .catch(() => {
-        setRelatedProducts(uniqueProductsById(fallbackProducts).filter((item) => item.id !== product.id).slice(0, 3));
+        setRelatedProducts([]);
       });
   }, [furnitureSlug, product.categorySlug, product.id, product.roomSlugs, product.type, roomSlug]);
 
@@ -384,15 +374,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       ...(product.gallery ?? []),
       product.hoverImage,
       product.technicalImage,
-      ...(fallbackProduct.gallery ?? []),
-      fallbackProduct.image,
-      fallbackProduct.hoverImage,
-      ...fallbackProducts.map((item) => item.image),
-      ...fallbackProducts.map((item) => item.hoverImage),
     ].filter(Boolean)));
 
     return images.slice(0, 5);
-  }, [fallbackProduct.gallery, fallbackProduct.hoverImage, fallbackProduct.image, product.gallery, product.hoverImage, product.image, product.technicalImage]);
+  }, [product.gallery, product.hoverImage, product.image, product.technicalImage]);
 
   useEffect(() => {
     setActiveImageIndex((currentIndex) => (productGallery.length ? Math.min(currentIndex, productGallery.length - 1) : 0));
@@ -415,9 +400,9 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const addToCart = async () => {
     try {
       if (isAuthorized()) {
-        await api.addCartItem({ productSlug: product.id, quantity: 1, material: selectedFinish.name });
+        await api.addCartItem({ productSlug: product.id, quantity: 1, material: selectedFinish?.name });
       } else {
-        addGuestCartItem({ ...product, material: selectedFinish.name }, 1);
+        addGuestCartItem({ ...product, material: selectedFinish?.name }, 1);
       }
       setIsAdded(true);
       showArtworkNotification(`${product.name} ավելացվեց զամբյուղում`);
@@ -712,7 +697,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
         <div className="details-material-grid">
           {materials.map((material) => (
             <button
-              className={`details-material-option ${selectedFinish.id === material.id ? 'is-selected' : ''}`}
+              className={`details-material-option ${selectedFinish?.id === material.id ? 'is-selected' : ''}`}
               type="button"
               onClick={() => {
                 setSelectedFinish(material);
@@ -745,6 +730,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
 
   if (isProductLoading) {
     return <ProductDetailsSkeleton />;
+  }
+
+  if (isProductMissing || !product.id) {
+    return <NotFoundPage />;
   }
 
   return (
@@ -809,15 +798,15 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
           </div>
           <div className="details-options">
             <span className="label-caps">ՆՅՈՒԹ</span>
-            <button className="details-material-trigger" type="button" onClick={() => setIsMaterialDialogOpen(true)}>
+            <button className="details-material-trigger" type="button" onClick={() => setIsMaterialDialogOpen(true)} disabled={!materials.length}>
               <span className="details-material-stack" aria-hidden="true">
                 {materials.slice(0, 3).map((material) => (
                   <i style={{ background: material.image ? `url(${material.image}) center / cover` : material.color }} key={material.id} />
                 ))}
               </span>
-              <span className="details-material-count label-caps">{Math.max(materials.length - 3, 0)}+ գույն/կտոր</span>
+              <span className="details-material-count label-caps">{materials.length ? `${Math.max(materials.length - 3, 0)}+ գույն/կտոր` : 'Նյութ չկա'}</span>
             </button>
-            <p className="details-selected-finish label-caps">Ընտրված՝ {selectedFinish.name}</p>
+            <p className="details-selected-finish label-caps">Ընտրված՝ {selectedFinish?.name ?? 'Չընտրված'}</p>
             {materialDialog}
           </div>
           <div className="details-description">
@@ -864,30 +853,36 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
             items={[{ productSlug: product.id, quantity: 1 }]}
             onClose={() => setIsDirectCheckoutOpen(false)}
           />
-          <details>
-            <summary><span className="label-caps">ՉԱՓԵՐ</span><Icon name="expand_more" /></summary>
-            <p>{dimensionsText}</p>
-          </details>
-          <details>
-            <summary><span className="label-caps">ՎԱՐՊԵՏՈՒԹՅՈՒՆ</span><Icon name="expand_more" /></summary>
-            <p>{craftsmanshipText}</p>
-          </details>
+          {dimensionsText ? (
+            <details>
+              <summary><span className="label-caps">ՉԱՓԵՐ</span><Icon name="expand_more" /></summary>
+              <p>{dimensionsText}</p>
+            </details>
+          ) : null}
+          {craftsmanshipText ? (
+            <details>
+              <summary><span className="label-caps">ՎԱՐՊԵՏՈՒԹՅՈՒՆ</span><Icon name="expand_more" /></summary>
+              <p>{craftsmanshipText}</p>
+            </details>
+          ) : null}
         </aside>
       </section>
 
-      <section className="details-technical">
-        <div className="container details-technical-grid">
-          <div>
-            <h2>{technicalTitle}</h2>
-            <p>{technicalDescription}</p>
-            <span className="label-caps">{technicalNoteOne}</span>
-            <span className="label-caps">{technicalNoteTwo}</span>
+      {technicalTitle || technicalDescription || technicalNoteOne || technicalNoteTwo || product.technicalImage ? (
+        <section className="details-technical">
+          <div className="container details-technical-grid">
+            <div>
+              {technicalTitle ? <h2>{technicalTitle}</h2> : null}
+              {technicalDescription ? <p>{technicalDescription}</p> : null}
+              {technicalNoteOne ? <span className="label-caps">{technicalNoteOne}</span> : null}
+              {technicalNoteTwo ? <span className="label-caps">{technicalNoteTwo}</span> : null}
+            </div>
+            <div>
+              {product.technicalImage ? <img src={product.technicalImage} alt="Տեխնիկական գծագիր" /> : null}
+            </div>
           </div>
-          <div>
-            <img src={product.technicalImage} alt="Տեխնիկական գծագիր" />
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="details-reviews container">
         <div className="details-reviews-header">
@@ -988,7 +983,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       <section className="details-complementary container">
         <div className="details-complementary-header">
           <h2>Նման առարկաներ</h2>
-          <a className="label-caps" href={`/rooms/${room.slug}/${category.slug}`}>ԴԻՏԵԼ ԱՄԲՈՂՋ ԲԱԺԻՆԸ</a>
+          <a className="label-caps" href={`/rooms/${roomSlug}/${furnitureSlug}`}>ԴԻՏԵԼ ԱՄԲՈՂՋ ԲԱԺԻՆԸ</a>
         </div>
         <div className="details-complementary-grid">
           {relatedProducts.map((item) => (

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-const transitionOutDelay = 1250;
 const entranceHold = 1150;
 
 export default function PageTransition() {
@@ -9,7 +8,9 @@ export default function PageTransition() {
 
   useEffect(() => {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (isTouchDevice) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (isTouchDevice || prefersReducedMotion) {
       setIsActive(false);
       return undefined;
     }
@@ -17,15 +18,9 @@ export default function PageTransition() {
     let entranceTimer = window.setTimeout(() => {
       setIsActive(false);
     }, entranceHold);
-    let leaveTimer = null;
 
     const hideTransition = () => {
       setIsActive(false);
-
-      if (leaveTimer) {
-        window.clearTimeout(leaveTimer);
-        leaveTimer = null;
-      }
 
       if (entranceTimer) {
         window.clearTimeout(entranceTimer);
@@ -51,13 +46,12 @@ export default function PageTransition() {
       if (nextUrl.origin !== window.location.origin) return;
       if (nextUrl.pathname === window.location.pathname && nextUrl.search === window.location.search && nextUrl.hash) return;
 
-      event.preventDefault();
       setAnimationKey((key) => key + 1);
       setIsActive(true);
 
-      leaveTimer = window.setTimeout(() => {
-        window.location.href = nextUrl.href;
-      }, transitionOutDelay);
+      window.setTimeout(() => {
+        setIsActive(false);
+      }, 900);
     };
 
     const handlePageShow = () => {
@@ -82,9 +76,6 @@ export default function PageTransition() {
     return () => {
       if (entranceTimer) {
         window.clearTimeout(entranceTimer);
-      }
-      if (leaveTimer) {
-        window.clearTimeout(leaveTimer);
       }
       document.removeEventListener('click', handleInternalLink);
       window.removeEventListener('pageshow', handlePageShow);

@@ -73,9 +73,16 @@ function productImage(product) {
   return product.image ?? product.gallery?.[0] ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
 }
 
+function hasProductRoute(product) {
+  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
+  const categorySlug = product.categorySlug ?? product.type;
+  return Boolean(product.id && roomSlug && categorySlug);
+}
+
 function productHref(product) {
-  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug ?? 'living-room';
-  const categorySlug = product.categorySlug ?? product.type ?? 'seating';
+  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
+  const categorySlug = product.categorySlug ?? product.type;
+  if (!product.id || !roomSlug || !categorySlug) return '/products';
   return `/rooms/${roomSlug}/${categorySlug}/${product.id}`;
 }
 
@@ -145,7 +152,7 @@ function getRoomCategoryProducts(products, roomSlug, categorySlug) {
       ? [product.categorySlug, product.type, product.group].filter(Boolean).includes(categorySlug)
       : true;
 
-    return product?.id && product.name && matchesRoom && matchesCategory;
+    return hasProductRoute(product) && product.name && matchesRoom && matchesCategory;
   });
 }
 
@@ -250,7 +257,7 @@ function getRecommendations(products, profile) {
   const activeProducts = profile.wantsSale && saleProducts.length ? saleProducts : candidateProducts;
 
   const sortedProducts = [...activeProducts]
-    .filter((product) => product?.id && product.name)
+    .filter((product) => hasProductRoute(product) && product.name)
     .sort((first, second) => {
       if (profile.wantsBudget) return productPrice(first) - productPrice(second);
       if (profile.wantsPremium) return productPrice(second) - productPrice(first);
@@ -447,7 +454,8 @@ export default function AiChatAssistant() {
     Promise.allSettled([api.products(), api.collections(), api.rooms()])
       .then(([productsResult, collectionsResult, roomsResult]) => {
         if (!isMounted) return;
-        setProducts(productsResult.status === 'fulfilled' ? (productsResult.value.products ?? []) : []);
+        const loadedProducts = productsResult.status === 'fulfilled' ? (productsResult.value.products ?? []) : [];
+        setProducts(loadedProducts.filter((product) => product?.isActive !== false && hasProductRoute(product)));
         setCollections(collectionsResult.status === 'fulfilled' ? (collectionsResult.value.collections ?? []) : []);
         setRooms(roomsResult.status === 'fulfilled' ? normalizeRooms(roomsResult.value.rooms ?? []) : []);
       });

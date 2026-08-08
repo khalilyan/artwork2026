@@ -279,11 +279,32 @@ function normalizeCollectionPayload(body, existingCollection = {}) {
 
 function normalizeHeroSlides(value, fallback = []) {
   const slides = parseJsonArray(value, fallback);
-  return slides.map((slide, index) => ({
-    title: toCleanString(slide.title, `Slide ${index + 1}`),
-    subtitle: toCleanString(slide.subtitle),
-    image: toCleanString(slide.image),
-  }));
+
+  return slides
+    .map((slide, index) => {
+      if (slide && typeof slide === 'object') {
+        return {
+          title: toCleanString(slide.title, `Slide ${index + 1}`),
+          subtitle: toCleanString(slide.subtitle),
+          image: toCleanString(slide.image),
+        };
+      }
+
+      if (typeof slide === 'string') {
+        return {
+          title: `Slide ${index + 1}`,
+          subtitle: '',
+          image: toCleanString(slide),
+        };
+      }
+
+      return {
+        title: `Slide ${index + 1}`,
+        subtitle: '',
+        image: '',
+      };
+    })
+    .filter((slide) => slide.title || slide.subtitle || slide.image);
 }
 
 async function findEmbeddedRoomProductBySlug(slug) {
@@ -724,8 +745,17 @@ export async function deleteAdminCollection(request, response, next) {
 export async function uploadAdminImage(request, response, next) {
   try {
     const filename = slugify(request.body.filename || 'upload');
-    const dataUrl = toCleanString(request.body.dataUrl);
-    const match = dataUrl.match(/^data:(image\/(?:png|jpeg|jpg|webp|gif));base64,(.+)$/);
+    const source = toCleanString(request.body.dataUrl || request.body.imageUrl || request.body.url);
+
+    if (/^https?:\/\//i.test(source)) {
+      response.status(201).json({
+        url: source,
+        filename: null,
+      });
+      return;
+    }
+
+    const match = source.match(/^data:(image\/(?:png|jpeg|jpg|webp|gif));base64,(.+)$/);
     assertRequest(match, 400, 'Image upload must be a png, jpg, webp, or gif data URL.');
 
     const [, mimeType, base64Data] = match;

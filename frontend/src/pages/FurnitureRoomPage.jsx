@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
-import { images } from '../data/homepage.js';
 import { api } from '../services/api.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../utils/motion.js';
 
@@ -40,13 +39,13 @@ export default function FurnitureRoomPage({ roomSlug }) {
 
   useEffect(() => {
     api.room(roomSlug)
-      .then(({ room: nextRoom }) => setRoom({ ...nextRoom, brandLogo: images.logo, categories: nextRoom.categories ?? [] }))
+      .then(({ room: nextRoom }) => setRoom({ ...nextRoom, categories: nextRoom.categories ?? [] }))
       .catch(() => setRoom(null));
   }, [roomSlug]);
 
   const roomName = room?.roomName ?? room?.title ?? room?.name ?? '';
-  const roomImage = room?.image ?? room?.categories?.[0]?.image ?? images.logo;
-  const roomBrandLogo = room?.brandLogo ?? images.logo;
+  const roomImage = room?.image ?? room?.categories?.[0]?.image ?? '/artwork-logo.png';
+  const roomBrandLogo = '/artwork-logo.png';
   const categories = room?.categories ?? [];
 
   return (

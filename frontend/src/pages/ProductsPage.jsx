@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getFurnitureCategory, getFurnitureRoom } from '../data/furnitureRooms.js';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
@@ -124,8 +123,8 @@ function ProductsSkeleton() {
 
 export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const searchParams = new URLSearchParams(window.location.search);
-  const [room, setRoom] = useState(() => (roomSlug ? getFurnitureRoom(roomSlug) : null));
-  const [category, setCategory] = useState(() => (furnitureSlug ? getFurnitureCategory(furnitureSlug) : null));
+  const [room, setRoom] = useState(null);
+  const [category, setCategory] = useState(null);
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'newest');
@@ -148,11 +147,11 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     api.room(roomSlug)
       .then(({ room: nextRoom }) => {
         setRoom(nextRoom);
-        setCategory(nextRoom.categories?.find((item) => item.slug === furnitureSlug) ?? getFurnitureCategory(furnitureSlug));
+        setCategory(nextRoom.categories?.find((item) => item.slug === furnitureSlug) ?? null);
       })
       .catch(() => {
-        setRoom(getFurnitureRoom(roomSlug));
-        setCategory(getFurnitureCategory(furnitureSlug));
+        setRoom(null);
+        setCategory(null);
       });
   }, [roomSlug, furnitureSlug]);
 
@@ -335,8 +334,9 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   }, [isProductsLoading, visibleProducts.length]);
 
   const getProductHref = (product) => {
-    const nextRoomSlug = room?.slug ?? product.roomSlugs?.[0] ?? 'living-room';
-    const nextCategorySlug = category?.slug ?? product.categorySlug ?? product.type ?? 'seating';
+    const nextRoomSlug = room?.slug ?? product.roomSlugs?.[0] ?? product.roomSlug;
+    const nextCategorySlug = category?.slug ?? product.categorySlug ?? product.type;
+    if (!product.id || !nextRoomSlug || !nextCategorySlug) return '/products';
     return `/rooms/${nextRoomSlug}/${nextCategorySlug}/${product.id}`;
   };
 

@@ -6,7 +6,6 @@ import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
 import ShopCta from '../components/sections/ShopCta.jsx';
 import NotFoundPage from './NotFoundPage.jsx';
-import { getCollection } from '../data/collections.js';
 import { addGuestCollectionCartItem, api, isAuthorized } from '../services/api.js';
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../utils/motion.js';
@@ -76,8 +75,8 @@ function getCollectionPrice(collection) {
 }
 
 export default function CollectionDetailPage({ collectionSlug }) {
-  const [collection, setCollection] = useState(() => getCollection(collectionSlug));
-  const [isCollectionLoading, setIsCollectionLoading] = useState(!getCollection(collectionSlug));
+  const [collection, setCollection] = useState(null);
+  const [isCollectionLoading, setIsCollectionLoading] = useState(true);
   const [cartStatus, setCartStatus] = useState('');
   const [isDirectCheckoutOpen, setIsDirectCheckoutOpen] = useState(false);
   const collectionPrice = collection ? getCollectionPrice(collection) : 0;
@@ -86,7 +85,7 @@ export default function CollectionDetailPage({ collectionSlug }) {
     setIsCollectionLoading(true);
     api.collection(collectionSlug)
       .then(({ collection: nextCollection }) => setCollection(nextCollection ?? null))
-      .catch(() => setCollection(getCollection(collectionSlug)))
+      .catch(() => setCollection(null))
       .finally(() => setIsCollectionLoading(false));
   }, [collectionSlug]);
 
