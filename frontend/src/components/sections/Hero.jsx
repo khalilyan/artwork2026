@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { createResponsiveImageSources } from '../../utils/imageCdn.js';
 import { easeOutExpo } from '../../utils/motion.js';
 
 const heroLoadingDelay = 0.8;
@@ -19,6 +20,13 @@ export default function Hero({ slides = [] }) {
   const boundedSlideIndex = hasSlides ? Math.min(activeSlideIndex, slides.length - 1) : 0;
   const activeSlide = hasSlides ? slides[boundedSlideIndex] : null;
   const slideSignature = slides.map((slide) => slide.image).join('|');
+  const slideSources = useMemo(() => (
+    slides.map((slide) => createResponsiveImageSources(slide.image, {
+      widths: [640, 960, 1280, 1600, 1920, 2560],
+      sizes: '100vw',
+      quality: 76,
+    }))
+  ), [slideSignature]);
   const reduceMotion = useReducedMotion();
   const introDelay = reduceMotion ? 0 : heroIntroDelayRef.current;
 
@@ -54,7 +62,7 @@ export default function Hero({ slides = [] }) {
         resolve();
       };
 
-      image.src = slides[index]?.image ?? '';
+      image.src = slideSources[index]?.src ?? slides[index]?.image ?? '';
     }).finally(() => {
       slidePreloadPromisesRef.current.delete(index);
     });
@@ -156,7 +164,7 @@ export default function Hero({ slides = [] }) {
 
     const timer = window.setTimeout(preloadNeighbors, 450);
     return () => window.clearTimeout(timer);
-  }, [activeSlideIndex, hasSlides, slides.length]);
+  }, [activeSlideIndex, hasSlides, slides.length, slideSources]);
 
   const showPreviousSlide = () => {
     navigateToSlide(activeSlideIndex - 1);
@@ -179,7 +187,9 @@ export default function Hero({ slides = [] }) {
       {slides.map((slide, index) => (
         <motion.img
           className={`parallax-image hero-slide-image ${index === activeSlideIndex ? 'is-active' : ''}`}
-          src={loadedSlideIndices.has(index) || index === activeSlideIndex ? slide.image : undefined}
+          src={loadedSlideIndices.has(index) || index === activeSlideIndex ? slideSources[index]?.src ?? slide.image : undefined}
+          srcSet={slideSources[index]?.srcSet}
+          sizes={slideSources[index]?.sizes}
           alt={slide.title}
           key={slide.title}
           loading={index === activeSlideIndex ? 'eager' : 'lazy'}

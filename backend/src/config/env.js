@@ -26,6 +26,7 @@ function parseCsv(value) {
 export const env = {
   port: Number(process.env.PORT ?? 4000),
   mongoUri: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/artwork',
+  mongoDbName: String(process.env.MONGODB_DB_NAME ?? '').trim(),
   publicSiteUrl: process.env.PUBLIC_SITE_URL ?? '',
   publicApiUrl: process.env.PUBLIC_API_URL ?? '',
   clientOrigins: parseClientOrigins(process.env.CLIENT_ORIGIN),
@@ -45,4 +46,8 @@ export const env = {
   gmailRedirectUri: process.env.GMAIL_REDIRECT_URI ?? 'http://localhost:4000/gmail-oauth-callback',
   gmailRefreshToken: process.env.GMAIL_REFRESH_TOKEN ?? '',
   gmailSender: process.env.GMAIL_SENDER ?? '',
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? '',
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY ?? '',
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? '',
+  cloudinaryUploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER ?? 'artwork/admin',
 };

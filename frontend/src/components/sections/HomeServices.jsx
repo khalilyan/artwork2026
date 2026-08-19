@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { createResponsiveImageSources } from '../../utils/imageCdn.js';
 import { easeOutExpo, fadeUp, staggerGroup, viewportReveal } from '../../utils/motion.js';
 import notRestavratedImage from '../../assets/images/not-restavrated.jpg';
 import restavratedImage from '../../assets/images/restavrated.jpg';
@@ -20,6 +21,16 @@ function BeforeAfterComparison({ beforeImage, afterImage }) {
   const frameRef = useRef(null);
   const [position, setPosition] = useState(50);
   const reduceMotion = useReducedMotion();
+  const beforeImageSource = createResponsiveImageSources(beforeImage, {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 96vw, 78vw',
+    quality: 72,
+  });
+  const afterImageSource = createResponsiveImageSources(afterImage, {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 96vw, 78vw',
+    quality: 72,
+  });
 
   const updatePosition = (clientX) => {
     const frame = frameRef.current;
@@ -71,14 +82,24 @@ function BeforeAfterComparison({ beforeImage, afterImage }) {
       viewport={viewportReveal}
       transition={{ duration: 1, ease: easeOutExpo }}
     >
-      <img className="before-after-image is-after" src={afterImage} alt="Վերականգնված կահույք" draggable="false" />
-      <img className="before-after-image is-before" src={beforeImage} alt="Հին փայտե կահույք" draggable="false" />
+      <img className="before-after-image is-after" src={afterImageSource.src} srcSet={afterImageSource.srcSet} sizes={afterImageSource.sizes} alt="Վերականգնված կահույք" loading="lazy" decoding="async" draggable="false" />
+      <img className="before-after-image is-before" src={beforeImageSource.src} srcSet={beforeImageSource.srcSet} sizes={beforeImageSource.sizes} alt="Հին փայտե կահույք" loading="lazy" decoding="async" draggable="false" />
     </motion.div>
   );
 }
 
 function RestorationLens({ beforeImage, afterImage }) {
   const [lens, setLens] = useState({ x: 50, y: 50, active: false });
+  const beforeImageSource = createResponsiveImageSources(beforeImage, {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 96vw, 78vw',
+    quality: 72,
+  });
+  const afterImageSource = createResponsiveImageSources(afterImage, {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 96vw, 78vw',
+    quality: 72,
+  });
 
   const updateLens = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -104,8 +125,8 @@ function RestorationLens({ beforeImage, afterImage }) {
         visible: { opacity: 1, transition: { duration: 1 } },
       }}
     >
-      <img className="restoration-lens-image is-before" src={afterImage} alt="Վերականգնումից առաջ" draggable="false" />
-      <img className="restoration-lens-image is-after" src={beforeImage} alt="Վերականգնված կահույք" draggable="false" />
+      <img className="restoration-lens-image is-before" src={afterImageSource.src} srcSet={afterImageSource.srcSet} sizes={afterImageSource.sizes} alt="Վերականգնումից առաջ" loading="lazy" decoding="async" draggable="false" />
+      <img className="restoration-lens-image is-after" src={beforeImageSource.src} srcSet={beforeImageSource.srcSet} sizes={beforeImageSource.sizes} alt="Վերականգնված կահույք" loading="lazy" decoding="async" draggable="false" />
     </motion.div>
   );
 }
@@ -156,6 +177,16 @@ export function TradeInSection({ images = tradeImages }) {
     images[0] ?? tradeImages[0],
     images[1] ?? tradeImages[1],
   ];
+  const oldImageSource = createResponsiveImageSources(sectionImages[0], {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 92vw, 44vw',
+    quality: 72,
+  });
+  const newImageSource = createResponsiveImageSources(sectionImages[1], {
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 1024px) 92vw, 44vw',
+    quality: 72,
+  });
 
   return (
     <motion.section
@@ -168,8 +199,8 @@ export function TradeInSection({ images = tradeImages }) {
     >
       <div className="home-service-sticky container">
         <motion.div className="home-service-visual" data-cursor-target variants={fadeUp}>
-          <motion.img className="home-service-image is-main is-new" src={sectionImages[1]} alt="Նոր կահույք մինիմալ հյուրասենյակում" variants={fadeUp} />
-          <motion.img className="home-service-image is-float is-old" src={sectionImages[0]} alt="Ժամանակակից բազմոց փոխանակման ծրագրի համար" variants={fadeUp} />
+          <motion.img className="home-service-image is-main is-new" src={newImageSource.src} srcSet={newImageSource.srcSet} sizes={newImageSource.sizes} alt="Նոր կահույք մինիմալ հյուրասենյակում" loading="lazy" decoding="async" variants={fadeUp} />
+          <motion.img className="home-service-image is-float is-old" src={oldImageSource.src} srcSet={oldImageSource.srcSet} sizes={oldImageSource.sizes} alt="Ժամանակակից բազմոց փոխանակման ծրագրի համար" loading="lazy" decoding="async" variants={fadeUp} />
           <motion.div className="home-service-chip label-caps" variants={fadeUp}>ՀԻՆ ԿԱՀՈՒՅՔԸ &gt; ՆՈՐԻ ԴԻՄԱՑ</motion.div>
         </motion.div>
 

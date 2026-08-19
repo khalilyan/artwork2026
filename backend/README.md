@@ -17,6 +17,7 @@ Default API URL: `http://localhost:4000/api`
 
 - `PORT`: API port, defaults to `4000`
 - `MONGODB_URI`: MongoDB connection string, defaults to `mongodb://localhost:27017/artwork`
+- `MONGODB_DB_NAME`: optional explicit database name. Use this when the URI has no database path or when cPanel/runtime should target a specific DB.
 - `PUBLIC_SITE_URL`: canonical public site URL for metadata links, e.g. `https://artwork.am`
 - `PUBLIC_API_URL`: public API URL used for absolute `/uploads/...` metadata images, e.g. `https://api.artwork.am`
 - `CLIENT_ORIGIN`: comma-separated frontend origins for CORS, defaults to common Vite localhost ports
@@ -25,6 +26,10 @@ Default API URL: `http://localhost:4000/api`
 - `ADMIN_EMAILS`: comma-separated emails that should receive admin access
 - `OPENAI_API_KEY`: required for AI room preview image generation
 - `OPENAI_IMAGE_MODEL`: optional OpenAI model for room previews, defaults to `gpt-image-1`
+- `CLOUDINARY_CLOUD_NAME`: optional Cloudinary cloud name for admin image uploads
+- `CLOUDINARY_API_KEY`: optional Cloudinary API key for server-side uploads
+- `CLOUDINARY_API_SECRET`: optional Cloudinary API secret for signed uploads
+- `CLOUDINARY_UPLOAD_FOLDER`: optional Cloudinary folder, defaults to `artwork/admin`
 
 ## Admin
 

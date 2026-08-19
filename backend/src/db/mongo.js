@@ -9,7 +9,7 @@ export async function connectDatabase() {
 
   client = new MongoClient(env.mongoUri);
   await client.connect();
-  database = client.db();
+  database = env.mongoDbName ? client.db(env.mongoDbName) : client.db();
   await ensureIndexes(database);
 
   return database;

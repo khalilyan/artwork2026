@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { api } from '../../services/api.js';
+import { createResponsiveImageSources } from '../../utils/imageCdn.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../../utils/motion.js';
 
 function normalizeCollection(collection, index) {
@@ -29,6 +30,11 @@ function CollectionCard({ collection, index }) {
     offset: ['start end', 'end start'],
   });
   const y = useTransform(scrollYProgress, [0, 1], [parallaxDistance, -parallaxDistance]);
+  const imageSource = createResponsiveImageSources(collection.image, {
+    widths: [420, 640, 900, 1200, 1600],
+    sizes: '(max-width: 1024px) 94vw, 31vw',
+    quality: 74,
+  });
 
   return (
     <motion.div
@@ -46,8 +52,12 @@ function CollectionCard({ collection, index }) {
         <div className="collection-image">
           {collection.image ? (
             <motion.img
-              src={collection.image}
+              src={imageSource.src}
+              srcSet={imageSource.srcSet}
+              sizes={imageSource.sizes}
               alt={collection.title}
+              loading="lazy"
+              decoding="async"
               data-parallax-image
             />
           ) : null}

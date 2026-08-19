@@ -7,6 +7,7 @@ import ShopCta from '../components/sections/ShopCta.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import usePageAssets from '../hooks/usePageAssets.js';
 import { api } from '../services/api.js';
+import { getOptimizedImageUrl } from '../utils/imageCdn.js';
 import { createOrganizationSchema, createWebsiteSchema, defaultSeoImage } from '../utils/seo.js';
 
 export default function HomePage() {
@@ -27,6 +28,10 @@ export default function HomePage() {
   ];
   const hasRestorationImages = restorationImages.some(Boolean);
   const hasTradeImages = tradeImages.some(Boolean);
+  const seoImage = getOptimizedImageUrl(pageImages.heroSlide1 ?? pageImages.hero1 ?? slides[0]?.image ?? defaultSeoImage, {
+    width: 1600,
+    quality: 76,
+  });
 
   useEffect(() => {
     api.page('home')
@@ -39,7 +44,7 @@ export default function HomePage() {
       <SeoMeta
         title="ARTWORK | Դիզայներական կահույք Հայաստանում"
         description="Բացահայտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, անհատական ինտերիերի լուծումները, վերականգնումն ու trade-in ծառայությունները։"
-        image={pageImages.heroSlide1 ?? pageImages.hero1 ?? slides[0]?.image ?? defaultSeoImage}
+        image={seoImage}
         url="/"
         keywords="ARTWORK, դիզայներական կահույք Հայաստան, անհատական կահույք Երևան, ինտերիերի կահույք, կահույքի վերականգնում"
         jsonLd={[createWebsiteSchema('/'), createOrganizationSchema('/')]}

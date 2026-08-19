@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,46 @@ const allowedOrderStatuses = ['quote_requested', 'processing', 'completed', 'can
 const allowedUserStatuses = ['active', 'disabled'];
 const allowedUserRoles = ['customer', 'admin'];
 const uploadRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'uploads', 'admin');
+
+function canUseCloudinary() {
+  return Boolean(env.cloudinaryCloudName && env.cloudinaryApiKey && env.cloudinaryApiSecret);
+}
+
+function createCloudinaryUploadSignature(timestamp, folder) {
+  const payload = `folder=${folder}&timestamp=${timestamp}${env.cloudinaryApiSecret}`;
+  return crypto.createHash('sha1').update(payload).digest('hex');
+}
+
+async function uploadToCloudinary({ base64Data, mimeType }) {
+  const cloudName = env.cloudinaryCloudName;
+  const folder = toCleanString(env.cloudinaryUploadFolder, 'artwork/admin');
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = createCloudinaryUploadSignature(timestamp, folder);
+  const dataUri = `data:${mimeType};base64,${base64Data}`;
+  const formData = new FormData();
+
+  formData.append('file', dataUri);
+  formData.append('api_key', env.cloudinaryApiKey);
+  formData.append('timestamp', String(timestamp));
+  formData.append('signature', signature);
+  formData.append('folder', folder);
+  formData.append('resource_type', 'image');
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || !payload.secure_url) {
+    throw new HttpError(502, payload.error?.message ?? 'Cloud image upload failed.');
+  }
+
+  return {
+    url: payload.secure_url,
+    filename: payload.public_id ?? null,
+  };
+}
 
 function slugify(value, fallback = 'item') {
   const slug = toCleanString(value)
@@ -759,6 +800,13 @@ export async function uploadAdminImage(request, response, next) {
     assertRequest(match, 400, 'Image upload must be a png, jpg, webp, or gif data URL.');
 
     const [, mimeType, base64Data] = match;
+
+    if (canUseCloudinary()) {
+      const cloudinaryUpload = await uploadToCloudinary({ base64Data, mimeType });
+      response.status(201).json(cloudinaryUpload);
+      return;
+    }
+
     const extension = mimeType.split('/')[1].replace('jpeg', 'jpg');
     const savedName = `${Date.now()}-${filename}.${extension}`;
     await fs.mkdir(uploadRoot, { recursive: true });
