@@ -719,9 +719,10 @@ export async function getAdminHomepage(_request, response, next) {
 export async function updateAdminHomepage(request, response, next) {
   try {
     const existingPage = await getDatabase().collection('pages').findOne({ slug: 'home' });
+    const { _id: _existingPageId, ...existingPageWithoutId } = existingPage ?? {};
     const now = new Date().toISOString();
     const page = {
-      ...(existingPage ?? { slug: 'home', type: 'landing' }),
+      ...(existingPageWithoutId ?? { slug: 'home', type: 'landing' }),
       heroSlides: normalizeHeroSlides(request.body.heroSlides, existingPage?.heroSlides ?? []),
       updatedAt: now,
     };
