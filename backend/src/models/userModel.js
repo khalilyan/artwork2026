@@ -8,8 +8,21 @@ export function usersCollection() {
   return getDatabase().collection('users');
 }
 
+function escapeRegExp(value) {
+  return String(value ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export async function findUserByEmail(email, options = {}) {
-  return usersCollection().findOne({ emailNormalized: normalizeEmail(email) }, options);
+  const normalizedEmail = normalizeEmail(email);
+  const userByNormalizedEmail = await usersCollection().findOne({ emailNormalized: normalizedEmail }, options);
+  if (userByNormalizedEmail) return userByNormalizedEmail;
+
+  const trimmedEmail = String(email ?? '').trim();
+  if (!trimmedEmail) return null;
+
+  return usersCollection().findOne({
+    email: { $regex: `^${escapeRegExp(trimmedEmail)}$`, $options: 'i' },
+  }, options);
 }
 
 export async function findUserById(userId, options = {}) {
