@@ -1,11 +1,43 @@
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 
-const configuredApiBaseUrl = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : 'http://localhost:4000/api');
+const defaultProductionApiBaseUrl = 'https://api.artwork.am/api';
+const configuredApiBaseUrl = resolveApiBaseUrl();
 const authTokenKey = 'artworkAuthToken';
 const authUserKey = 'artworkAuthUser';
 const guestCartKey = 'artworkGuestCart';
 const guestIdKey = 'artworkGuestId';
 let resolvedApiBaseUrl = null;
+
+function resolveApiBaseUrl() {
+  const envBaseUrl = String(import.meta.env.VITE_API_URL ?? '').trim();
+
+  if (!envBaseUrl) {
+    return import.meta.env.PROD ? defaultProductionApiBaseUrl : 'http://localhost:4000/api';
+  }
+
+  // In production, a relative base (e.g. "/api") can accidentally point to the frontend host.
+  if (import.meta.env.PROD && envBaseUrl.startsWith('/')) {
+    return defaultProductionApiBaseUrl;
+  }
+
+  return envBaseUrl;
+}
+
+function readStoredJson(key, fallbackValue) {
+  const rawValue = window.localStorage.getItem(key);
+
+  if (!rawValue || rawValue === 'undefined') {
+    return fallbackValue;
+  }
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+    return parsedValue ?? fallbackValue;
+  } catch {
+    window.localStorage.removeItem(key);
+    return fallbackValue;
+  }
+}
 
 function normalizeBaseUrl(value) {
   if (!value) return '';
@@ -66,8 +98,7 @@ export function getAuthToken() {
 }
 
 export function getStoredAuthUser() {
-  const user = window.localStorage.getItem(authUserKey);
-  return user ? JSON.parse(user) : null;
+  return readStoredJson(authUserKey, null);
 }
 
 export function isAuthorized() {
@@ -89,7 +120,8 @@ export function clearAuthSession() {
 }
 
 export function getGuestCart() {
-  return JSON.parse(window.localStorage.getItem(guestCartKey) ?? '[]');
+  const cart = readStoredJson(guestCartKey, []);
+  return Array.isArray(cart) ? cart : [];
 }
 
 export function setGuestCart(cart) {
