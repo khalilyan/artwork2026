@@ -174,6 +174,13 @@ export default function Hero({ slides = [] }) {
     navigateToSlide(activeSlideIndex + 1);
   };
 
+  const scrollToBrandSection = (event) => {
+    event.preventDefault();
+    const aboutSection = document.getElementById('showroom');
+    if (!aboutSection) return;
+    aboutSection.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  };
+
   if (!activeSlide) return null;
 
   return (
@@ -223,9 +230,32 @@ export default function Hero({ slides = [] }) {
             >
               {activeSlide.subtitle}
             </motion.p>
+            <motion.div
+              className="hero-copy-actions"
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.72, delay: introDelay + 0.3, ease: easeOutExpo }}
+            >
+              <a className="primary-button hero-shop-button label-caps" href="/rooms">ՄՈՒՏՔ ԴԵՊԻ ԽԱՆՈՒԹ</a>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <motion.a
+        className="hero-brand-scroll"
+        href="#showroom"
+        onClick={scrollToBrandSection}
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: introDelay + 0.8, ease: easeOutExpo }}
+      >
+        <span className="label-caps">ԾԱՆՈԹԱՆԱԼ ԲՐԵՆԴԻՆ</span>
+        <span className="hero-scroll-indicator" aria-hidden="true">
+          <span className="hero-scroll-wheel" />
+        </span>
+      </motion.a>
+
       <motion.div
         className="hero-count label-caps"
         initial={reduceMotion ? false : { opacity: 0, y: 16 }}

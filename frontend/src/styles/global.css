@@ -1190,6 +1190,92 @@ img {
   letter-spacing: 0.6em;
 }
 
+.hero-copy-actions {
+  margin-top: 34px;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-shop-button {
+  --button-fill: #9f632f;
+  --button-base: rgba(252, 249, 248, 0.14);
+  border: 1px solid rgba(252, 249, 248, 0.48);
+  background: rgba(252, 249, 248, 0.16);
+  color: var(--surface);
+  box-shadow: 0 18px 34px -18px rgba(15, 9, 5, 0.58);
+  letter-spacing: 0.24em;
+}
+
+.hero-shop-button:hover {
+  color: #fff;
+  border-color: rgba(252, 249, 248, 0.74);
+}
+
+.hero-brand-scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(92vw, 420px);
+  margin-inline: auto;
+  color: rgba(252, 249, 248, 0.84);
+  text-decoration: none;
+  transition: color 0.35s ease;
+}
+
+.hero-brand-scroll span {
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  text-align: center;
+}
+
+.hero-scroll-indicator {
+  width: 23px;
+  height: 36px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  display: inline-flex;
+  justify-content: center;
+  padding-top: 7px;
+  box-sizing: border-box;
+}
+
+.hero-scroll-wheel {
+  width: 3px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: heroScrollWheel 1.45s ease-in-out infinite;
+}
+
+.hero-brand-scroll:hover {
+  color: var(--secondary-fixed);
+}
+
+@keyframes heroScrollWheel {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: translateY(9px);
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-wheel {
+    animation: none;
+  }
+}
+
 .mask-up {
   display: block;
   overflow: hidden;
@@ -1249,6 +1335,28 @@ img {
 
 .hero-control:hover i {
   background: var(--secondary-fixed);
+}
+
+@media (max-width: 767px) {
+  .hero-copy-actions {
+    margin-top: 24px;
+  }
+
+  .hero-shop-button {
+    width: 100%;
+    justify-content: center;
+    padding: 16px 20px;
+    letter-spacing: 0.16em;
+  }
+
+  .hero-brand-scroll {
+    bottom: 24px;
+  }
+
+  .hero-brand-scroll span {
+    letter-spacing: 0.2em;
+    font-size: 9px;
+  }
 }
 
 .section {
@@ -10556,7 +10664,7 @@ body.has-mobile-menu-open {
   }
 
   .hero-overlay {
-    align-items: flex-end;
+    align-items: center;
     padding: 120px 16px 128px;
   }
 

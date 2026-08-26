@@ -50,9 +50,9 @@ export default function HomePage() {
         jsonLd={[createWebsiteSchema('/'), createOrganizationSchema('/')]}
       />
       {slides.length ? <Hero slides={slides} /> : null}
+      <Studio />
       <Collections />
       <RestorationSection images={hasRestorationImages ? restorationImages : undefined} />
-      <Studio />
       <TradeInSection images={hasTradeImages ? tradeImages : undefined} />
       <ShopCta
         eyebrow="ՎԵՐՋՆԱԿԱՆ ՇԵՇՏԱԴՐՈՒՄ"
