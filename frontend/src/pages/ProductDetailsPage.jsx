@@ -211,16 +211,6 @@ function ProductDetailsSkeleton() {
         </aside>
       </section>
 
-      <section className="details-technical">
-        <div className="container details-technical-grid product-details-skeleton" aria-hidden="true">
-          <div>
-            <span className="details-skeleton-line is-title" />
-            <span className="details-skeleton-line is-copy" />
-            <span className="details-skeleton-line is-copy is-short" />
-          </div>
-          <div className="details-skeleton-block" />
-        </div>
-      </section>
     </main>
   );
 }
@@ -254,11 +244,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [selectedFinish, setSelectedFinish] = useState(() => getDefaultMaterial([]));
   const [isProductLoading, setIsProductLoading] = useState(true);
   const dimensionsText = product.dimensionsText ?? '';
-  const craftsmanshipText = product.craftsmanshipText ?? '';
-  const technicalTitle = product.technicalTitle ?? '';
-  const technicalDescription = product.technicalDescription ?? '';
-  const technicalNoteOne = product.technicalNoteOne ?? '';
-  const technicalNoteTwo = product.technicalNoteTwo ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
   const productPrice = formatAmdPrice(productPriceAmount);
   const oldPriceAmount = getPriceAmount(product.oldPrice?.amount, product.oldPriceAmount, product.oldPrice);
@@ -373,11 +358,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       product.image,
       ...(product.gallery ?? []),
       product.hoverImage,
-      product.technicalImage,
     ].filter(Boolean)));
 
     return images.slice(0, 5);
-  }, [product.gallery, product.hoverImage, product.image, product.technicalImage]);
+  }, [product.gallery, product.hoverImage, product.image]);
 
   useEffect(() => {
     setActiveImageIndex((currentIndex) => (productGallery.length ? Math.min(currentIndex, productGallery.length - 1) : 0));
@@ -859,30 +843,8 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
               <p>{dimensionsText}</p>
             </details>
           ) : null}
-          {craftsmanshipText ? (
-            <details>
-              <summary><span className="label-caps">ՎԱՐՊԵՏՈՒԹՅՈՒՆ</span><Icon name="expand_more" /></summary>
-              <p>{craftsmanshipText}</p>
-            </details>
-          ) : null}
         </aside>
       </section>
-
-      {technicalTitle || technicalDescription || technicalNoteOne || technicalNoteTwo || product.technicalImage ? (
-        <section className="details-technical">
-          <div className="container details-technical-grid">
-            <div>
-              {technicalTitle ? <h2>{technicalTitle}</h2> : null}
-              {technicalDescription ? <p>{technicalDescription}</p> : null}
-              {technicalNoteOne ? <span className="label-caps">{technicalNoteOne}</span> : null}
-              {technicalNoteTwo ? <span className="label-caps">{technicalNoteTwo}</span> : null}
-            </div>
-            <div>
-              {product.technicalImage ? <img src={product.technicalImage} alt="Տեխնիկական գծագիր" /> : null}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section className="details-reviews container">
         <div className="details-reviews-header">

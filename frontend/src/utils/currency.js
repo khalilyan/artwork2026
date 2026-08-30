@@ -1,4 +1,4 @@
-const priceFallback = 'Գինը՝ հարցման դեպքում';
+const priceFallback = 'Գինը անհատական';
 
 function extractPriceAmount(value) {
   if (typeof value === 'number') return value;

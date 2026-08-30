@@ -25,7 +25,7 @@
         "reviews": [
           { "username": "Mira Stone", "rate": 5, "review": "Beautiful proportions and the walnut finish feels warm without being heavy." }
         ],
-        "inventory": { "status": "in_stock", "quantity": 12, "limitedEdition": false },
+        "inventory": { "status": "in_stock", "quantity": 12 },
         "layout": "feature",
         "isActive": true,
         "adminEditable": ["name", "price", "oldPrice", "sale", "badge", "description", "images", "inventory", "roomSlugs", "categorySlug", "hashtags"],
@@ -39,13 +39,13 @@
         "categorySlug": "seating",
         "roomSlugs": ["living-room", "lobby"],
         "type": "chair",
-        "hashtags": ["walnut", "chair", "sculptural", "limited-edition", "gallery-piece", "architectural"],
+        "hashtags": ["walnut", "chair", "sculptural", "gallery-piece", "architectural"],
         "price": { "amount": 3450, "currency": "AMD", "display": "3,450 ֏" },
         "oldPrice": null,
         "sale": { "isActive": false, "percent": 0, "label": null },
-        "badge": "LIMITED PRODUCTION",
+        "badge": null,
         "material": "Solid black walnut / natural oil finish",
-        "description": "A study in architectural reduction. Hand-carved from solid black walnut with a deep, natural oil finish. The Sculptor's Chair challenges the boundary between functional furniture and fine art installation. Limited production of 50 signed pieces.",
+        "description": "A study in architectural reduction. Hand-carved from solid black walnut with a deep, natural oil finish. The Sculptor's Chair challenges the boundary between functional furniture and fine art installation.",
         "images": {
           "primary": "https://lh3.googleusercontent.com/aida-public/AB6AXuACoj4-HbMFclJQTxixfx_JeymiDkChaVV-wH9guY62x9fZF8ThHmmcbv0rSW3a-DVqNft6_6pZyhtj1HFu3Xn9erbbb3wy4ysdqHrbefxHSv8M-sI5M6fkCgLdqoscWBy3HLZyq0IGQvIKSmOEMYlMuTS10iJ2_L4pxDk6ME0wXKcvrPaQWgHkT6-_OEzFVF4MuRGbGokTcFclbnDQS0iduCfLdavnjq-nxtrmas-XDvTRd1GiCDGpVR8T0oBsp-v4L5G6yTv_rQ",
           "hover": null,
@@ -53,12 +53,10 @@
             "https://lh3.googleusercontent.com/aida-public/AB6AXuACoj4-HbMFclJQTxixfx_JeymiDkChaVV-wH9guY62x9fZF8ThHmmcbv0rSW3a-DVqNft6_6pZyhtj1HFu3Xn9erbbb3wy4ysdqHrbefxHSv8M-sI5M6fkCgLdqoscWBy3HLZyq0IGQvIKSmOEMYlMuTS10iJ2_L4pxDk6ME0wXKcvrPaQWgHkT6-_OEzFVF4MuRGbGokTcFclbnDQS0iduCfLdavnjq-nxtrmas-XDvTRd1GiCDGpVR8T0oBsp-v4L5G6yTv_rQ",
             "https://lh3.googleusercontent.com/aida/AP1WRLtp3SQLplq75RIhs9MxuEsH4ocK11xvz34OTAoc4nm-tEVIBAIe92NxS6r6z69z7zdJ_ghJRKPtSK5VkdTjCJJ4Ah2RbLsEmjmBFStKO96iDAnj8X5jAFxCuOZK8H_ztY1jdAvgTUa9_gvu9aeYk24-1zVfJBAOUF0fapKvq2Scm-dkuJkgvZp2tLgmb7sxVvNl1mLq8Gi_3b63_swzkZ2acDWD8v3-QmZsDHg-cFmpbahMDZPNDZTV",
             "https://lh3.googleusercontent.com/aida/AP1WRLsXMhFJiPh80P9_kDvgLQF_XiMCiHYSLiDAUfb_JY7E1XucPZ_47KG9BymgmXL_mClflBryMyl_cNQ8AnpnKYer5D9cTOkZNE1ZtgovVcjd4jCjn82NGdW87KnLqm74d9kg1iEx8Dmk8hBdm8JiXaezENaMzaz3-D_j3PqkHyamNdqv55zc0uJKKFF9Sj57-jm7V9zBMlhEddc_RSA5u4Ct5LRATPY46n9CNMX9tT92QuSyepel3m76Kg"
-          ],
-          "technical": "https://lh3.googleusercontent.com/aida-public/AB6AXuBpfPGEkhKvgYyq22HWRjbFz48jnYETE073Cbju-3adQ5bH_MB11JCnHT2nrVmEqenfErVJteVcm_dPALBRuOtGBm2RffcIsHThdSca8gJgn9ngwuTRe8ePmpMiyB4qmilCCxrCyFBcXNKNunlsTwlUbNZn4la0ilU9PnocQZy5bHg7Ws0bQmFTJ2trf9HEQCzvqUymzJcv45d9F-MSUwHP23Dfxmn6tdc5lPz1qqYvSFJvdz_TyiZ3BYw9f1rY33Rb2pgch3KqDg"
+          ]
         },
         "details": {
           "dimensions": "W 60cm x D 55cm x H 78cm. Seat Height: 45cm.",
-          "craftsmanship": "Each piece is individually turned and assembled by master craftsmen in our Milan studio.",
           "materials": ["walnut", "stone", "brass"]
         },
         "reviews": [
@@ -66,7 +64,7 @@
           { "username": "ELENA ROSSI", "rate": 5, "review": "Surprisingly comfortable given its rigid appearance. The ergonomic support is exactly as described. A true masterclass in design." },
           { "username": "JULIAN VANCE", "rate": 5, "review": "The attention to detail in the joinery is breathtaking. It arrived perfectly packaged and has become the focal point of my study." }
         ],
-        "inventory": { "status": "limited", "quantity": 50, "limitedEdition": true },
+        "inventory": { "status": "limited", "quantity": 50 },
         "layout": "detail",
         "isActive": true,
         "adminEditable": ["name", "price", "sale", "description", "images", "details", "inventory", "hashtags", "reviews"],
@@ -99,7 +97,7 @@
           "gallery": []
         },
         "reviews": [],
-        "inventory": { "status": "made_to_order", "quantity": 0, "limitedEdition": false },
+        "inventory": { "status": "made_to_order", "quantity": 0 },
         "layout": "square-left",
         "isActive": true,
         "adminEditable": ["name", "price", "sale", "description", "images", "inventory", "hashtags", "reviews"],
@@ -132,7 +130,7 @@
           "gallery": []
         },
         "reviews": [],
-        "inventory": { "status": "in_stock", "quantity": 8, "limitedEdition": false },
+        "inventory": { "status": "in_stock", "quantity": 8 },
         "layout": "narrow-drop",
         "isActive": true,
         "adminEditable": ["name", "price", "oldPrice", "sale", "badge", "description", "images", "inventory", "hashtags", "reviews"],

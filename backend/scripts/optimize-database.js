@@ -14,7 +14,7 @@ function createPrice(price) {
   return {
     amount,
     currency: 'AMD',
-    display: amount === null ? 'Price on request' : new Intl.NumberFormat('hy-AM', {
+    display: amount === null ? 'Գինը անհատական' : new Intl.NumberFormat('hy-AM', {
       style: 'currency',
       currency: 'AMD',
       maximumFractionDigits: 0,
@@ -25,19 +25,27 @@ function createPrice(price) {
 function compactRoomProduct(product) {
   const {
     adminEditable,
+    craftsmanshipText,
     details,
-    inventory,
     material,
+    technicalDescription,
+    technicalImage,
+    technicalNoteOne,
+    technicalNoteTwo,
+    technicalTitle,
     productSlug,
     productSku,
     ...cleanProduct
   } = product;
 
+  const images = cleanProduct.images && typeof cleanProduct.images === 'object'
+    ? (({ technical, ...safeImages }) => safeImages)(cleanProduct.images)
+    : cleanProduct.images;
+
   return {
     ...cleanProduct,
-    limitedEdition: Boolean(cleanProduct.limitedEdition ?? inventory?.limitedEdition),
+    images,
     dimensionsText: cleanProduct.dimensionsText ?? details?.dimensions ?? '',
-    craftsmanshipText: cleanProduct.craftsmanshipText ?? details?.craftsmanship ?? '',
     price: createPrice(cleanProduct.price),
     oldPrice: cleanProduct.oldPrice?.amount !== null && cleanProduct.oldPrice?.amount !== undefined
       ? createPrice(cleanProduct.oldPrice)

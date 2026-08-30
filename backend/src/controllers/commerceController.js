@@ -39,7 +39,7 @@ function createCollectionSnapshot(collection, products = []) {
     currency: 'AMD',
     display: fallbackAmount
       ? new Intl.NumberFormat('hy-AM', { style: 'currency', currency: 'AMD', maximumFractionDigits: 0 }).format(fallbackAmount)
-      : 'Price on request',
+      : 'Գինը անհատական',
   };
 
   return {
@@ -219,7 +219,7 @@ function createOrderNumber(prefix = 'ART') {
 
 function formatAmdAmount(amount) {
   const numericAmount = Number(amount);
-  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Գինը հարցումով';
+  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Գինը անհատական';
 
   return new Intl.NumberFormat('hy-AM', {
     style: 'currency',
@@ -236,7 +236,7 @@ function getMoneyAmount(value) {
 function getMoneyDisplay(value) {
   if (value?.display) return value.display;
   const amount = getMoneyAmount(value);
-  return amount ? formatAmdAmount(amount) : 'Գինը հարցումով';
+  return amount ? formatAmdAmount(amount) : 'Գինը անհատական';
 }
 
 function normalizeOrderCustomer(body, fallbackUser) {
@@ -261,7 +261,7 @@ function normalizeItemPrice(item) {
     item.unitPrice?.display
       ?? item.price?.display
       ?? item.snapshot?.price?.display,
-    amount ? formatAmdAmount(amount) : 'Գինը հարցումով',
+    amount ? formatAmdAmount(amount) : 'Գինը անհատական',
   );
 
   return {

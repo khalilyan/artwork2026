@@ -15,7 +15,6 @@ export const productImages = {
   detailAltOne: 'https://lh3.googleusercontent.com/aida/AP1WRLtp3SQLplq75RIhs9MxuEsH4ocK11xvz34OTAoc4nm-tEVIBAIe92NxS6r6z69z7zdJ_ghJRKPtSK5VkdTjCJJ4Ah2RbLsEmjmBFStKO96iDAnj8X5jAFxCuOZK8H_ztY1jdAvgTUa9_gvu9aeYk24-1zVfJBAOUF0fapKvq2Scm-dkuJkgvZp2tLgmb7sxVvNl1mLq8Gi_3b63_swzkZ2acDWD8v3-QmZsDHg-cFmpbahMDZPNDZTV',
   detailAltTwo: 'https://lh3.googleusercontent.com/aida/AP1WRLsXMhFJiPh80P9_kDvgLQF_XiMCiHYSLiDAUfb_JY7E1XucPZ_47KG9BymgmXL_mClflBryMyl_cNQ8AnpnKYer5D9cTOkZNE1ZtgovVcjd4jCjn82NGdW87KnLqm74d9kg1iEx8Dmk8hBdm8JiXaezENaMzaz3-D_j3PqkHyamNdqv55zc0uJKKFF9Sj57-jm7V9zBMlhEddc_RSA5u4Ct5LRATPY46n9CNMX9tT92QuSyepel3m76Kg',
   detailAltThree: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA2Vhn2U6ijquYM5Qyv1Nt575zDJCa66AkHPfW5oFybqNj91VrS-OsHGHvPD1bspxqI6VRl1IYYKF3I9gTX6wqsNJd3JHrKuG80ear0VR6cSXWn_nJD84Obo4fz_hltflgQxOUmKt0lobf8LQ2u6MLqjrwuvCHlB75cj9R8AId4Palg99B-RGUI96zxQM4iVONdCir593InAS9s2G_kAHov8ODItWsPLGlohgeD1wy2ek9hbO0GUTy4J9DXFvS_Xwytjki4NuXG6g',
-  technical: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBpfPGEkhKvgYyq22HWRjbFz48jnYETE073Cbju-3adQ5bH_MB11JCnHT2nrVmEqenfErVJteVcm_dPALBRuOtGBm2RffcIsHThdSca8gJgn9ngwuTRe8ePmpMiyB4qmilCCxrCyFBcXNKNunlsTwlUbNZn4la0ilU9PnocQZy5bHg7Ws0bQmFTJ2trf9HEQCzvqUymzJcv45d9F-MSUwHP23Dfxmn6tdc5lPz1qqYvSFJvdz_TyiZ3BYw9f1rY33Rb2pgch3KqDg',
 };
 
 export const products = [
@@ -32,9 +31,8 @@ export const productDetails = {
   name: "THE SCULPTOR'S CHAIR",
   material: 'SOLID WALNUT',
   price: { amount: 3450, currency: 'AMD', display: '3,450 ֏' },
-  description: "A study in architectural reduction. Hand-carved from solid black walnut with a deep, natural oil finish. The Sculptor's Chair challenges the boundary between functional furniture and fine art installation. Limited production of 50 signed pieces.",
+  description: "A study in architectural reduction. Hand-carved from solid black walnut with a deep, natural oil finish. The Sculptor's Chair challenges the boundary between functional furniture and fine art installation.",
   gallery: [productImages.detailMain, productImages.detailAltOne, productImages.detailAltTwo, productImages.detailAltThree],
-  technicalImage: productImages.technical,
 };
 
 export function getProduct(productId) {

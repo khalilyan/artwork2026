@@ -116,11 +116,6 @@ function productFormState(product = {}) {
     badge: product.sale?.isActive ? '' : product.badge ?? '',
     description: product.description ?? '',
     dimensionsText: product.dimensionsText ?? '',
-    craftsmanshipText: product.craftsmanshipText ?? '',
-    technicalTitle: product.technicalTitle ?? '',
-    technicalDescription: product.technicalDescription ?? '',
-    technicalNoteOne: product.technicalNoteOne ?? '',
-    technicalNoteTwo: product.technicalNoteTwo ?? '',
     categorySlug: product.categorySlug ?? '',
     type: product.type ?? '',
     priceAmount: basePriceAmount,
@@ -128,11 +123,9 @@ function productFormState(product = {}) {
     salePercent: product.sale?.percent ?? 0,
     primaryImage: product.images?.primary ?? product.image ?? '',
     hoverImage: product.images?.hover ?? product.hoverImage ?? '',
-    technicalImage: product.images?.technical ?? product.technicalImage ?? '',
     gallery: toArray(product.images?.gallery ?? product.gallery),
     roomSlugs: toArray(product.roomSlugs),
     hashtags: toCsv(product.hashtags),
-    limitedEdition: Boolean(product.limitedEdition),
     isActive: product.isActive !== false,
   };
 }
@@ -293,7 +286,6 @@ function ProductPhotoManager({ form, setForm, onUpload }) {
       </div>
       <ImageField label="Գլխավոր նկար" value={form.primaryImage} onChange={(value) => setField('primaryImage', value)} onUpload={onUpload} />
       <ImageField label="Լրացուցիչ նկար" value={form.hoverImage} onChange={(value) => setField('hoverImage', value)} onUpload={onUpload} />
-      <ImageField label="Չափերի / տեխնիկական նկար" value={form.technicalImage} onChange={(value) => setField('technicalImage', value)} onUpload={onUpload} />
       <div className="admin-gallery-list">
         <div className="admin-gallery-heading">
           <span>Գալերեայի նկարներ</span>
@@ -1110,11 +1102,6 @@ export default function AdminPage() {
                   <AdminEditorInput label="Նշում" value={productForm.badge} onChange={(value) => setProductForm((current) => ({ ...current, badge: value }))} />
                   <AdminEditorTextarea label="Նկարագրություն" value={productForm.description} onChange={(value) => setProductForm((current) => ({ ...current, description: value }))} />
                   <AdminEditorTextarea label="Չափեր" value={productForm.dimensionsText} onChange={(value) => setProductForm((current) => ({ ...current, dimensionsText: value }))} />
-                  <AdminEditorTextarea label="Վարպետություն" value={productForm.craftsmanshipText} onChange={(value) => setProductForm((current) => ({ ...current, craftsmanshipText: value }))} />
-                  <AdminEditorInput label="Տեխնիկական բլոկի վերնագիր" value={productForm.technicalTitle} onChange={(value) => setProductForm((current) => ({ ...current, technicalTitle: value }))} />
-                  <AdminEditorTextarea label="Տեխնիկական բլոկի տեքստ" value={productForm.technicalDescription} onChange={(value) => setProductForm((current) => ({ ...current, technicalDescription: value }))} />
-                  <AdminEditorInput label="Տեխնիկական նշում 1" value={productForm.technicalNoteOne} onChange={(value) => setProductForm((current) => ({ ...current, technicalNoteOne: value }))} />
-                  <AdminEditorInput label="Տեխնիկական նշում 2" value={productForm.technicalNoteTwo} onChange={(value) => setProductForm((current) => ({ ...current, technicalNoteTwo: value }))} />
                   <AdminEditorInput label="Սկզբնական գին" type="number" value={productForm.priceAmount} onChange={(value) => setProductForm((current) => ({ ...current, priceAmount: value }))} />
                   <AdminEditorInput label="Զեղչի տոկոս" type="number" value={productForm.salePercent} onChange={updateProductSalePercent} />
                   <ProductPlacementEditor rooms={rooms} form={productForm} setForm={setProductForm} />
@@ -1122,7 +1109,6 @@ export default function AdminPage() {
                   <AdminEditorInput label="Հեշթեգներ" value={productForm.hashtags} onChange={(value) => setProductForm((current) => ({ ...current, hashtags: value }))} />
                   <div className="admin-checks">
                     <label><input type="checkbox" checked={productForm.saleIsActive} onChange={(event) => setProductForm((current) => ({ ...current, saleIsActive: event.target.checked }))} /> Զեղչը ակտիվ է</label>
-                    <label><input type="checkbox" checked={productForm.limitedEdition} onChange={(event) => setProductForm((current) => ({ ...current, limitedEdition: event.target.checked }))} /> Սահմանափակ թողարկում</label>
                   </div>
                 </form>
                 {selectedProduct ? (

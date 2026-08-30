@@ -68,7 +68,6 @@ function getOrderItemImages(item, product) {
     product?.image,
     ...(product?.gallery ?? []),
     product?.hoverImage,
-    product?.technicalImage,
   ]);
 }
 

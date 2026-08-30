@@ -13,6 +13,17 @@ export function formatProduct(product, options = {}) {
   delete publicProduct.material;
   delete publicProduct.productSlug;
   delete publicProduct.productSku;
+  delete publicProduct.craftsmanshipText;
+  delete publicProduct.technicalTitle;
+  delete publicProduct.technicalDescription;
+  delete publicProduct.technicalNoteOne;
+  delete publicProduct.technicalNoteTwo;
+  delete publicProduct.limitedEdition;
+  delete publicProduct.technicalImage;
+  if (publicProduct.images && typeof publicProduct.images === 'object') {
+    const { technical: _technical, ...safeImages } = publicProduct.images;
+    publicProduct.images = safeImages;
+  }
   if (!options.includeReviews) {
     delete publicProduct.reviews;
   }
@@ -33,13 +44,12 @@ export function formatProduct(product, options = {}) {
     id: product.slug,
     priceAmount: product.price?.amount ?? null,
     currency: product.price?.currency ?? 'AMD',
-    price: product.price?.display ?? 'Price on request',
+    price: product.price?.display ?? 'Գինը անհատական',
     oldPriceAmount: product.oldPrice?.amount ?? null,
     oldPrice: product.oldPrice?.display ?? null,
     image: primaryImage,
     hoverImage: product.images?.hover ?? primaryImage,
     gallery: galleryImages,
-    technicalImage: product.images?.technical ?? primaryImage,
     reviewCount,
     averageRating,
   };
@@ -183,8 +193,6 @@ export function createProductSnapshot(product) {
     product.image,
     product.images?.hover,
     product.hoverImage,
-    product.images?.technical,
-    product.technicalImage,
   ].filter(Boolean)));
 
   return {
@@ -197,7 +205,7 @@ export function createProductSnapshot(product) {
       amount: priceAmount,
       currency: product.price?.currency ?? product.currency ?? 'AMD',
       display: priceDisplay ?? (priceAmount === null || priceAmount === undefined
-        ? 'Գինը հարցումով'
+        ? 'Գինը անհատական'
         : new Intl.NumberFormat('hy-AM', { style: 'currency', currency: product.price?.currency ?? product.currency ?? 'AMD', maximumFractionDigits: 0 }).format(priceAmount)),
     },
     roomSlugs: product.roomSlugs ?? [],

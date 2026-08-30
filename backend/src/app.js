@@ -51,7 +51,7 @@ function absoluteUrl(request, value, { preferApiOrigin = false } = {}) {
 
 function formatAmdPrice(amount) {
   const numericAmount = Number(amount);
-  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Գինը հարցումով';
+  if (!Number.isFinite(numericAmount) || numericAmount <= 0) return 'Գինը անհատական';
 
   return `${Math.round(numericAmount).toLocaleString('hy-AM')} ֏`;
 }

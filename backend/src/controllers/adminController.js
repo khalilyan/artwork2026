@@ -110,7 +110,7 @@ function createPrice(amount) {
   return {
     amount: parsedAmount,
     currency: nextCurrency,
-    display: parsedAmount === null ? 'Price on request' : new Intl.NumberFormat('hy-AM', {
+    display: parsedAmount === null ? 'Գինը անհատական' : new Intl.NumberFormat('hy-AM', {
       style: 'currency',
       currency: nextCurrency,
       maximumFractionDigits: 0,
@@ -156,6 +156,18 @@ function applySaleToProduct(product) {
 
 function cleanProductForStorage(product) {
   const { inventory: _inventory, ...cleanProduct } = product;
+  delete cleanProduct.craftsmanshipText;
+  delete cleanProduct.technicalTitle;
+  delete cleanProduct.technicalDescription;
+  delete cleanProduct.technicalNoteOne;
+  delete cleanProduct.technicalNoteTwo;
+  delete cleanProduct.limitedEdition;
+
+  if (cleanProduct.images && typeof cleanProduct.images === 'object') {
+    const { technical: _technical, ...safeImages } = cleanProduct.images;
+    cleanProduct.images = safeImages;
+  }
+
   if (Object.hasOwn(cleanProduct, 'price')) {
     cleanProduct.price = cleanProduct.price ? createPrice(cleanProduct.price.amount) : createPrice(null);
   }
@@ -179,11 +191,6 @@ function normalizeProductPayload(body) {
   setString('badge');
   setString('description');
   setString('dimensionsText');
-  setString('craftsmanshipText');
-  setString('technicalTitle');
-  setString('technicalDescription');
-  setString('technicalNoteOne');
-  setString('technicalNoteTwo');
   setString('categorySlug');
   setString('type');
   setString('group');
@@ -203,16 +210,13 @@ function normalizeProductPayload(body) {
     Object.assign(update, applySaleToProduct(update));
   }
 
-  if (Object.hasOwn(body, 'primaryImage') || Object.hasOwn(body, 'hoverImage') || Object.hasOwn(body, 'technicalImage') || Object.hasOwn(body, 'gallery')) {
+  if (Object.hasOwn(body, 'primaryImage') || Object.hasOwn(body, 'hoverImage') || Object.hasOwn(body, 'gallery')) {
     update.images = {
       primary: toCleanString(body.primaryImage),
       hover: toCleanString(body.hoverImage) || null,
-      technical: toCleanString(body.technicalImage) || null,
       gallery: toStringArray(body.gallery),
     };
   }
-
-  if (Object.hasOwn(body, 'limitedEdition')) update.limitedEdition = toBoolean(body.limitedEdition);
 
   update.updatedAt = new Date().toISOString();
   return cleanProductForStorage(update);
@@ -239,19 +243,12 @@ function normalizeNewProduct(body) {
     badge: toCleanString(body.badge),
     description: toCleanString(body.description),
     dimensionsText: toCleanString(body.dimensionsText),
-    craftsmanshipText: toCleanString(body.craftsmanshipText),
-    technicalTitle: toCleanString(body.technicalTitle),
-    technicalDescription: toCleanString(body.technicalDescription),
-    technicalNoteOne: toCleanString(body.technicalNoteOne),
-    technicalNoteTwo: toCleanString(body.technicalNoteTwo),
     images: {
       primary: toCleanString(body.primaryImage),
       hover: toCleanString(body.hoverImage) || null,
-      technical: toCleanString(body.technicalImage) || null,
       gallery: toStringArray(body.gallery),
     },
     reviews: [],
-    limitedEdition: toBoolean(body.limitedEdition),
     layout: toCleanString(body.layout, 'feature'),
     isActive: toBoolean(body.isActive, true),
     createdAt: now,
