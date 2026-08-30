@@ -43,6 +43,13 @@ export default function FurnitureRoomPage({ roomSlug }) {
       .catch(() => setRoom(null));
   }, [roomSlug]);
 
+  useEffect(() => {
+    if (!room) return;
+    if ((room.categories ?? []).length > 0) return;
+
+    window.location.replace(`/rooms/${roomSlug}/all`);
+  }, [room, roomSlug]);
+
   const roomName = room?.roomName ?? room?.title ?? room?.name ?? '';
   const roomImage = room?.image ?? room?.categories?.[0]?.image ?? '/artwork-logo.png';
   const roomBrandLogo = '/artwork-logo.png';

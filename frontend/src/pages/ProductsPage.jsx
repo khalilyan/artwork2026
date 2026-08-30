@@ -122,6 +122,8 @@ function ProductsSkeleton() {
 }
 
 export default function ProductsPage({ roomSlug, furnitureSlug }) {
+  const categoryFilter = furnitureSlug && furnitureSlug !== 'all' ? furnitureSlug : '';
+  const isRoomAllPage = Boolean(roomSlug) && furnitureSlug === 'all';
   const searchParams = new URLSearchParams(window.location.search);
   const [room, setRoom] = useState(null);
   const [category, setCategory] = useState(null);
@@ -138,7 +140,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const [isProductsLoading, setIsProductsLoading] = useState(true);
 
   useEffect(() => {
-    if (!roomSlug || !furnitureSlug) {
+    if (!roomSlug) {
       setRoom(null);
       setCategory(null);
       return;
@@ -147,13 +149,13 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     api.room(roomSlug)
       .then(({ room: nextRoom }) => {
         setRoom(nextRoom);
-        setCategory(nextRoom.categories?.find((item) => item.slug === furnitureSlug) ?? null);
+        setCategory(categoryFilter ? (nextRoom.categories?.find((item) => item.slug === categoryFilter) ?? null) : null);
       })
       .catch(() => {
         setRoom(null);
         setCategory(null);
       });
-  }, [roomSlug, furnitureSlug]);
+  }, [categoryFilter, roomSlug]);
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -161,7 +163,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     const loadingStartedAt = performance.now();
 
     setIsProductsLoading(true);
-    api.products({ roomSlug, categorySlug: furnitureSlug, q: query })
+    api.products({ roomSlug, categorySlug: categoryFilter, q: query })
       .then(({ products: nextProducts }) => {
         if (isCurrentRequest) setProducts(nextProducts ?? []);
       })
@@ -181,7 +183,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       isCurrentRequest = false;
       if (loadingTimer) window.clearTimeout(loadingTimer);
     };
-  }, [roomSlug, furnitureSlug, query]);
+  }, [categoryFilter, query, roomSlug]);
 
   const absoluteMaxPrice = defaultMaxPrice;
 
@@ -335,7 +337,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
 
   const getProductHref = (product) => {
     const nextRoomSlug = room?.slug ?? product.roomSlugs?.[0] ?? product.roomSlug;
-    const nextCategorySlug = category?.slug ?? product.categorySlug ?? product.type;
+    const nextCategorySlug = category?.slug ?? product.categorySlug ?? product.type ?? (nextRoomSlug ? 'all' : '');
     if (!product.id || !nextRoomSlug || !nextCategorySlug) return '/products';
     return `/rooms/${nextRoomSlug}/${nextCategorySlug}/${product.id}`;
   };
@@ -387,11 +389,15 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const isRoomCategoryPage = Boolean(room && category);
   const seoTitle = query
     ? `"${query}" որոնման արդյունքներ | ARTWORK`
+    : isRoomAllPage
+      ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Սենյակ'} | ARTWORK`
     : isRoomCategoryPage
       ? `${room.roomName ?? room.title ?? room.name}-ի ${furnitureTypeName} | ARTWORK`
       : 'ARTWORK | Դիզայներական կահույքի կատալոգ';
   const seoDescription = isRoomCategoryPage
     ? `${room.roomName ?? room.title ?? room.name}-ի համար ARTWORK-ի ${furnitureTypeName}՝ ընտրված նյութերով, վարպետական մշակումով և ժամանակակից ինտերիերի շեշտադրումներով։`
+    : isRoomAllPage
+      ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Այս սենյակի'} համար դիտեք ARTWORK-ի ամբողջ հասանելի կահույքը մեկ էջում։`
     : 'Դիտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, բազկաթոռները, լուսավորությունը, մահճակալները, բազմոցները և ինտերիերի այլ առարկաները։';
   const seoUrl = typeof window === 'undefined' ? '/products' : `${window.location.pathname}${window.location.search}`;
   const seoImage = visibleProducts[0]?.image ?? visibleProducts[0]?.images?.primary ?? defaultSeoImage;
@@ -409,10 +415,12 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         <div className="products-header-inner" data-products-header>
           <div>
             <span className="label-caps products-eyebrow">{isRoomCategoryPage ? 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ - ԼԱՅՆ ԸՆՏՐԱՆԻ' : 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ'}</span>
-            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${furnitureTypeName}ների լայն տեսականի` : 'Ցանկալի առարկաներ'}</h1>
+            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${furnitureTypeName}ների լայն տեսականի` : isRoomAllPage ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Սենյակ'} • բոլոր ապրանքները` : 'Ցանկալի առարկաներ'}</h1>
             <p>
               {isRoomCategoryPage
                 ? `Ձեռագործ ${furnitureTypeName}ներ, որոնք համադրում են բարձրակարգ նյութերը, վարպետական մշակումը և ժամանակակից դիզայնը՝ ստեղծելով ներդաշնակ ինտերիեր`
+                : isRoomAllPage
+                  ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Այս սենյակի'} համար հասանելի բոլոր ապրանքները մեկ էջում՝ առանց կահույքի տեսակի ընտրության։`
                 : 'Գտեք ձեր նախընտրած կահույքը՝ որոնելով և դասավորելով ամբողջ տեսականին ըստ անվան, գնի, նորույթի կամ ընտրած գնային միջակայքի։'}
             </p>
           </div>
