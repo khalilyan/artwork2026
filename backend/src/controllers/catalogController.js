@@ -5,6 +5,22 @@ import { toCleanString } from '../utils/validators.js';
 
 const furnitureLayouts = ['wide-center', 'portrait-left', 'wide-right'];
 const furniturePanels = ['bottom-right', 'center-right', 'bottom-left'];
+const defaultHomePage = {
+  slug: 'home',
+  type: 'landing',
+  heroSlides: [
+    {
+      title: 'ARTWORK FURNITURE',
+      subtitle: 'THE WALNUT & GOLD COLLECTION',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDde5DxRcfKhPmfRd713rQ9Ju9zoxMCiwafMQrh0gTZck2ovnnjgkrLfGxAjuOh5ddARMoNBKh2l60BskAHMs5iPPk-kHjRQFBpSOwMnKzmUI39X0Zom6tg3Y-FOzISnf2bzzGEFtpByHo-BCHGtZcodDZ5pK0i3AwSuHBBj87MB-5WMbzd6uynDsSxeZ9r1QKP2TmVvIxA42R6t_HbmRy4lVV1q-LrqlVD8gEQx8J78G9YJEdtwUUWCupTFlzubUUMvlzYjR8MCA',
+    },
+    {
+      title: 'LIVING QUARTERS',
+      subtitle: 'ARCHITECTURAL SEATING & COMFORT',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAQvPa4-s_1zVoBCQhXdX13CoOuP0oJg0tD8u-ogVGPM2l36814pyp255QAraFx2egLOpCwqHp_Vcy6KSFrNhjaaoqhU2riDbVGdhBMm0NwqKyUZ7IGmEf0j74nlZRwtlEeRcUeTQXiwK_zwJeLPjEQeK7IIqZX4I5QZgPJW9r5ZXxOHDYm15AlGnBg0GJwaEVh9MgoKqTe6vVJFEkHl5xLe5NnqZLaUFEU-gSMDuGvWsAmMFzGkKUercGj0RhuWfrGYK-CyXf9Ow',
+    },
+  ],
+};
 
 function withFurnitureLayout(type, index, roomSlug) {
   return {
@@ -165,8 +181,17 @@ export async function getPage(request, response, next) {
   try {
     const slug = toCleanString(request.params.pageSlug);
     const page = await getDatabase().collection('pages').findOne({ slug });
-    if (!page) throw new HttpError(404, 'Page was not found.');
+    if (!page) {
+      if (slug === 'home') {
+        response.set('Cache-Control', 'no-store');
+        response.json({ page: defaultHomePage });
+        return;
+      }
 
+      throw new HttpError(404, 'Page was not found.');
+    }
+
+    response.set('Cache-Control', slug === 'home' ? 'no-store' : 'public, max-age=60');
     response.json({ page });
   } catch (error) {
     next(error);
