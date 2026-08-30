@@ -53,7 +53,7 @@ export async function broadcastProductNotification(product) {
   const payload = JSON.stringify({
     title: 'ARTWORK նոր ապրանք',
     body: `${product.name} արդեն հասանելի է խանութում։`,
-    url: `/rooms/${product.roomSlugs?.[0] ?? 'living-room'}/${product.categorySlug ?? product.type ?? 'seating'}/${product.slug}`,
+    url: `/rooms/${product.roomSlugs?.[0] ?? 'living-room'}/${product.categorySlug ?? product.type ?? 'all'}/${product.slug}`,
     image: product.images?.primary ?? product.image ?? '/artwork-logo.png',
   });
   let sent = 0;

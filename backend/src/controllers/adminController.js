@@ -226,7 +226,7 @@ function normalizeNewProduct(body) {
   const now = new Date().toISOString();
   const slug = slugify(body.slug || body.name, `product-${Date.now()}`);
   const price = createPrice(body.priceAmount);
-  const categorySlug = toCleanString(body.categorySlug, toCleanString(body.type, 'seating'));
+  const categorySlug = toCleanString(body.categorySlug, toCleanString(body.type, ''));
 
   const product = {
     slug,
@@ -347,27 +347,75 @@ function normalizeHeroSlides(value, fallback = []) {
 
 async function findEmbeddedRoomProductBySlug(slug) {
   const room = await getDatabase().collection('rooms').findOne(
-    { 'furnitureTypes.products.slug': slug },
-    { projection: { slug: 1, furnitureTypes: 1 } },
+    {
+      $or: [
+        { 'products.slug': slug },
+        { 'products.productSlug': slug },
+        { 'furnitureTypes.products.slug': slug },
+        { 'furnitureTypes.products.productSlug': slug },
+      ],
+    },
+    { projection: { slug: 1, products: 1, furnitureTypes: 1 } },
   );
+
+  const roomLevelProduct = (room?.products ?? []).find((item) => item.slug === slug || item.productSlug === slug);
+  if (roomLevelProduct) {
+    return { roomSlug: room.slug, typeSlug: '', source: 'room', product: roomLevelProduct };
+  }
 
   for (const type of room?.furnitureTypes ?? []) {
     const product = (type.products ?? []).find((item) => item.slug === slug || item.productSlug === slug);
-    if (product) return { roomSlug: room.slug, typeSlug: type.slug, product };
+    if (product) return { roomSlug: room.slug, typeSlug: type.slug, source: 'type', product };
   }
 
   return null;
 }
 
+async function removeProductFromRooms(productSlug) {
+  const roomsCollection = getDatabase().collection('rooms');
+  const updatedAt = new Date().toISOString();
+
+  await Promise.all([
+    roomsCollection.updateMany(
+      { 'products.slug': productSlug },
+      { $pull: { products: { slug: productSlug } }, $set: { updatedAt } },
+    ),
+    roomsCollection.updateMany(
+      { 'products.productSlug': productSlug },
+      { $pull: { products: { productSlug } }, $set: { updatedAt } },
+    ),
+    roomsCollection.updateMany(
+      { 'furnitureTypes.products.slug': productSlug },
+      { $pull: { 'furnitureTypes.$[].products': { slug: productSlug } }, $set: { updatedAt } },
+    ),
+    roomsCollection.updateMany(
+      { 'furnitureTypes.products.productSlug': productSlug },
+      { $pull: { 'furnitureTypes.$[].products': { productSlug } }, $set: { updatedAt } },
+    ),
+  ]);
+}
+
 async function insertProductIntoRooms(product) {
   await assertProductPlacement(product);
+  const roomSlugs = toStringArray(product.roomSlugs);
+  const typeSlug = toCleanString(product.categorySlug, product.type);
+  const roomsCollection = getDatabase().collection('rooms');
 
-  await getDatabase().collection('rooms').updateMany(
-    { slug: { $in: toStringArray(product.roomSlugs) }, 'furnitureTypes.slug': toCleanString(product.categorySlug, product.type) },
-    {
-      $push: {
-        'furnitureTypes.$.products': product,
+  if (!typeSlug) {
+    await roomsCollection.updateMany(
+      { slug: { $in: roomSlugs } },
+      {
+        $push: { products: product },
+        $set: { updatedAt: new Date().toISOString() },
       },
+    );
+    return;
+  }
+
+  await roomsCollection.updateMany(
+    { slug: { $in: roomSlugs }, 'furnitureTypes.slug': typeSlug },
+    {
+      $push: { 'furnitureTypes.$.products': product },
       $set: { updatedAt: new Date().toISOString() },
     },
   );
@@ -377,10 +425,18 @@ async function assertProductPlacement(product) {
   const roomSlugs = toStringArray(product.roomSlugs);
   const typeSlug = toCleanString(product.categorySlug, product.type);
   assertRequest(roomSlugs.length > 0, 400, 'Select at least one room for this product.');
-  assertRequest(typeSlug, 400, 'Select a furniture type for this product.');
 
-  const matchingRooms = await getDatabase().collection('rooms').countDocuments({ slug: { $in: roomSlugs }, 'furnitureTypes.slug': typeSlug });
-  assertRequest(matchingRooms > 0, 400, 'Selected furniture type does not exist in the selected rooms.');
+  const selectedRooms = await getDatabase().collection('rooms')
+    .find({ slug: { $in: roomSlugs } }, { projection: { slug: 1, furnitureTypes: 1 } })
+    .toArray();
+  assertRequest(selectedRooms.length === roomSlugs.length, 400, 'One or more selected rooms do not exist.');
+
+  if (!typeSlug) {
+    return;
+  }
+
+  const matchingRooms = selectedRooms.filter((room) => (room.furnitureTypes ?? []).some((type) => type.slug === typeSlug));
+  assertRequest(matchingRooms.length === roomSlugs.length, 400, 'Selected furniture type does not exist in the selected rooms.');
 }
 
 function formatOrder(order, source = 'guest') {
@@ -518,11 +574,10 @@ export async function updateAdminProduct(request, response, next) {
     assertRequest(Object.keys(update).length > 1, 400, 'At least one product field is required.');
 
     const updatedProduct = cleanProductForStorage({ ...embeddedMatch.product, ...update });
+    updatedProduct.slug = toCleanString(updatedProduct.slug, slug);
+    delete updatedProduct.productSlug;
     await assertProductPlacement(updatedProduct);
-    await getDatabase().collection('rooms').updateMany(
-      { 'furnitureTypes.products.slug': slug },
-      { $pull: { 'furnitureTypes.$[].products': { slug } } },
-    );
+    await removeProductFromRooms(slug);
     await insertProductIntoRooms(updatedProduct);
 
     response.json({ product: { ...formatProduct(updatedProduct, { includeReviews: true }), group: updatedProduct.group ?? updatedProduct.type } });
@@ -553,10 +608,7 @@ export async function deleteAdminProduct(request, response, next) {
     const embeddedMatch = await findEmbeddedRoomProductBySlug(slug);
     if (!embeddedMatch) throw new HttpError(404, 'Product was not found.');
 
-    await getDatabase().collection('rooms').updateMany(
-      { 'furnitureTypes.products.slug': slug },
-      { $pull: { 'furnitureTypes.$[].products': { slug } } },
-    );
+    await removeProductFromRooms(slug);
 
     response.json({ deleted: true, productSlug: slug });
   } catch (error) {

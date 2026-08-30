@@ -109,7 +109,7 @@ function productFormState(product = {}) {
   const basePriceAmount = product.oldPriceAmount ?? product.oldPrice?.amount ?? product.priceAmount ?? product.price?.amount ?? '';
 
   return {
-    group: product.group ?? 'chairs',
+    group: product.group ?? '',
     slug: product.slug ?? '',
     name: product.name ?? '',
     sku: product.sku ?? '',
@@ -140,6 +140,7 @@ function materialFormState(material = {}) {
 }
 
 function getStorageGroupForType(typeSlug = '') {
+  if (!typeSlug) return '';
   if (typeSlug.includes('sofa')) return 'sofas';
   if (typeSlug.includes('bed')) return 'beds';
   if (typeSlug.includes('light')) return 'lighting';
@@ -304,7 +305,7 @@ function ProductPhotoManager({ form, setForm, onUpload }) {
           </label>
         </div>
         {form.gallery.map((photo, index) => (
-          <div className="admin-gallery-item" key={`${photo}-${index}`}>
+          <div className="admin-gallery-item" key={`gallery-item-${index}`}>
             {photo ? <img src={photo} alt={`Gallery ${index + 1}`} /> : <div className="admin-gallery-placeholder"><Icon name="image" /></div>}
             <input value={photo} onChange={(event) => updateGalleryItem(index, event.target.value)} placeholder="Նկարի հղում" />
             <label className="admin-upload-icon">
@@ -379,8 +380,8 @@ function CollectionProductPicker({ products, selectedSlugs, onChange }) {
 
 function ProductPlacementEditor({ rooms, form, setForm }) {
   const selectedRooms = new Set(form.roomSlugs);
-  const availableTypes = rooms
-    .filter((room) => selectedRooms.size === 0 || selectedRooms.has(room.slug))
+  const selectedRoomItems = rooms.filter((room) => selectedRooms.size === 0 || selectedRooms.has(room.slug));
+  const availableTypes = selectedRoomItems
     .flatMap((room) => room.furnitureTypes ?? [])
     .filter((type, index, types) => type.slug && types.findIndex((item) => item.slug === type.slug) === index);
 
@@ -420,11 +421,12 @@ function ProductPlacementEditor({ rooms, form, setForm }) {
       <label>
         <span>Կահույքի տեսակ</span>
         <select value={form.categorySlug} onChange={(event) => setType(event.target.value)}>
-          <option value="">Ընտրել տեսակ</option>
+          <option value="">Առանց տեսակի (ALL)</option>
           {availableTypes.map((type) => (
             <option value={type.slug} key={type.slug}>{type.title || type.slug}</option>
           ))}
         </select>
+        <small>Եթե տեսակը պարտադիր չէ, ընտրեք «Առանց տեսակի (ALL)»։</small>
       </label>
     </div>
   );
@@ -516,18 +518,24 @@ export default function AdminPage() {
 
   const productsByRoom = useMemo(() => {
     const needle = query.trim().toLowerCase();
+    const filterProducts = (items = []) => items
+      .map((embeddedProduct) => productsBySlug.get(embeddedProduct.slug ?? embeddedProduct.productSlug) ?? embeddedProduct)
+      .filter((product) => !needle || [product.name, product.sku, product.categorySlug]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(needle));
+
     return rooms.map((room) => {
       const typeSections = (room.furnitureTypes ?? []).map((type) => {
-        const typeProducts = (type.products ?? [])
-          .map((embeddedProduct) => productsBySlug.get(embeddedProduct.slug ?? embeddedProduct.productSlug) ?? embeddedProduct)
-          .filter((product) => !needle || [product.name, product.sku, product.categorySlug]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-          .includes(needle));
+        const typeProducts = filterProducts(type.products ?? []);
 
         return { type, products: typeProducts };
       });
+      const roomLevelProducts = filterProducts(room.products ?? []);
+      if (roomLevelProducts.length) {
+        typeSections.push({ type: { slug: 'all-products', title: 'Բոլոր ապրանքները (առանց տեսակի)' }, products: roomLevelProducts });
+      }
       const roomProducts = typeSections.flatMap((section) => section.products);
 
       return { room, products: roomProducts, typeSections };

@@ -38,6 +38,8 @@ async function ensureIndexes(db) {
     db.collection('rooms').createIndex({ slug: 1 }, { unique: true }),
     db.collection('rooms').createIndex({ 'furnitureTypes.slug': 1 }),
     db.collection('rooms').createIndex({ 'furnitureTypes.products.slug': 1 }),
+    db.collection('rooms').createIndex({ 'products.slug': 1 }),
+    db.collection('rooms').createIndex({ 'products.productSlug': 1 }),
     db.collection('contacts').createIndex({ createdAt: -1 }),
     db.collection('contacts').createIndex({ status: 1 }),
     db.collection('ai_generation_limits').createIndex({ key: 1 }, { unique: true }),

@@ -60,6 +60,24 @@ export async function listRoomProducts(options = {}) {
   const productsBySlug = new Map();
 
   for (const room of rooms) {
+    for (const embeddedProduct of room.products ?? []) {
+      const slug = embeddedProduct.slug ?? embeddedProduct.productSlug;
+      if (!slug) continue;
+
+      const existingProduct = productsBySlug.get(slug);
+      const roomSlugs = new Set([...(existingProduct?.roomSlugs ?? []), room.slug, ...(embeddedProduct.roomSlugs ?? [])]);
+      const productType = embeddedProduct.categorySlug ?? embeddedProduct.type ?? '';
+
+      productsBySlug.set(slug, {
+        ...embeddedProduct,
+        slug,
+        categorySlug: embeddedProduct.categorySlug ?? productType,
+        type: embeddedProduct.type ?? productType,
+        roomSlugs: Array.from(roomSlugs),
+        group: embeddedProduct.group ?? productType,
+      });
+    }
+
     for (const type of room.furnitureTypes ?? []) {
       for (const embeddedProduct of type.products ?? []) {
         const slug = embeddedProduct.slug ?? embeddedProduct.productSlug;
@@ -136,6 +154,17 @@ export async function incrementProductViews(productSlug) {
   if (!slug) return null;
 
   await getDatabase().collection('rooms').updateMany(
+    { 'products.slug': slug },
+    { $inc: { 'products.$[product].views': 1 } },
+    { arrayFilters: [{ 'product.slug': slug }] },
+  );
+  await getDatabase().collection('rooms').updateMany(
+    { 'products.productSlug': slug, 'products.slug': { $exists: false } },
+    { $inc: { 'products.$[product].views': 1 } },
+    { arrayFilters: [{ 'product.productSlug': slug, 'product.slug': { $exists: false } }] },
+  );
+
+  await getDatabase().collection('rooms').updateMany(
     { 'furnitureTypes.products.slug': slug },
     { $inc: { 'furnitureTypes.$[].products.$[product].views': 1 } },
     { arrayFilters: [{ 'product.slug': slug }] },
@@ -155,9 +184,25 @@ export async function appendProductReview(productSlug, review) {
   if (!match) return null;
 
   await getDatabase().collection('rooms').updateMany(
+    { 'products.slug': productSlug },
+    { $push: { 'products.$[product].reviews': review } },
+    { arrayFilters: [{ 'product.slug': productSlug }] },
+  );
+  await getDatabase().collection('rooms').updateMany(
+    { 'products.productSlug': productSlug, 'products.slug': { $exists: false } },
+    { $push: { 'products.$[product].reviews': review } },
+    { arrayFilters: [{ 'product.productSlug': productSlug, 'product.slug': { $exists: false } }] },
+  );
+
+  await getDatabase().collection('rooms').updateMany(
     { 'furnitureTypes.products.slug': productSlug },
     { $push: { 'furnitureTypes.$[].products.$[product].reviews': review } },
     { arrayFilters: [{ 'product.slug': productSlug }] },
+  );
+  await getDatabase().collection('rooms').updateMany(
+    { 'furnitureTypes.products.productSlug': productSlug, 'furnitureTypes.products.slug': { $exists: false } },
+    { $push: { 'furnitureTypes.$[].products.$[product].reviews': review } },
+    { arrayFilters: [{ 'product.productSlug': productSlug, 'product.slug': { $exists: false } }] },
   );
 
   const updatedMatch = await findProductBySlug(productSlug);
@@ -175,9 +220,25 @@ export async function removeProductReview(productSlug, reviewId) {
   }
 
   await getDatabase().collection('rooms').updateMany(
+    { 'products.slug': slug },
+    { $pull: { 'products.$[product].reviews': { _id: { $in: reviewIds } } } },
+    { arrayFilters: [{ 'product.slug': slug }] },
+  );
+  await getDatabase().collection('rooms').updateMany(
+    { 'products.productSlug': slug, 'products.slug': { $exists: false } },
+    { $pull: { 'products.$[product].reviews': { _id: { $in: reviewIds } } } },
+    { arrayFilters: [{ 'product.productSlug': slug, 'product.slug': { $exists: false } }] },
+  );
+
+  await getDatabase().collection('rooms').updateMany(
     { 'furnitureTypes.products.slug': slug },
     { $pull: { 'furnitureTypes.$[].products.$[product].reviews': { _id: { $in: reviewIds } } } },
     { arrayFilters: [{ 'product.slug': slug }] },
+  );
+  await getDatabase().collection('rooms').updateMany(
+    { 'furnitureTypes.products.productSlug': slug, 'furnitureTypes.products.slug': { $exists: false } },
+    { $pull: { 'furnitureTypes.$[].products.$[product].reviews': { _id: { $in: reviewIds } } } },
+    { arrayFilters: [{ 'product.productSlug': slug, 'product.slug': { $exists: false } }] },
   );
 
   const updatedMatch = await findProductBySlug(slug);

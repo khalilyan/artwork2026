@@ -75,13 +75,12 @@ function productImage(product) {
 
 function hasProductRoute(product) {
   const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
-  const categorySlug = product.categorySlug ?? product.type;
-  return Boolean(product.id && roomSlug && categorySlug);
+  return Boolean(product.id && roomSlug);
 }
 
 function productHref(product) {
   const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
-  const categorySlug = product.categorySlug ?? product.type;
+  const categorySlug = product.categorySlug ?? product.type ?? 'all';
   if (!product.id || !roomSlug || !categorySlug) return '/products';
   return `/rooms/${roomSlug}/${categorySlug}/${product.id}`;
 }

@@ -86,7 +86,7 @@ function getOrderTitle(order) {
 
 function getSavedItemHref(item) {
   const roomSlug = item.roomSlug ?? item.roomSlugs?.[0] ?? item.snapshot?.roomSlugs?.[0] ?? 'living-room';
-  const furnitureSlug = item.categorySlug ?? item.snapshot?.categorySlug ?? item.type ?? item.snapshot?.type ?? 'seating';
+  const furnitureSlug = item.categorySlug ?? item.snapshot?.categorySlug ?? item.type ?? item.snapshot?.type ?? 'all';
   return `/rooms/${roomSlug}/${furnitureSlug}/${item.productSlug}`;
 }
 

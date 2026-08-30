@@ -442,7 +442,7 @@ function getOrderItemUrl(item) {
   }
 
   const roomSlug = item.roomSlugs?.[0] ?? 'living-room';
-  const categorySlug = item.categorySlug ?? item.type ?? 'seating';
+  const categorySlug = item.categorySlug ?? item.type ?? 'all';
   return absolutePublicUrl(`/rooms/${roomSlug}/${categorySlug}/${item.productSlug}`);
 }
 

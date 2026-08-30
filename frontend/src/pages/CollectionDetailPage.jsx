@@ -26,7 +26,7 @@ function CollectionProductCard({ product, index }) {
   const price = formatAmdPrice(product.price?.amount ?? product.priceAmount ?? product.price);
   const material = product.description ?? 'Պատվերով նյութ';
   const roomSlug = product.roomSlugs?.[0] ?? 'living-room';
-  const furnitureSlug = product.categorySlug ?? product.type ?? 'seating';
+  const furnitureSlug = product.categorySlug ?? product.type ?? 'all';
   const href = `/rooms/${roomSlug}/${furnitureSlug}/${productId}`;
   const viewCount = Number(product.views ?? 0).toLocaleString('hy-AM');
   const badgeLabel = getProductBadgeLabel(product);

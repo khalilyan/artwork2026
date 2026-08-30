@@ -157,7 +157,7 @@ function ComplementaryProduct({ product }) {
   const productId = product.id ?? product.slug;
   const image = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
   const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
-  const furnitureSlug = product.categorySlug ?? product.type;
+  const furnitureSlug = product.categorySlug ?? product.type ?? (roomSlug ? 'all' : '');
   const href = productId && roomSlug && furnitureSlug ? `/rooms/${roomSlug}/${furnitureSlug}/${productId}` : '/products';
 
   return (
@@ -334,7 +334,8 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   }, [product.id]);
 
   useEffect(() => {
-    const targetCategorySlug = product.categorySlug ?? product.type ?? furnitureSlug;
+    const routeCategorySlug = furnitureSlug === 'all' ? '' : furnitureSlug;
+    const targetCategorySlug = product.categorySlug ?? product.type ?? routeCategorySlug;
     const targetRoomSlug = product.roomSlugs?.[0] ?? roomSlug;
     const relatedParams = targetCategorySlug
       ? { categorySlug: targetCategorySlug, sort: 'newest' }
