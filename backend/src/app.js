@@ -123,6 +123,10 @@ function extractProductSlugFromPath(requestPath) {
   return String(productSlug).trim();
 }
 
+function createInstanceMarker() {
+  return `artwork-${process.pid}-${Date.now().toString(36)}`;
+}
+
 async function getRouteMeta(request) {
   const productSlug = extractProductSlugFromPath(request.path);
   if (!productSlug) return defaultMeta;
@@ -145,9 +149,19 @@ async function getRouteMeta(request) {
 
 export function createApp() {
   const app = express();
+  const instanceMarker = createInstanceMarker();
 
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
+  app.locals.instanceMarker = instanceMarker;
+  app.locals.backendBuild = 'cors-diagnostic-2026-08-31';
+  app.locals.appModule = import.meta.url;
+  app.locals.startedAt = new Date().toISOString();
+  app.use((request, response, next) => {
+    response.set('X-Artwork-Instance', instanceMarker);
+    response.set('X-Artwork-Build', app.locals.backendBuild);
+    next();
+  });
   app.use(corsMiddleware);
   app.options(/.*/, corsMiddleware);
   app.use(jsonMiddleware);

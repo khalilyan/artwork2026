@@ -7,6 +7,15 @@ async function startServer() {
 
   const app = createApp();
   app.listen(env.port, () => {
+    console.log('[ARTWORK_BOOT]', {
+      marker: app.locals.instanceMarker,
+      build: app.locals.backendBuild,
+      appModule: app.locals.appModule,
+      startedAt: app.locals.startedAt,
+      cwd: process.cwd(),
+      port: env.port,
+      node: process.version,
+    });
     console.log(`ARTWORK API running on http://localhost:${env.port}`);
   });
 }
