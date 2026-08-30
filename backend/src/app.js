@@ -149,6 +149,7 @@ export function createApp() {
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
   app.use(corsMiddleware);
+  app.options(/.*/, corsMiddleware);
   app.use(jsonMiddleware);
   app.use('/uploads', express.static(path.join(backendRoot, 'uploads')));
   app.use('/api', apiRoutes);

@@ -2,6 +2,15 @@ import cors from 'cors';
 import express from 'express';
 import { env } from '../config/env.js';
 
+const defaultProductionOrigins = [
+  'https://artwork.am',
+  'https://www.artwork.am',
+  'https://api.artwork.am',
+];
+
+const allowedMethods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+const allowedHeaders = ['Content-Type', 'Authorization', 'X-Artwork-Guest-Id'];
+
 function isLocalFrontendOrigin(origin) {
   try {
     const { hostname } = new URL(origin);
@@ -13,7 +22,17 @@ function isLocalFrontendOrigin(origin) {
 
 function parseHostname(origin) {
   try {
-    return new URL(origin).hostname.toLowerCase();
+    return new URL(origin).hostname.toLowerCase().replace(/\.+$/, '');
+  } catch {
+    return '';
+  }
+}
+
+function normalizeOrigin(origin) {
+  try {
+    const parsed = new URL(origin);
+    const normalizedHostname = parsed.hostname.toLowerCase().replace(/\.+$/, '');
+    return `${parsed.protocol}//${normalizedHostname}${parsed.port ? `:${parsed.port}` : ''}`;
   } catch {
     return '';
   }
@@ -45,13 +64,32 @@ const trustedHostnames = (() => {
   }
 
   addHostnameVariants(hostnames, parseHostname(env.publicSiteUrl));
+  addHostnameVariants(hostnames, parseHostname(env.publicApiUrl));
+
+  for (const origin of defaultProductionOrigins) {
+    addHostnameVariants(hostnames, parseHostname(origin));
+  }
 
   return hostnames;
 })();
 
-const trustedRootDomain = getRootDomain(parseHostname(env.publicSiteUrl));
+const trustedOrigins = (() => {
+  const origins = new Set();
+
+  for (const origin of [...env.clientOrigins, env.publicSiteUrl, env.publicApiUrl, ...defaultProductionOrigins]) {
+    const normalized = normalizeOrigin(origin);
+    if (normalized) origins.add(normalized);
+  }
+
+  return origins;
+})();
+
+const trustedRootDomain = getRootDomain(parseHostname(env.publicSiteUrl)) || 'artwork.am';
 
 function isTrustedDeploymentOrigin(origin) {
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (normalizedOrigin && trustedOrigins.has(normalizedOrigin)) return true;
+
   const hostname = parseHostname(origin);
   if (!hostname) return false;
 
@@ -70,7 +108,10 @@ export const corsMiddleware = cors({
 
     callback(null, false);
   },
+  methods: allowedMethods,
+  allowedHeaders,
   credentials: true,
+  maxAge: 86400,
   optionsSuccessStatus: 204,
 });
 
