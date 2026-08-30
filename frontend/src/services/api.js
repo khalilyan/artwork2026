@@ -202,20 +202,32 @@ async function cartRequest(request) {
 }
 
 async function apiRequest(path, options = {}) {
+  const {
+    includeAuth = true,
+    includeGuestId = true,
+    ...requestOptions
+  } = options;
   const token = getAuthToken();
   const baseCandidates = createBaseCandidates(resolvedApiBaseUrl ?? configuredApiBaseUrl);
+  const requestMethod = String(requestOptions.method ?? 'GET').toUpperCase();
+  const isReadRequest = requestMethod === 'GET' || requestMethod === 'HEAD';
+  const hasBody = requestOptions.body !== undefined && requestOptions.body !== null;
 
   for (let index = 0; index < baseCandidates.length; index += 1) {
     const candidate = baseCandidates[index];
 
     try {
+      const baseHeaders = {
+        ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
+        ...(!isReadRequest && includeGuestId ? { 'X-Artwork-Guest-Id': getGuestId() } : {}),
+        ...(includeAuth && token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
       const response = await fetch(composeRequestUrl(candidate, path), {
-        ...options,
+        ...requestOptions,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Artwork-Guest-Id': getGuestId(),
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(options.headers ?? {}),
+          ...baseHeaders,
+          ...(requestOptions.headers ?? {}),
         },
       });
       const data = await response.json().catch(() => ({}));
@@ -259,24 +271,24 @@ export const api = {
   savePushSubscription: (payload) => apiRequest('/push/subscriptions', { method: 'POST', body: JSON.stringify(payload) }),
   removePushSubscription: (payload) => apiRequest('/push/subscriptions', { method: 'DELETE', body: JSON.stringify(payload) }),
   createReview: (productSlug, payload) => apiRequest(`/products/${productSlug}/reviews`, { method: 'POST', body: JSON.stringify(payload) }),
-  rooms: () => apiRequest('/catalog/rooms'),
-  room: (roomSlug) => apiRequest(`/catalog/rooms/${roomSlug}`),
-  categories: () => apiRequest('/catalog/categories'),
-  materials: () => apiRequest('/catalog/materials'),
-  pageAssets: (pageKey) => apiRequest(`/catalog/page-assets/${pageKey}`),
-  page: (pageSlug) => apiRequest(`/catalog/pages/${pageSlug}`),
+  rooms: () => apiRequest('/catalog/rooms', { includeAuth: false, includeGuestId: false }),
+  room: (roomSlug) => apiRequest(`/catalog/rooms/${roomSlug}`, { includeAuth: false, includeGuestId: false }),
+  categories: () => apiRequest('/catalog/categories', { includeAuth: false, includeGuestId: false }),
+  materials: () => apiRequest('/catalog/materials', { includeAuth: false, includeGuestId: false }),
+  pageAssets: (pageKey) => apiRequest(`/catalog/page-assets/${pageKey}`, { includeAuth: false, includeGuestId: false }),
+  page: (pageSlug) => apiRequest(`/catalog/pages/${pageSlug}`, { includeAuth: false, includeGuestId: false }),
   products: (params = {}) => {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value)).toString();
-    return apiRequest(`/catalog/products${query ? `?${query}` : ''}`);
+    return apiRequest(`/catalog/products${query ? `?${query}` : ''}`, { includeAuth: false, includeGuestId: false });
   },
-  product: (productSlug) => apiRequest(`/catalog/products/${productSlug}`),
+  product: (productSlug) => apiRequest(`/catalog/products/${productSlug}`, { includeAuth: false, includeGuestId: false }),
   aiSettings: () => apiRequest('/ai/settings'),
   visualizeProductInRoom: (payload) => apiRequest('/ai/room-preview', { method: 'POST', body: JSON.stringify(payload) }),
   collections: (params = {}) => {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')).toString();
-    return apiRequest(`/catalog/collections${query ? `?${query}` : ''}`);
+    return apiRequest(`/catalog/collections${query ? `?${query}` : ''}`, { includeAuth: false, includeGuestId: false });
   },
-  collection: (collectionSlug) => apiRequest(`/catalog/collections/${collectionSlug}`),
+  collection: (collectionSlug) => apiRequest(`/catalog/collections/${collectionSlug}`, { includeAuth: false, includeGuestId: false }),
   adminOverview: () => apiRequest('/admin/overview'),
   adminAiSettings: () => apiRequest('/admin/ai-settings'),
   updateAdminAiSettings: (payload) => apiRequest('/admin/ai-settings', { method: 'PATCH', body: JSON.stringify(payload) }),
