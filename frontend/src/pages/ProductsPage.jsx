@@ -44,13 +44,6 @@ function getFurnitureTypeName(category) {
   return category?.title ?? category?.name ?? category?.slug ?? '';
 }
 
-function pluralizeFurnitureTypeName(name) {
-  const cleanName = String(name ?? '').trim();
-  if (!cleanName) return '';
-  if (cleanName.endsWith('ներ')) return cleanName;
-  return `${cleanName}ներ`;
-}
-
 function ProductCard({ product, href, index }) {
   const layout = getProductLayout(index);
   const primaryImage = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
@@ -209,26 +202,6 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       .map(({ product }) => product);
   }, [isPriceFilterActive, maxPrice, minPrice, products, sort]);
 
-  const groupedProducts = useMemo(() => {
-    const groups = new Map();
-
-    visibleProducts.forEach((product) => {
-      const group = product.group ?? product.categorySlug ?? product.type ?? 'other';
-      if (!groups.has(group)) groups.set(group, []);
-      groups.get(group).push(product);
-    });
-
-    return Array.from(groups.entries()).map(([group, groupProducts]) => ({
-      group,
-      label: pluralizeFurnitureTypeName(
-        category
-          ? getFurnitureTypeName(category)
-          : room?.categories?.find((item) => item.slug === group)?.title ?? group.replace(/-/g, ' '),
-      ),
-      products: groupProducts,
-    }));
-  }, [category, room?.categories, visibleProducts]);
-
   useEffect(() => {
     if (isProductsLoading || typeof window === 'undefined') return undefined;
 
@@ -336,10 +309,14 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   }, [isProductsLoading, visibleProducts.length]);
 
   const getProductHref = (product) => {
-    const nextRoomSlug = room?.slug ?? product.roomSlugs?.[0] ?? product.roomSlug;
-    const nextCategorySlug = category?.slug ?? product.categorySlug ?? product.type ?? (nextRoomSlug ? 'all' : '');
-    if (!product.id || !nextRoomSlug || !nextCategorySlug) return '/products';
-    return `/rooms/${nextRoomSlug}/${nextCategorySlug}/${product.id}`;
+    const productId = product.id ?? product.slug ?? product.productSlug;
+    const nextRoomSlug = roomSlug ?? room?.slug ?? product.roomSlug ?? product.roomSlugs?.[0];
+    const routeCategorySlug = category?.slug ?? categoryFilter ?? (isRoomAllPage ? 'all' : '');
+    const itemCategorySlug = product.categorySlug ?? product.type ?? '';
+    const nextCategorySlug = routeCategorySlug || itemCategorySlug || (nextRoomSlug ? 'all' : '');
+
+    if (!productId || !nextRoomSlug || !nextCategorySlug) return '/products';
+    return `/rooms/${nextRoomSlug}/${nextCategorySlug}/${productId}`;
   };
 
   const clearFilters = () => {
@@ -387,6 +364,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
 
   const furnitureTypeName = getFurnitureTypeName(category);
   const isRoomCategoryPage = Boolean(room && category);
+  const roomHeadingTitle = room?.roomName ?? room?.title ?? room?.name ?? 'Բոլոր ապրանքները';
   const seoTitle = query
     ? `"${query}" որոնման արդյունքներ | ARTWORK`
     : isRoomAllPage
@@ -500,19 +478,24 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       </header>
 
       <section className="products-grouped container">
-        {isProductsLoading ? <ProductsSkeleton /> : visibleProducts.length ? groupedProducts.map(({ group, label, products: groupProducts }) => (
-          <section className="products-group" key={group}>
+        {isProductsLoading ? <ProductsSkeleton /> : visibleProducts.length ? (
+          <section className="products-group">
             <div className="products-group-heading">
-              <span className="label-caps">{String(groupProducts.length).padStart(2, '0')} ՏԵՍԱԿ</span>
-              <h2>{label}</h2>
+              <span className="label-caps">{String(visibleProducts.length).padStart(2, '0')} ԱՊՐԱՆՔ</span>
+              <h2>{roomHeadingTitle}</h2>
             </div>
             <div className="products-collage">
-              {groupProducts.map((product, index) => (
-                <ProductCard product={product} href={getProductHref(product)} index={index} key={product.id} />
+              {visibleProducts.map((product, index) => (
+                <ProductCard
+                  product={product}
+                  href={getProductHref(product)}
+                  index={index}
+                  key={product.id ?? product.slug ?? product.productSlug ?? `${product.name}-${index}`}
+                />
               ))}
             </div>
           </section>
-        )) : <p className="products-empty">Այս գնի միջակայքում առարկաներ չկան։</p>}
+        ) : <p className="products-empty">Այս գնի միջակայքում առարկաներ չկան։</p>}
       </section>
     </main>
   );

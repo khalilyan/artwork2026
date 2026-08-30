@@ -3659,8 +3659,9 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .products-form-meta > .material-symbols-outlined {
-  width: 44px;
-  height: 44px;
+  width: 64px;
+  height: 46px;
+  font-size: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -14389,6 +14390,11 @@ body.has-mobile-menu-open {
   .products-form-meta {
     margin-top: 20px;
     gap: 16px;
+  }
+
+  .products-form-meta > .material-symbols-outlined {
+    width: 58px;
+    height: 44px;
   }
 
   .products-form-meta strong {
