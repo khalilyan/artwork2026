@@ -3660,6 +3660,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 .products-form-meta > .material-symbols-outlined {
   width: 98px;
+  min-width: 98px;
+  max-width: none;
   height: 52px;
   font-size: 24px;
   display: inline-flex;
@@ -14394,6 +14396,8 @@ body.has-mobile-menu-open {
 
   .products-form-meta > .material-symbols-outlined {
     width: 86px;
+    min-width: 86px;
+    max-width: none;
     height: 50px;
   }
 
