@@ -1,6 +1,7 @@
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 
-const defaultProductionApiBaseUrl = 'https://api.artwork.am/api';
+const defaultProductionApiBaseUrl = '/api';
+const defaultProductionApiFallbackUrl = 'https://api.artwork.am/api';
 const configuredApiBaseUrl = resolveApiBaseUrl();
 const authTokenKey = 'artworkAuthToken';
 const authUserKey = 'artworkAuthUser';
@@ -58,6 +59,11 @@ function createBaseCandidates(baseUrl) {
     pushCandidate(normalizedBase.slice(0, -4));
   } else {
     pushCandidate(`${normalizedBase}/api`);
+  }
+
+  // Prefer same-origin in production, but keep cross-origin API fallback.
+  if (import.meta.env.PROD && normalizedBase.startsWith('/')) {
+    pushCandidate(defaultProductionApiFallbackUrl);
   }
 
   return candidates.filter((candidate) => candidate || candidate === '');
