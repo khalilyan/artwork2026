@@ -4913,15 +4913,15 @@ body:has(.restoration-lens:hover) .custom-cursor {
 .details-complementary-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .details-similar-card {
   display: grid;
-  grid-template-columns: 116px minmax(0, 1fr) auto;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 10px;
+  gap: 10px;
+  padding: 8px;
   border: 1px solid rgba(99, 48, 5, 0.14);
   background: var(--surface-container-low);
   color: inherit;
@@ -4937,7 +4937,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 .details-similar-image-wrap {
   position: relative;
-  width: 116px;
+  width: 90px;
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--surface-container);
@@ -4966,24 +4966,24 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .details-similar-copy h3 {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   font-family: var(--font-serif);
-  font-size: clamp(18px, 2.1vw, 24px);
-  line-height: 1.15;
+  font-size: clamp(16px, 1.6vw, 20px);
+  line-height: 1.1;
 }
 
 .details-similar-copy p {
   margin: 0;
   color: rgba(83, 68, 59, 0.86);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .details-similar-copy p:last-child {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
   overflow: hidden;
 }
 
@@ -4991,13 +4991,13 @@ body:has(.restoration-lens:hover) .custom-cursor {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: rgba(99, 48, 5, 0.62);
 }
 
 .details-similar-meta {
   display: grid;
-  gap: 10px;
+  gap: 6px;
   justify-items: end;
   text-align: right;
 }
@@ -5019,7 +5019,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
 .details-similar-meta strong {
   color: var(--primary);
   font-family: var(--font-serif);
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
 }
 
@@ -5027,8 +5027,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border: 1px solid rgba(99, 48, 5, 0.2);
   border-radius: 999px;
 }
@@ -15461,26 +15461,26 @@ body.has-mobile-menu-open {
   }
 
   .details-complementary-grid {
-    gap: 12px;
+    gap: 8px;
   }
 
   .details-similar-card {
-    grid-template-columns: 92px minmax(0, 1fr);
+    grid-template-columns: 76px minmax(0, 1fr);
     align-items: start;
-    gap: 10px;
-    padding: 9px;
+    gap: 8px;
+    padding: 7px;
   }
 
   .details-similar-image-wrap {
-    width: 92px;
+    width: 76px;
   }
 
   .details-similar-copy h3 {
-    font-size: clamp(17px, 5.2vw, 22px);
+    font-size: clamp(15px, 4.8vw, 18px);
   }
 
   .details-similar-copy p {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .details-similar-meta {
@@ -15491,7 +15491,7 @@ body.has-mobile-menu-open {
   }
 
   .details-similar-meta strong {
-    font-size: 19px;
+    font-size: 16px;
   }
 
   .details-similar-arrow {
