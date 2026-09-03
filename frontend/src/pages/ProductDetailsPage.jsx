@@ -13,7 +13,6 @@ import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js
 
 const initialReviewLimit = 3;
 const minimumSkeletonMs = 1700;
-const relatedProductLayouts = ['feature', 'narrow-drop', 'square-left', 'wide-mid', 'narrow', 'large-square'];
 const emptyProduct = {
   id: '',
   name: '',
@@ -51,10 +50,6 @@ function uniqueProductsById(items) {
     seenIds.add(id);
     return true;
   });
-}
-
-function getRelatedProductLayout(index) {
-  return relatedProductLayouts[index % relatedProductLayouts.length];
 }
 
 function buildProductDetailsHref(product, fallbackRoomSlug = '', fallbackCategorySlug = 'all') {
@@ -236,36 +231,34 @@ function StarRating({ value, onChange }) {
   );
 }
 
-function ComplementaryProduct({ product, index, fallbackRoomSlug, fallbackCategorySlug }) {
-  const productId = product.id ?? product.slug;
-  const layout = getRelatedProductLayout(index);
+function ComplementaryProduct({ product, fallbackRoomSlug, fallbackCategorySlug }) {
   const primaryImage = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
-  const hoverImage = product.hoverImage ?? product.images?.hover ?? product.images?.gallery?.[1] ?? primaryImage;
   const viewCount = Number(product.views ?? 0).toLocaleString('hy-AM');
   const badgeLabel = getProductBadgeLabel(product);
   const href = buildProductDetailsHref(product, fallbackRoomSlug, fallbackCategorySlug);
   const price = formatAmdPrice(getPriceAmount(product.price?.amount, product.priceAmount, product.price));
 
   return (
-    <a className={`products-card products-card-${layout} products-form-card product-card details-complementary-card`} href={href} data-cursor-target>
-      <span className="products-form-index label-caps">{String(index + 1).padStart(2, '0')}</span>
-      <div className="products-form-image products-image-wrap">
-        {badgeLabel ? <span className="products-badge label-caps">{badgeLabel}</span> : null}
-        <img className="products-card-image card-img-primary" src={primaryImage} alt={product.name} />
-        <img className="products-card-image card-img-secondary" src={hoverImage} alt={`${product.name} լրացուցիչ տեսք`} />
+    <a className="details-similar-card" href={href} data-cursor-target>
+      <div className="details-similar-image-wrap">
+        {badgeLabel ? <span className="details-similar-badge label-caps">{badgeLabel}</span> : null}
+        <img className="details-similar-image" src={primaryImage} alt={product.name} />
       </div>
-      <div className="products-form-copy">
-        <p className="label-caps products-views-label"><Icon name="visibility" />Դիտումներ՝ {viewCount}</p>
+      <div className="details-similar-copy">
+        <p className="label-caps details-similar-views">
+          <ViewIcon className="details-view-icon" />
+          Դիտումներ՝ {viewCount}
+        </p>
         <h3>{product.name}</h3>
-        <span>{product.description ?? product.type ?? 'ARTWORK ԱՌԱՐԿԱ'}</span>
+        <p>{product.description ?? product.type ?? 'ARTWORK ԱՌԱՐԿԱ'}</p>
       </div>
-      <div className="products-form-meta">
+      <div className="details-similar-meta">
         <div>
           <span className="label-caps">Գին</span>
           {product.oldPrice ? <del>{formatAmdPrice(product.oldPrice)}</del> : null}
           <strong>{price}</strong>
         </div>
-        <Icon name="arrow_forward" />
+        <Icon name="arrow_forward" className="details-similar-arrow" />
       </div>
     </a>
   );
@@ -1058,7 +1051,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
           {relatedProducts.map((item, index) => (
             <ComplementaryProduct
               product={item}
-              index={index}
               fallbackRoomSlug={relatedFallbackRoomSlug}
               fallbackCategorySlug={relatedFallbackCategorySlug}
               key={item.id ?? item.slug ?? `${item.name}-${index}`}
