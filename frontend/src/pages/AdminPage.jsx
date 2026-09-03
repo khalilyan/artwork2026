@@ -982,6 +982,16 @@ export default function AdminPage() {
               <h1>Ադմին վահանակ</h1>
             </div>
             <div className="admin-topbar-actions">
+              <label className="admin-tab-picker" htmlFor="admin-tab-picker">
+                <span className="label-caps">Բաժին</span>
+                <select id="admin-tab-picker" value={activeTab} onChange={(event) => setActiveTab(event.target.value)}>
+                  {tabs.map((tab) => (
+                    <option value={tab.id} key={tab.id}>
+                      {tab.label}{notificationCounts[tab.id] ? ` (${notificationCounts[tab.id] > 99 ? '99+' : notificationCounts[tab.id]})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {activeSaveAction ? (
                 <button className="admin-save" type="submit" form={activeSaveAction.formId}>
                   <Icon name="save" />

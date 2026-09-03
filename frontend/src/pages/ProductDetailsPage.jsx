@@ -13,6 +13,7 @@ import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js
 
 const initialReviewLimit = 3;
 const minimumSkeletonMs = 1700;
+const relatedProductLayouts = ['feature', 'narrow-drop', 'square-left', 'wide-mid', 'narrow', 'large-square'];
 const emptyProduct = {
   id: '',
   name: '',
@@ -50,6 +51,88 @@ function uniqueProductsById(items) {
     seenIds.add(id);
     return true;
   });
+}
+
+function getRelatedProductLayout(index) {
+  return relatedProductLayouts[index % relatedProductLayouts.length];
+}
+
+function buildProductDetailsHref(product, fallbackRoomSlug = '', fallbackCategorySlug = 'all') {
+  const productId = product.id ?? product.slug ?? product.productSlug;
+  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug ?? fallbackRoomSlug;
+  const categorySlug = product.categorySlug ?? product.type ?? fallbackCategorySlug ?? (roomSlug ? 'all' : '');
+
+  if (!productId || !roomSlug) return '/products';
+  return `/rooms/${roomSlug}/${categorySlug || 'all'}/${productId}`;
+}
+
+function normalizeTag(value) {
+  return String(value ?? '').trim().toLowerCase();
+}
+
+function getProductTags(product) {
+  return new Set([
+    ...(product.hashtags ?? []),
+    product.categorySlug,
+    product.type,
+    product.group,
+  ].map((value) => normalizeTag(value)).filter(Boolean));
+}
+
+function getRelatedScore(sourceProduct, candidateProduct) {
+  const sourceTags = getProductTags(sourceProduct);
+  const candidateTags = getProductTags(candidateProduct);
+
+  let score = 0;
+  candidateTags.forEach((tag) => {
+    if (sourceTags.has(tag)) score += 1;
+  });
+
+  if (sourceProduct.categorySlug && sourceProduct.categorySlug === candidateProduct.categorySlug) score += 2;
+  if (sourceProduct.type && sourceProduct.type === candidateProduct.type) score += 1;
+
+  return score;
+}
+
+function pickRelatedProducts(candidates, sourceProduct, maxCount = 3) {
+  const scoredCandidates = candidates.map((item) => ({
+    item,
+    score: getRelatedScore(sourceProduct, item),
+    randomOrder: Math.random(),
+  }));
+
+  const selectedItems = [];
+  const selectedIds = new Set();
+
+  const tagMatched = scoredCandidates
+    .filter((entry) => entry.score > 0)
+    .sort((first, second) => second.score - first.score || first.randomOrder - second.randomOrder);
+
+  tagMatched.forEach(({ item }) => {
+    if (selectedItems.length >= maxCount) return;
+    const itemId = item.id ?? item.slug ?? item.productSlug;
+    if (!itemId || selectedIds.has(itemId)) return;
+    selectedIds.add(itemId);
+    selectedItems.push(item);
+  });
+
+  if (selectedItems.length >= maxCount) {
+    return selectedItems.slice(0, maxCount);
+  }
+
+  const randomFill = scoredCandidates
+    .sort((first, second) => first.randomOrder - second.randomOrder)
+    .map(({ item }) => item);
+
+  randomFill.forEach((item) => {
+    if (selectedItems.length >= maxCount) return;
+    const itemId = item.id ?? item.slug ?? item.productSlug;
+    if (!itemId || selectedIds.has(itemId)) return;
+    selectedIds.add(itemId);
+    selectedItems.push(item);
+  });
+
+  return selectedItems;
 }
 
 function ViewIcon({ className = '' }) {
@@ -153,24 +236,37 @@ function StarRating({ value, onChange }) {
   );
 }
 
-function ComplementaryProduct({ product }) {
+function ComplementaryProduct({ product, index, fallbackRoomSlug, fallbackCategorySlug }) {
   const productId = product.id ?? product.slug;
-  const image = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
-  const roomSlug = product.roomSlugs?.[0] ?? product.roomSlug;
-  const furnitureSlug = product.categorySlug ?? product.type ?? (roomSlug ? 'all' : '');
-  const href = productId && roomSlug && furnitureSlug ? `/rooms/${roomSlug}/${furnitureSlug}/${productId}` : '/products';
+  const layout = getRelatedProductLayout(index);
+  const primaryImage = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
+  const hoverImage = product.hoverImage ?? product.images?.hover ?? product.images?.gallery?.[1] ?? primaryImage;
+  const viewCount = Number(product.views ?? 0).toLocaleString('hy-AM');
+  const badgeLabel = getProductBadgeLabel(product);
+  const href = buildProductDetailsHref(product, fallbackRoomSlug, fallbackCategorySlug);
+  const price = formatAmdPrice(getPriceAmount(product.price?.amount, product.priceAmount, product.price));
 
   return (
-    <a className="details-complementary-card" href={href}>
-      <div>
-        <img src={image} alt={product.name} />
+    <a className={`products-card products-card-${layout} products-form-card product-card details-complementary-card`} href={href} data-cursor-target>
+      <span className="products-form-index label-caps">{String(index + 1).padStart(2, '0')}</span>
+      <div className="products-form-image products-image-wrap">
+        {badgeLabel ? <span className="products-badge label-caps">{badgeLabel}</span> : null}
+        <img className="products-card-image card-img-primary" src={primaryImage} alt={product.name} />
+        <img className="products-card-image card-img-secondary" src={hoverImage} alt={`${product.name} լրացուցիչ տեսք`} />
       </div>
-      <p className="label-caps details-complementary-views">
-        <ViewIcon className="details-view-icon" />
-        Դիտումներ՝ {Number(product.views ?? 0).toLocaleString('hy-AM')}
-      </p>
-      <h4>{product.name}</h4>
-      <span>{formatAmdPrice(product.price?.amount ?? product.priceAmount ?? product.price)}</span>
+      <div className="products-form-copy">
+        <p className="label-caps products-views-label"><Icon name="visibility" />Դիտումներ՝ {viewCount}</p>
+        <h3>{product.name}</h3>
+        <span>{product.description ?? product.type ?? 'ARTWORK ԱՌԱՐԿԱ'}</span>
+      </div>
+      <div className="products-form-meta">
+        <div>
+          <span className="label-caps">Գին</span>
+          {product.oldPrice ? <del>{formatAmdPrice(product.oldPrice)}</del> : null}
+          <strong>{price}</strong>
+        </div>
+        <Icon name="arrow_forward" />
+      </div>
     </a>
   );
 }
@@ -250,6 +346,8 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const hasSalePrice = oldPriceAmount > 0 && oldPriceAmount > productPriceAmount;
   const oldProductPrice = hasSalePrice ? formatAmdPrice(oldPriceAmount) : '';
   const badgeLabel = getProductBadgeLabel(product);
+  const relatedFallbackRoomSlug = product.roomSlugs?.[0] ?? roomSlug ?? '';
+  const relatedFallbackCategorySlug = product.categorySlug ?? product.type ?? furnitureSlug ?? 'all';
 
   useEffect(() => {
     api.aiSettings()
@@ -334,25 +432,33 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   }, [product.id]);
 
   useEffect(() => {
-    const routeCategorySlug = furnitureSlug === 'all' ? '' : furnitureSlug;
-    const targetCategorySlug = product.categorySlug ?? product.type ?? routeCategorySlug;
     const targetRoomSlug = product.roomSlugs?.[0] ?? roomSlug;
-    const relatedParams = targetCategorySlug
-      ? { categorySlug: targetCategorySlug, sort: 'newest' }
-      : { roomSlug: targetRoomSlug, sort: 'newest' };
+    if (!targetRoomSlug || !product.id) {
+      setRelatedProducts([]);
+      return;
+    }
 
-    api.products(relatedParams)
+    api.products({ roomSlug: targetRoomSlug })
       .then(({ products: nextProducts }) => {
-        const nextRelatedProducts = uniqueProductsById(nextProducts)
-          .filter((item) => item.id !== product.id)
-          .slice(0, 3);
+        const roomProducts = uniqueProductsById(nextProducts)
+          .filter((item) => {
+            const itemId = item.id ?? item.slug ?? item.productSlug;
+            const itemRooms = Array.isArray(item.roomSlugs) ? item.roomSlugs : [];
+            const itemRoomSlug = item.roomSlug ?? itemRooms[0] ?? '';
+
+            return Boolean(itemId)
+              && itemId !== product.id
+              && (itemRoomSlug === targetRoomSlug || itemRooms.includes(targetRoomSlug));
+          });
+
+        const nextRelatedProducts = pickRelatedProducts(roomProducts, product, 3);
 
         setRelatedProducts(nextRelatedProducts);
       })
       .catch(() => {
         setRelatedProducts([]);
       });
-  }, [furnitureSlug, product.categorySlug, product.id, product.roomSlugs, product.type, roomSlug]);
+  }, [product.categorySlug, product.group, product.hashtags, product.id, product.roomSlug, product.roomSlugs, product.type, roomSlug]);
 
   const productGallery = useMemo(() => {
     const images = Array.from(new Set([
@@ -949,8 +1055,14 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
           <a className="label-caps" href={`/rooms/${roomSlug}/${furnitureSlug}`}>ԴԻՏԵԼ ԱՄԲՈՂՋ ԲԱԺԻՆԸ</a>
         </div>
         <div className="details-complementary-grid">
-          {relatedProducts.map((item) => (
-            <ComplementaryProduct product={item} key={item.id} />
+          {relatedProducts.map((item, index) => (
+            <ComplementaryProduct
+              product={item}
+              index={index}
+              fallbackRoomSlug={relatedFallbackRoomSlug}
+              fallbackCategorySlug={relatedFallbackCategorySlug}
+              key={item.id ?? item.slug ?? `${item.name}-${index}`}
+            />
           ))}
         </div>
       </section>

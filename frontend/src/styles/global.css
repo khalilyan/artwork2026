@@ -17,10 +17,10 @@
   --surface-container-low: #f6f3f2;
   --surface-container-high: #eae7e7;
   --outline-variant: #d8c2b7;
-  --primary: #C2B067;
+  --primary: #9d893b;
   --primary-container: #442a16;
   --secondary: #735b11;
-  --secondary-fixed: #ffdf91;
+  --secondary-fixed: #d6b258;
   --on-primary: #ffffff;
   --on-surface: #1c1b1b;
   --on-surface-variant: #53443b;
@@ -2023,7 +2023,7 @@ img {
 
 :where(
   .products-image-wrap img,
-  .details-complementary-card img,
+  .details-complementary-card .products-card-image,
   .cart-item-image img,
   .spec-product-image img,
   .details-stack-item img,
@@ -4915,47 +4915,21 @@ body:has(.restoration-lens:hover) .custom-cursor {
   gap: var(--gutter);
 }
 
-.details-complementary-card div {
+.details-complementary-card .products-form-image {
   aspect-ratio: 3 / 4;
   margin-bottom: 24px;
   overflow: hidden;
   background: var(--surface-container);
 }
 
-.details-complementary-card img {
+.details-complementary-card .products-card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.details-complementary-card:hover img {
-  transform: scale(1.025);
-}
-
-.details-complementary-card p {
-  margin: 0 0 8px;
-  color: var(--primary);
-}
-
-.details-complementary-views {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.details-complementary-views .details-view-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.details-complementary-card h4,
-.details-complementary-card span {
-  margin: 0 0 8px;
-  font-family: var(--font-serif);
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1.3;
+.details-complementary-card .products-form-copy > span {
+  max-width: none;
 }
 
 .cart-page {
@@ -7458,7 +7432,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 :where(
   .products-image-wrap img,
-  .details-complementary-card img,
+  .details-complementary-card .products-card-image,
   .cart-item-image img,
   .spec-product-image img,
   .details-stack-item img,
@@ -7492,36 +7466,6 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
   .home-service-visual,
   .home-service-trade .home-service-visual {
-    grid-column: span 6;
-  }
-
-  .home-service-copy h2 {
-    font-size: clamp(44px, 6vw, 72px);
-  }
-
-  .header-logo img {
-    height: 70px;
-  }
-
-  .header-menu {
-    gap: 24px;
-  }
-
-  .hide-tablet {
-    display: none;
-  }
-
-  .about-hero-copy,
-  .about-hero-image,
-  .about-image-stack,
-  .about-heritage-copy,
-  .about-precision-image,
-  .about-precision-copy {
-    grid-column: span 6;
-  }
-
-  .room-card,
-  .room-card.is-right {
     grid-column: span 6;
   }
 
@@ -8938,9 +8882,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .admin-topbar,
-.admin-panel-heading,
-.admin-list-row,
-.admin-products-table button {
+.admin-panel-heading {
   display: flex;
   align-items: center;
 }
@@ -8957,6 +8899,26 @@ body:has(.restoration-lens:hover) .custom-cursor {
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.admin-tab-picker {
+  display: none;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.admin-tab-picker span {
+  color: rgba(33, 27, 22, 0.62);
+}
+
+.admin-tab-picker select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(33, 27, 22, 0.16);
+  background: #fffaf2;
+  color: #211b16;
+  font: inherit;
 }
 
 .admin-topbar h1,
@@ -9047,6 +9009,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 .admin-panel-heading {
   justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -9443,6 +9407,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .admin-products-table button {
+  display: grid;
+  align-items: center;
   grid-template-columns: 64px minmax(0, 1fr) 120px 96px 64px;
   gap: 12px;
   width: 100%;
@@ -9602,6 +9568,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .admin-list-row {
+  display: grid;
+  align-items: center;
   grid-template-columns: minmax(140px, 0.9fr) minmax(180px, 1.3fr) minmax(120px, 0.8fr) minmax(160px, 0.7fr);
   gap: 14px;
   min-height: 58px;
@@ -10140,18 +10108,66 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 @media (max-width: 1180px) {
+  .admin-page {
+    padding: 22px 16px;
+  }
+
   .admin-shell,
   .admin-products-layout {
     grid-template-columns: 1fr;
   }
 
+  .admin-shell {
+    gap: 16px;
+  }
+
   .admin-sidebar {
     position: static;
     min-height: 0;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .admin-user-card {
+    margin-top: 0;
   }
 
   .admin-tabs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .admin-tabs button {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding: 0 14px;
+    border: 1px solid rgba(33, 27, 22, 0.1);
+    border-radius: 999px;
+  }
+
+  .admin-topbar {
+    position: sticky;
+    top: 10px;
+    z-index: 6;
+    padding: 14px;
+    border: 1px solid rgba(33, 27, 22, 0.12);
+    background: rgba(255, 252, 246, 0.96);
+    backdrop-filter: blur(6px);
+  }
+
+  .admin-topbar h1 {
+    font-size: clamp(34px, 6.2vw, 58px);
+  }
+
+  .admin-tab-picker {
+    display: grid;
+  }
+
+  .admin-list-table {
+    max-height: none;
   }
 
   .admin-metrics,
@@ -10162,18 +10178,55 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 @media (max-width: 700px) {
   .admin-page {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .admin-sidebar {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .admin-tabs {
+    display: none;
   }
 
   .admin-topbar,
-  .admin-panel-heading,
-  .admin-list-row {
+  .admin-panel-heading {
     align-items: stretch;
     flex-direction: column;
   }
 
+  .admin-topbar {
+    top: 8px;
+    padding: 12px;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .admin-topbar h1 {
+    font-size: clamp(30px, 11vw, 42px);
+    line-height: 1;
+  }
+
   .admin-topbar-actions,
   .admin-topbar-actions :where(button, a) {
+    width: 100%;
+  }
+
+  .admin-topbar-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+    gap: 8px;
+  }
+
+  .admin-topbar-actions .admin-save,
+  .admin-topbar-actions .admin-refresh {
+    justify-content: center;
+  }
+
+  .admin-tab-picker {
+    min-width: 0;
     width: 100%;
   }
 
@@ -10182,7 +10235,11 @@ body:has(.restoration-lens:hover) .custom-cursor {
   .admin-product-strip,
   .admin-editor,
   .admin-order-main,
-  .admin-order-details {
+  .admin-order-details,
+  .admin-list-row,
+  .admin-picker-grid,
+  .admin-room-checks,
+  .admin-nested-grid {
     grid-template-columns: 1fr;
   }
 
@@ -10197,10 +10254,42 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
   .admin-products-table button {
     grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-areas:
+      'image title'
+      'image sku'
+      'image views'
+      'image status';
+    gap: 6px 10px;
+    min-height: 112px;
+  }
+
+  .admin-products-table button img {
+    grid-area: image;
+    width: 56px;
+    height: 56px;
+  }
+
+  .admin-products-table button > span {
+    grid-area: title;
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .admin-products-table button > small:first-of-type {
+    grid-area: sku;
+  }
+
+  .admin-products-table button > small:last-of-type {
+    grid-area: views;
+  }
+
+  .admin-products-table button > em {
+    grid-area: status;
+    justify-self: start;
   }
 
   .admin-resource-main,
-  .admin-nested-grid {
+  .admin-list-row {
     grid-template-columns: 1fr;
   }
 
@@ -10238,7 +10327,15 @@ body:has(.restoration-lens:hover) .custom-cursor {
   .admin-products-table em,
   .admin-resource-main span,
   .admin-child-row small {
-    display: none;
+    display: block;
+  }
+
+  .admin-panel-block {
+    padding: 12px;
+  }
+
+  .admin-order-card {
+    padding: 14px;
   }
 }
 
@@ -14354,7 +14451,11 @@ body.has-mobile-menu-open {
   }
 
   .products-collage {
-    gap: clamp(54px, 14vw, 76px);
+    gap: clamp(38px, 11vw, 56px);
+  }
+
+  .products-form-card {
+    padding: 22px 0;
   }
 
   .products-card-feature .products-image-wrap,
@@ -14373,7 +14474,7 @@ body.has-mobile-menu-open {
   }
 
   .products-form-card .products-form-image {
-    margin-bottom: 22px;
+    margin-bottom: 16px;
   }
 
   .products-form-copy h3,
@@ -14390,8 +14491,13 @@ body.has-mobile-menu-open {
   }
 
   .products-form-meta {
-    margin-top: 20px;
-    gap: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    gap: 14px;
+  }
+
+  .products-form-meta div {
+    gap: 6px;
   }
 
   .products-form-meta > .material-symbols-outlined {
@@ -14443,6 +14549,24 @@ body.has-mobile-menu-open {
 
   .products-price-inputs {
     gap: 10px;
+  }
+
+  .products-form-card {
+    padding: 16px 0;
+  }
+
+  .products-collage {
+    gap: clamp(30px, 10vw, 44px);
+  }
+
+  .products-form-card .products-form-image {
+    margin-bottom: 14px;
+  }
+
+  .products-form-meta {
+    margin-top: 12px;
+    padding-top: 12px;
+    gap: 12px;
   }
 
   .products-form-image {
@@ -14580,7 +14704,7 @@ body.has-mobile-menu-open {
 
 .details-main-image,
 .details-thumbnail,
-.details-complementary-card div,
+.details-complementary-card .products-form-image,
 .details-stack-item {
   min-width: 0;
 }
@@ -14590,8 +14714,8 @@ body.has-mobile-menu-open {
 .details-reviews h2,
 .details-review-form h3,
 .details-complementary h2,
-.details-complementary-card h4,
-.details-complementary-card span,
+.details-complementary-card .products-form-copy h3,
+.details-complementary-card .products-form-copy > span,
 .details-description p,
 .details-summary details p,
 .details-review > p,
@@ -15004,8 +15128,7 @@ body.has-mobile-menu-open {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .details-complementary-card h4,
-  .details-complementary-card span {
+  .details-complementary-card .products-form-copy h3 {
     font-size: clamp(22px, 3vw, 30px);
   }
 }
@@ -15241,13 +15364,12 @@ body.has-mobile-menu-open {
     gap: 34px;
   }
 
-  .details-complementary-card div {
+  .details-complementary-card .products-form-image {
     aspect-ratio: 4 / 5;
     margin-bottom: 16px;
   }
 
-  .details-complementary-card h4,
-  .details-complementary-card span {
+  .details-complementary-card .products-form-copy h3 {
     font-size: clamp(26px, 8vw, 34px);
   }
 

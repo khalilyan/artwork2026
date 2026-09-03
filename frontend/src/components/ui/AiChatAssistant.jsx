@@ -155,6 +155,10 @@ function getRoomCategoryProducts(products, roomSlug, categorySlug) {
   });
 }
 
+function getRoomProducts(products, roomSlug) {
+  return getRoomCategoryProducts(products, roomSlug, '');
+}
+
 function createFurnitureTypeOptions(room) {
   return (room?.categories ?? []).map((category) => ({
     label: getCategoryLabel(category),
@@ -298,6 +302,22 @@ function buildAssistantReply(message, products, collections, rooms) {
     }
 
     const options = createFurnitureTypeOptions(room);
+    if (!options.length) {
+      const roomRecommendations = shuffleProducts(getRoomProducts(products, room.slug)).slice(0, maxRecommendationCount);
+
+      if (roomRecommendations.length) {
+        return {
+          text: `${getRoomLabel(room)}-ի համար առանձին կահույքի բաժիններ դեռ նշված չեն, բայց գտա նույն սենյակի հասանելի տարբերակներ։`,
+          recommendations: roomRecommendations,
+        };
+      }
+
+      return {
+        text: `${getRoomLabel(room)}-ի համար այս պահին ակտիվ ապրանք չգտա։ Կարող եք կապ հաստատել մեզ հետ պատվերով տարբերակի համար։`,
+        recommendations: [],
+      };
+    }
+
     return {
       text: `${getRoomLabel(room)}-ի համար ի՞նչ տեսակի կահույք եք ուզում։ Ընտրեք տարբերակներից մեկը, և ես կառաջարկեմ ապրանք կատալոգից։`,
       recommendations: [],
@@ -494,6 +514,22 @@ export default function AiChatAssistant() {
     if (!room) return;
 
     const options = createFurnitureTypeOptions(room);
+    if (!options.length) {
+      const roomRecommendations = shuffleProducts(getRoomProducts(products, room.slug)).slice(0, maxRecommendationCount);
+      setPendingRoomSlug('');
+
+      if (!roomRecommendations.length) {
+        addAssistantMessage(`${getRoomLabel(room)} սենյակի համար այս պահին ակտիվ ապրանք չգտա։ Կարող եք կապ հաստատել մեզ հետ պատվերով տարբերակի համար։`);
+        return;
+      }
+
+      addAssistantMessage(
+        `${getRoomLabel(room)}-ի համար առանձին կահույքի բաժիններ դեռ նշված չեն, բայց առաջարկում եմ առկա տարբերակներից։`,
+        roomRecommendations,
+      );
+      return;
+    }
+
     setPendingRoomSlug(room.slug);
     addAssistantMessage(
       `${getRoomLabel(room)}-ի համար ի՞նչ տեսակի կահույք եք ուզում։ Ընտրեք տարբերակներից մեկը, եւ ես պատահականորեն կառաջարկեմ 3 ապրանք կատալոգից։`,
@@ -509,6 +545,16 @@ export default function AiChatAssistant() {
     setPendingRoomSlug('');
 
     if (!recommendations.length) {
+      const fallbackRecommendations = shuffleProducts(getRoomProducts(products, roomSlug)).slice(0, maxRecommendationCount);
+
+      if (fallbackRecommendations.length) {
+        addAssistantMessage(
+          `${getRoomLabel(room)} սենյակի «${label}» տեսակի համար այս պահին ակտիվ ապրանք չգտա, բայց առաջարկում եմ նույն սենյակի այլ տարբերակներ։`,
+          fallbackRecommendations,
+        );
+        return;
+      }
+
       addAssistantMessage(`${getRoomLabel(room)} սենյակի «${label}» տեսակի համար այս պահին ակտիվ ապրանք չգտա։ Կարող եք ընտրել այլ տեսակ կամ կապ հաստատել մեզ հետ պատվերով տարբերակի համար։`);
       return;
     }
