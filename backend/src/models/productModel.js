@@ -85,14 +85,15 @@ export async function listRoomProducts(options = {}) {
 
         const existingProduct = productsBySlug.get(slug);
         const roomSlugs = new Set([...(existingProduct?.roomSlugs ?? []), room.slug, ...(embeddedProduct.roomSlugs ?? [])]);
+        const normalizedTypeSlug = String(type.slug ?? '').trim();
 
         productsBySlug.set(slug, {
           ...embeddedProduct,
           slug,
-          categorySlug: embeddedProduct.categorySlug ?? type.slug,
-          type: embeddedProduct.type ?? type.slug,
+          categorySlug: normalizedTypeSlug || embeddedProduct.categorySlug || embeddedProduct.type || '',
+          type: normalizedTypeSlug || embeddedProduct.type || embeddedProduct.categorySlug || '',
           roomSlugs: Array.from(roomSlugs),
-          group: embeddedProduct.group ?? type.slug,
+          group: normalizedTypeSlug || embeddedProduct.group || embeddedProduct.type || embeddedProduct.categorySlug || '',
         });
       }
     }

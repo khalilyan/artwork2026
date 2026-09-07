@@ -131,6 +131,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const [isPriceRangeDragging, setIsPriceRangeDragging] = useState(false);
   const [hasPendingPriceCommit, setHasPendingPriceCommit] = useState(false);
   const [isProductsLoading, setIsProductsLoading] = useState(true);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(() => (typeof window === 'undefined' ? true : window.innerWidth > 1024));
 
   useEffect(() => {
     if (!roomSlug) {
@@ -403,75 +404,88 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
             </p>
           </div>
           <div className="products-filters" aria-label="Ապրանքների դասավորման կառավարիչներ">
-            <div className="products-control-panel">
-              <label className="products-sort-control">
-                <span className="label-caps">Դասավորել</span>
-                <select value={sort} onChange={(event) => setSort(event.target.value)}>
-                  {sortOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
-                </select>
-                <Icon name="expand_more" />
-              </label>
+            <button
+              type="button"
+              className={`products-filters-toggle ${isFiltersOpen ? 'is-open' : ''}`}
+              onClick={() => setIsFiltersOpen((currentState) => !currentState)}
+              aria-expanded={isFiltersOpen}
+              aria-controls="products-filters-panel"
+            >
+              <span className="label-caps">Ֆիլտրեր և դասավորում</span>
+              <Icon name={isFiltersOpen ? 'close' : 'tune'} />
+            </button>
 
-              <div className="products-price-control">
-                <div className="products-control-heading">
-                  <span className="label-caps">Գնի միջակայք</span>
-                  <strong>{formatAmdPrice(Math.min(draftMinPrice, draftMaxPrice), '0')} - {formatAmdPrice(Math.max(draftMinPrice, draftMaxPrice), '0')}</strong>
+            <div className={`products-filters-panel ${isFiltersOpen ? 'is-open' : ''}`} id="products-filters-panel">
+              <div className="products-control-panel">
+                <label className="products-sort-control">
+                  <span className="label-caps">Դասավորել</span>
+                  <select value={sort} onChange={(event) => setSort(event.target.value)}>
+                    {sortOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
+                  </select>
+                  <Icon name="expand_more" />
+                </label>
+
+                <div className="products-price-control">
+                  <div className="products-control-heading">
+                    <span className="label-caps">Գնի միջակայք</span>
+                    <strong>{formatAmdPrice(Math.min(draftMinPrice, draftMaxPrice), '0')} - {formatAmdPrice(Math.max(draftMinPrice, draftMaxPrice), '0')}</strong>
+                  </div>
+                  <div className="products-range-track">
+                    <input
+                      type="range"
+                      min="0"
+                      max={absoluteMaxPrice}
+                      step="1000"
+                      value={draftMinPrice}
+                      aria-label="Նվազագույն գին"
+                      onChange={(event) => updateDraftMinPrice(event.target.value)}
+                      onPointerDown={() => setIsPriceRangeDragging(true)}
+                      onPointerUp={() => {
+                        setIsPriceRangeDragging(false);
+                        commitPriceRange(draftMinPrice, draftMaxPrice);
+                      }}
+                      onTouchEnd={() => {
+                        setIsPriceRangeDragging(false);
+                        commitPriceRange(draftMinPrice, draftMaxPrice);
+                      }}
+                      onKeyUp={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
+                      onBlur={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
+                    />
+                    <input
+                      type="range"
+                      min="0"
+                      max={absoluteMaxPrice}
+                      step="1000"
+                      value={draftMaxPrice}
+                      aria-label="Առավելագույն գին"
+                      onChange={(event) => updateDraftMaxPrice(event.target.value)}
+                      onPointerDown={() => setIsPriceRangeDragging(true)}
+                      onPointerUp={() => {
+                        setIsPriceRangeDragging(false);
+                        commitPriceRange(draftMinPrice, draftMaxPrice);
+                      }}
+                      onTouchEnd={() => {
+                        setIsPriceRangeDragging(false);
+                        commitPriceRange(draftMinPrice, draftMaxPrice);
+                      }}
+                      onKeyUp={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
+                      onBlur={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
+                    />
+                  </div>
+                  <div className="products-price-inputs">
+                    <label>
+                      <span className="label-caps">Նվազ.</span>
+                      <input type="number" min="0" max={absoluteMaxPrice} value={draftMinPrice} onChange={(event) => updateDraftMinPrice(event.target.value)} />
+                    </label>
+                    <label>
+                      <span className="label-caps">Առավ.</span>
+                      <input type="number" min="0" max={absoluteMaxPrice} value={draftMaxPrice} onChange={(event) => updateDraftMaxPrice(event.target.value)} />
+                    </label>
+                  </div>
                 </div>
-                <div className="products-range-track">
-                  <input
-                    type="range"
-                    min="0"
-                    max={absoluteMaxPrice}
-                    step="1000"
-                    value={draftMinPrice}
-                    aria-label="Նվազագույն գին"
-                    onChange={(event) => updateDraftMinPrice(event.target.value)}
-                    onPointerDown={() => setIsPriceRangeDragging(true)}
-                    onPointerUp={() => {
-                      setIsPriceRangeDragging(false);
-                      commitPriceRange(draftMinPrice, draftMaxPrice);
-                    }}
-                    onTouchEnd={() => {
-                      setIsPriceRangeDragging(false);
-                      commitPriceRange(draftMinPrice, draftMaxPrice);
-                    }}
-                    onKeyUp={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
-                    onBlur={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max={absoluteMaxPrice}
-                    step="1000"
-                    value={draftMaxPrice}
-                    aria-label="Առավելագույն գին"
-                    onChange={(event) => updateDraftMaxPrice(event.target.value)}
-                    onPointerDown={() => setIsPriceRangeDragging(true)}
-                    onPointerUp={() => {
-                      setIsPriceRangeDragging(false);
-                      commitPriceRange(draftMinPrice, draftMaxPrice);
-                    }}
-                    onTouchEnd={() => {
-                      setIsPriceRangeDragging(false);
-                      commitPriceRange(draftMinPrice, draftMaxPrice);
-                    }}
-                    onKeyUp={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
-                    onBlur={() => commitPriceRange(draftMinPrice, draftMaxPrice)}
-                  />
-                </div>
-                <div className="products-price-inputs">
-                  <label>
-                    <span className="label-caps">Նվազ.</span>
-                    <input type="number" min="0" max={absoluteMaxPrice} value={draftMinPrice} onChange={(event) => updateDraftMinPrice(event.target.value)} />
-                  </label>
-                  <label>
-                    <span className="label-caps">Առավ.</span>
-                    <input type="number" min="0" max={absoluteMaxPrice} value={draftMaxPrice} onChange={(event) => updateDraftMaxPrice(event.target.value)} />
-                  </label>
-                </div>
+
+                <button type="button" className="products-clear-control label-caps" onClick={clearFilters}>Մաքրել</button>
               </div>
-
-              <button type="button" className="products-clear-control label-caps" onClick={clearFilters}>Մաքրել</button>
             </div>
           </div>
         </div>
