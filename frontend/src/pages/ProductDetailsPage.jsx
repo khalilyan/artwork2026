@@ -336,8 +336,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const relatedFallbackCategorySlug = product.categorySlug ?? product.type ?? furnitureSlug ?? 'all';
 
   useEffect(() => {
-
-  useEffect(() => {
     let isCurrentRequest = true;
     let loadingTimer = null;
     const loadingStartedAt = performance.now();
@@ -382,10 +380,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       if (loadingTimer) window.clearTimeout(loadingTimer);
     };
   }, [productId]);
-
-  useEffect(() => {
-    setSelectedFinish((current) => materials.find((material) => material.id === current?.id) ?? getDefaultMaterial(materials));
-  }, [materials, product.id]);
 
   useEffect(() => {
     if (!isAuthorized()) {
