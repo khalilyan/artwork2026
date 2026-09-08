@@ -67,7 +67,7 @@ function RoomFeature({ room, index }) {
   const roomHref = hasFurnitureTypes ? `/rooms/${room.slug}` : `/rooms/${room.slug}/all`;
   const roomMetaLabel = hasFurnitureTypes
     ? `ՊԱՐՈՒՆԱԿՈՒՄ Է ${furnitureTypeCount} տեսակ կահույք`
-    : 'ՑՈՒՑԱԴՐԵԼ ՍԵՆՅԱԿԻ ԲՈԼՈՐ ԱՊՐԱՆՔՆԵՐԸ';
+    : '';
   const ctaText = `ՄՈՒՏՔ ԴԵՊԻ ${roomName}`;
 
   return (
@@ -83,7 +83,7 @@ function RoomFeature({ room, index }) {
       </motion.a>
       <div className="room-content-grid">
         <motion.a className={`room-card is-${align} tone-${tone} reveal-section is-active`} href={roomHref} data-reveal variants={fadeUp}>
-          <motion.span className="label-caps" variants={fadeUp}>{roomMetaLabel}</motion.span>
+          {roomMetaLabel ? <motion.span className="label-caps" variants={fadeUp}>{roomMetaLabel}</motion.span> : null}
           <motion.h2 variants={fadeUp}>{title}</motion.h2>
           <motion.p className={patternedRoom.italicDescription ? 'is-italic' : ''} variants={fadeUp}>{patternedRoom.description ?? 'Բացահայտեք այս սենյակի համար ընտրված կահույքը։'}</motion.p>
           <motion.span className="room-link label-caps" variants={fadeUp}>{ctaText}</motion.span>
