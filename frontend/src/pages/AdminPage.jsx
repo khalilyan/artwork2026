@@ -45,7 +45,6 @@ const tabs = [
   { id: 'orders', label: 'Պատվերներ', icon: 'receipt_long' },
   { id: 'contacts', label: 'Կոնտակտներ', icon: 'contact_mail' },
   { id: 'users', label: 'Օգտատերեր', icon: 'group' },
-  { id: 'materials', label: 'Նյութեր', icon: 'palette' },
   { id: 'ai', label: 'ԱԲ', icon: 'auto_awesome' },
 ];
 const adminSeenStorageKey = 'artworkAdminSeenNotifications';
@@ -127,15 +126,6 @@ function productFormState(product = {}) {
     roomSlugs: toArray(product.roomSlugs),
     hashtags: toCsv(product.hashtags),
     isActive: product.isActive !== false,
-  };
-}
-
-function materialFormState(material = {}) {
-  return {
-    id: material.id ?? '',
-    name: material.name ?? '',
-    color: material.color ?? '#c2a24e',
-    image: material.image ?? '',
   };
 }
 
@@ -491,7 +481,6 @@ export default function AdminPage() {
   const [products, setProducts] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [collections, setCollections] = useState([]);
-  const [materials, setMaterials] = useState([]);
   const [orders, setOrders] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [users, setUsers] = useState([]);
@@ -499,12 +488,10 @@ export default function AdminPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedCollection, setSelectedCollection] = useState(null);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [homepageForm, setHomepageForm] = useState(homepageFormState());
   const [productForm, setProductForm] = useState(productFormState());
   const [roomForm, setRoomForm] = useState(roomFormState());
   const [collectionForm, setCollectionForm] = useState(collectionFormState());
-  const [materialForm, setMaterialForm] = useState(materialFormState());
   const [query, setQuery] = useState('');
   const [expandedProductRooms, setExpandedProductRooms] = useState({});
   const [expandedProductTypes, setExpandedProductTypes] = useState({});
@@ -584,13 +571,12 @@ export default function AdminPage() {
     setIsLoading(true);
 
     try {
-      const [overviewData, homepageData, productsData, roomsData, collectionsData, materialsData, ordersData, contactsData, usersData, aiSettingsData] = await Promise.all([
+      const [overviewData, homepageData, productsData, roomsData, collectionsData, ordersData, contactsData, usersData, aiSettingsData] = await Promise.all([
         api.adminOverview(),
         api.adminHomepage(),
         api.adminProducts(),
         api.adminRooms(),
         api.adminCollections(),
-        api.adminMaterials(),
         api.adminOrders(),
         api.adminContacts(),
         api.adminUsers(),
@@ -600,14 +586,12 @@ export default function AdminPage() {
       const nextProducts = productsData.products ?? [];
       const nextRooms = roomsData.rooms ?? [];
       const nextCollections = collectionsData.collections ?? [];
-      const nextMaterials = materialsData.materials ?? [];
       setOverview(overviewData);
       setHomePage(homepageData.page);
       setHomepageForm(homepageFormState(homepageData.page));
       setProducts(nextProducts);
       setRooms(nextRooms);
       setCollections(nextCollections);
-      setMaterials(nextMaterials);
       setOrders(ordersData.orders ?? []);
       setContacts(contactsData.contacts ?? []);
       setUsers(usersData.users ?? []);
@@ -615,11 +599,9 @@ export default function AdminPage() {
       setSelectedProduct(nextProducts[0] ?? null);
       setSelectedRoom(nextRooms[0] ?? null);
       setSelectedCollection(nextCollections[0] ?? null);
-      setSelectedMaterial(nextMaterials[0] ?? null);
       setProductForm(productFormState(nextProducts[0]));
       setRoomForm(roomFormState(nextRooms[0]));
       setCollectionForm(collectionFormState(nextCollections[0]));
-      setMaterialForm(materialFormState(nextMaterials[0]));
       setExpandedRooms(Object.fromEntries(nextRooms.map((room, index) => [room.slug, index === 0])));
       setExpandedCollections(Object.fromEntries(nextCollections.map((collection, index) => [collection.slug, index === 0])));
       setExpandedProductRooms(Object.fromEntries(nextRooms.map((room, index) => [room.slug, index === 0])));
@@ -837,42 +819,6 @@ export default function AdminPage() {
     }
   };
 
-  const saveMaterial = async (event) => {
-    event.preventDefault();
-    notify('Նյութը պահպանվում է...', 'info', false);
-
-    try {
-      if (selectedMaterial) {
-        const { material } = await api.updateAdminMaterial(selectedMaterial.id, materialForm);
-        setMaterials((current) => current.map((item) => (item.id === material.id ? material : item)));
-        setSelectedMaterial(material);
-        setMaterialForm(materialFormState(material));
-      } else {
-        const { material } = await api.createAdminMaterial(materialForm);
-        setMaterials((current) => [material, ...current]);
-        setSelectedMaterial(material);
-        setMaterialForm(materialFormState(material));
-      }
-      notify('Նյութը պահպանվեց։', 'success');
-    } catch (error) {
-      notifyError(error);
-    }
-  };
-
-  const deleteMaterial = async () => {
-    if (!selectedMaterial || !window.confirm(`Ջնջե՞լ ${selectedMaterial.name} նյութը։`)) return;
-    notify('Նյութը ջնջվում է...', 'info', false);
-    try {
-      await api.deleteAdminMaterial(selectedMaterial.id);
-      setMaterials((current) => current.filter((material) => material.id !== selectedMaterial.id));
-      setSelectedMaterial(null);
-      setMaterialForm(materialFormState());
-      notify('Նյութը ջնջվեց։', 'success');
-    } catch (error) {
-      notifyError(error);
-    }
-  };
-
   const saveHomepage = async (event) => {
     event.preventDefault();
     notify('Գլխավոր էջը պահպանվում է...', 'info', false);
@@ -936,7 +882,6 @@ export default function AdminPage() {
   const activeSaveAction = {
     homepage: { formId: 'admin-homepage-form', label: 'Պահպանել գլխավոր էջը' },
     products: { formId: 'admin-product-form', label: selectedProduct ? 'Պահպանել ապրանքը' : 'Ստեղծել ապրանքը' },
-    materials: { formId: 'admin-material-form', label: selectedMaterial ? 'Պահպանել նյութը' : 'Ստեղծել նյութը' },
     rooms: { formId: 'admin-room-form', label: selectedRoom ? 'Պահպանել սենյակը' : 'Ստեղծել սենյակը' },
     collections: { formId: 'admin-collection-form', label: selectedCollection ? 'Պահպանել հավաքածուն' : 'Ստեղծել հավաքածուն' },
   }[activeTab];
@@ -1156,43 +1101,6 @@ export default function AdminPage() {
                     )) : <p className="admin-muted-text">Այս ապրանքի համար կարծիքներ դեռ չկան։</p>}
                   </section>
                 ) : null}
-              </AdminPanel>
-            </div>
-          ) : null}
-
-          {activeTab === 'materials' ? (
-            <div className="admin-products-layout">
-              <AdminPanel title="Նյութեր" action={<button className="admin-add-button" type="button" onClick={() => { setSelectedMaterial(null); setMaterialForm(materialFormState()); }}><Icon name="add" /><span>Ավելացնել նյութ</span></button>}>
-                <div className="admin-list-table">
-                  {materials.map((material) => (
-                    <button className={`admin-material-row ${selectedMaterial?.id === material.id ? 'is-selected' : ''}`} type="button" key={material.id} onClick={() => { setSelectedMaterial(material); setMaterialForm(materialFormState(material)); }}>
-                      <span className="admin-material-swatch" style={{ background: material.image ? `url(${material.image}) center / cover` : material.color }} />
-                      <strong>{material.name}</strong>
-                      <small>{material.image ? 'Նկար' : 'Գույն'}</small>
-                    </button>
-                  ))}
-                </div>
-              </AdminPanel>
-
-              <AdminPanel title={selectedMaterial ? `Խմբագրել ${selectedMaterial.name}` : 'Ավելացնել նյութ'} action={selectedMaterial ? <button className="admin-danger" type="button" onClick={deleteMaterial}>Ջնջել</button> : null}>
-                <form className="admin-editor" id="admin-material-form" onSubmit={saveMaterial}>
-                  <AdminEditorInput label="Նյութի անուն" value={materialForm.name} onChange={(value) => setMaterialForm((current) => ({ ...current, name: value }))} />
-                  <label className="admin-image-field is-wide">
-                    <span>Նյութի նկար</span>
-                    {materialForm.image ? <img className="admin-image-preview" src={materialForm.image} alt="" /> : <span className="admin-image-preview admin-image-preview-placeholder">Նկար չկա</span>}
-                    <div>
-                      <input value={materialForm.image} onChange={(event) => setMaterialForm((current) => ({ ...current, image: event.target.value }))} placeholder="Նկարի URL" />
-                      <label className="admin-upload-button">
-                        <Icon name="upload" />
-                        <input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadImage(file, (url) => setMaterialForm((current) => ({ ...current, image: url }))); }} />
-                      </label>
-                    </div>
-                  </label>
-                  <label>
-                    <span>Նյութի գույն</span>
-                    <input type="color" value={materialForm.color} onChange={(event) => setMaterialForm((current) => ({ ...current, color: event.target.value }))} />
-                  </label>
-                </form>
               </AdminPanel>
             </div>
           ) : null}

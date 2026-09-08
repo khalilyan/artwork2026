@@ -22,10 +22,6 @@ const emptyProduct = {
   price: { currency: 'AMD', amount: null },
 };
 
-function getDefaultMaterial(materials = []) {
-  return materials[0] ?? null;
-}
-
 function normalizeReviews(nextReviews) {
   return (nextReviews ?? []).map((review, index) => ({
     id: review._id ?? `${review.username ?? review.name ?? 'review'}-${review.createdAt ?? index}`,
@@ -318,7 +314,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [previewReviewImage, setPreviewReviewImage] = useState('');
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isGalleryPreviewOpen, setIsGalleryPreviewOpen] = useState(false);
-  const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false);
   const [isDirectCheckoutOpen, setIsDirectCheckoutOpen] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
   const [isRoomPreviewOpen, setIsRoomPreviewOpen] = useState(false);
@@ -329,8 +324,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [isGeneratingRoomPreview, setIsGeneratingRoomPreview] = useState(false);
   const [isImageGenerationEnabled, setIsImageGenerationEnabled] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [materials, setMaterials] = useState([]);
-  const [selectedFinish, setSelectedFinish] = useState(() => getDefaultMaterial([]));
   const [isProductLoading, setIsProductLoading] = useState(true);
   const dimensionsText = product.dimensionsText ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
@@ -343,23 +336,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const relatedFallbackCategorySlug = product.categorySlug ?? product.type ?? furnitureSlug ?? 'all';
 
   useEffect(() => {
-    api.aiSettings()
-      .then(({ imageGeneration }) => setIsImageGenerationEnabled(imageGeneration?.enabled !== false))
-      .catch(() => setIsImageGenerationEnabled(true));
-  }, []);
-
-  useEffect(() => {
-    api.materials()
-      .then(({ materials: nextMaterials }) => {
-        const activeMaterials = nextMaterials?.length ? nextMaterials : [];
-        setMaterials(activeMaterials);
-        setSelectedFinish((current) => activeMaterials.find((material) => material.id === current?.id) ?? getDefaultMaterial(activeMaterials));
-      })
-      .catch(() => {
-        setMaterials([]);
-        setSelectedFinish(null);
-      });
-  }, [product]);
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -484,9 +460,9 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const addToCart = async () => {
     try {
       if (isAuthorized()) {
-        await api.addCartItem({ productSlug: product.id, quantity: 1, material: selectedFinish?.name });
+        await api.addCartItem({ productSlug: product.id, quantity: 1 });
       } else {
-        addGuestCartItem({ ...product, material: selectedFinish?.name }, 1);
+        addGuestCartItem(product, 1);
       }
       setIsAdded(true);
       showArtworkNotification(`${product.name} ավելացվեց զամբյուղում`);
@@ -768,37 +744,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
     document.body,
   ) : null;
 
-  const materialDialog = isMaterialDialogOpen && typeof document !== 'undefined' ? createPortal(
-    <div className="details-material-dialog" role="dialog" aria-modal="true" aria-label="Ընտրել նյութը">
-      <div>
-        <button className="details-share-close" type="button" onClick={() => setIsMaterialDialogOpen(false)} aria-label="Փակել նյութերի պատուհանը">
-          <Icon name="close" />
-        </button>
-        <div className="details-material-heading">
-          <p className="label-caps">ՆՅՈՒԹ / ԳՈՒՅՆ</p>
-          <h3>Ընտրեք նյութը/գույնը</h3>
-        </div>
-        <div className="details-material-grid">
-          {materials.map((material) => (
-            <button
-              className={`details-material-option ${selectedFinish?.id === material.id ? 'is-selected' : ''}`}
-              type="button"
-              onClick={() => {
-                setSelectedFinish(material);
-                setIsMaterialDialogOpen(false);
-              }}
-              key={material.id}
-            >
-              <span style={{ background: material.image ? `url(${material.image}) center / cover` : material.color }} />
-              <strong>{material.name}</strong>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>,
-    document.body,
-  ) : null;
-
   const shareProduct = async () => {
     if (navigator.share) {
       try {
@@ -879,19 +824,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
           <div className="details-price">
             {hasSalePrice ? <del>{oldProductPrice}</del> : null}
             <strong>{productPrice}</strong>
-          </div>
-          <div className="details-options">
-            <span className="label-caps">ՆՅՈՒԹ</span>
-            <button className="details-material-trigger" type="button" onClick={() => setIsMaterialDialogOpen(true)} disabled={!materials.length}>
-              <span className="details-material-stack" aria-hidden="true">
-                {materials.slice(0, 3).map((material) => (
-                  <i style={{ background: material.image ? `url(${material.image}) center / cover` : material.color }} key={material.id} />
-                ))}
-              </span>
-              <span className="details-material-count label-caps">{materials.length ? `${Math.max(materials.length - 3, 0)}+ գույն/կտոր` : 'Նյութ չկա'}</span>
-            </button>
-            <p className="details-selected-finish label-caps">Ընտրված՝ {selectedFinish?.name ?? 'Չընտրված'}</p>
-            {materialDialog}
           </div>
           <div className="details-description">
             <span className="label-caps">ՆԿԱՐԱԳՐՈՒԹՅՈՒՆ</span>
