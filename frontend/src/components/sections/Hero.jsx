@@ -4,6 +4,7 @@ import { createResponsiveImageSources } from '../../utils/imageCdn.js';
 import { easeOutExpo } from '../../utils/motion.js';
 
 const heroLoadingDelay = 0.8;
+const heroAutoplayDelayMs = 4000;
 
 function wrapSlideIndex(index, total) {
   if (!total) return 0;
@@ -165,6 +166,16 @@ export default function Hero({ slides = [] }) {
     const timer = window.setTimeout(preloadNeighbors, 450);
     return () => window.clearTimeout(timer);
   }, [activeSlideIndex, hasSlides, slides.length, slideSources]);
+
+  useEffect(() => {
+    if (!hasSlides || slides.length < 2) return undefined;
+
+    const timer = window.setTimeout(() => {
+      navigateToSlide(activeSlideIndex + 1);
+    }, heroAutoplayDelayMs);
+
+    return () => window.clearTimeout(timer);
+  }, [activeSlideIndex, hasSlides, slides.length]);
 
   const showPreviousSlide = () => {
     navigateToSlide(activeSlideIndex - 1);

@@ -6,7 +6,7 @@ import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
 import NotFoundPage from './NotFoundPage.jsx';
 import { addGuestCartItem, api, isAuthorized } from '../services/api.js';
-import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
+import { formatAmdPriceByUnit, formatCatalogProductPrice, getPriceAmount } from '../utils/currency.js';
 import { compressImageFiles } from '../utils/imageUpload.js';
 import { getProductBadgeLabel } from '../utils/productBadge.js';
 import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js';
@@ -232,7 +232,10 @@ function ComplementaryProduct({ product, fallbackRoomSlug, fallbackCategorySlug 
   const viewCount = Number(product.views ?? 0).toLocaleString('hy-AM');
   const badgeLabel = getProductBadgeLabel(product);
   const href = buildProductDetailsHref(product, fallbackRoomSlug, fallbackCategorySlug);
-  const price = formatAmdPrice(getPriceAmount(product.price?.amount, product.priceAmount, product.price));
+  const price = formatCatalogProductPrice(product);
+  const oldPrice = product.oldPrice
+    ? formatAmdPriceByUnit(product.oldPrice, Boolean(product.pricePerSquareMeter))
+    : null;
 
   return (
     <a className="details-similar-card" href={href} data-cursor-target>
@@ -251,7 +254,7 @@ function ComplementaryProduct({ product, fallbackRoomSlug, fallbackCategorySlug 
       <div className="details-similar-meta">
         <div>
           <span className="label-caps">Գին</span>
-          {product.oldPrice ? <del>{formatAmdPrice(product.oldPrice)}</del> : null}
+          {oldPrice ? <del>{oldPrice}</del> : null}
           <strong>{price}</strong>
         </div>
         <Icon name="arrow_forward" className="details-similar-arrow" />
@@ -327,10 +330,10 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [isProductLoading, setIsProductLoading] = useState(true);
   const dimensionsText = product.dimensionsText ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
-  const productPrice = formatAmdPrice(productPriceAmount);
+  const productPrice = formatAmdPriceByUnit(productPriceAmount, Boolean(product.pricePerSquareMeter));
   const oldPriceAmount = getPriceAmount(product.oldPrice?.amount, product.oldPriceAmount, product.oldPrice);
   const hasSalePrice = oldPriceAmount > 0 && oldPriceAmount > productPriceAmount;
-  const oldProductPrice = hasSalePrice ? formatAmdPrice(oldPriceAmount) : '';
+  const oldProductPrice = hasSalePrice ? formatAmdPriceByUnit(oldPriceAmount, Boolean(product.pricePerSquareMeter)) : '';
   const badgeLabel = getProductBadgeLabel(product);
   const relatedFallbackRoomSlug = product.roomSlugs?.[0] ?? roomSlug ?? '';
   const relatedFallbackCategorySlug = product.categorySlug ?? product.type ?? furnitureSlug ?? 'all';

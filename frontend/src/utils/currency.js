@@ -24,3 +24,26 @@ export function formatAmdPrice(value, fallback = priceFallback) {
 
   return `${Math.round(amount).toLocaleString('hy-AM')} ֏`;
 }
+
+export function formatAmdPriceByUnit(value, isPricePerSquareMeter = false, fallback = priceFallback) {
+  const formattedPrice = formatAmdPrice(value, fallback);
+
+  if (formattedPrice === fallback) return fallback;
+  return isPricePerSquareMeter ? `${formattedPrice}/քմ` : formattedPrice;
+}
+
+export function formatCatalogProductPrice(product, fallback = priceFallback) {
+  const amount = getPriceAmount(
+    product?.price?.amount,
+    product?.priceAmount,
+    product?.price,
+    product?.snapshot?.price?.amount,
+    product?.snapshot?.price,
+  );
+
+  return formatAmdPriceByUnit(
+    amount,
+    Boolean(product?.pricePerSquareMeter ?? product?.snapshot?.pricePerSquareMeter),
+    fallback,
+  );
+}

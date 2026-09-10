@@ -103,18 +103,20 @@ function parseJsonArray(value, fallback = []) {
   }
 }
 
-function createPrice(amount) {
+function createPrice(amount, options = {}) {
   const parsedAmount = toNumberOrNull(amount);
   const nextCurrency = 'AMD';
+  const isPricePerSquareMeter = Boolean(options.pricePerSquareMeter);
+  const baseDisplay = parsedAmount === null ? 'Գինը անհատական' : new Intl.NumberFormat('hy-AM', {
+    style: 'currency',
+    currency: nextCurrency,
+    maximumFractionDigits: 0,
+  }).format(parsedAmount);
 
   return {
     amount: parsedAmount,
     currency: nextCurrency,
-    display: parsedAmount === null ? 'Գինը անհատական' : new Intl.NumberFormat('hy-AM', {
-      style: 'currency',
-      currency: nextCurrency,
-      maximumFractionDigits: 0,
-    }).format(parsedAmount),
+    display: parsedAmount === null || !isPricePerSquareMeter ? baseDisplay : `${baseDisplay}/քմ`,
   };
 }
 
@@ -133,7 +135,7 @@ function normalizeSale(body) {
 function applySaleToProduct(product) {
   const sale = product.sale ?? { isActive: false, percent: 0, label: null };
   const basePrice = product.oldPrice?.amount ?? product.price?.amount ?? null;
-  const currency = product.oldPrice?.currency ?? product.price?.currency ?? 'AMD';
+  const isPricePerSquareMeter = Boolean(product.pricePerSquareMeter);
 
   if (!sale.isActive || !sale.percent || basePrice === null) {
     return {
@@ -147,8 +149,8 @@ function applySaleToProduct(product) {
 
   return {
     ...product,
-    price: createPrice(saleAmount, currency),
-    oldPrice: createPrice(basePrice, currency),
+    price: createPrice(saleAmount, { pricePerSquareMeter: isPricePerSquareMeter }),
+    oldPrice: createPrice(basePrice, { pricePerSquareMeter: isPricePerSquareMeter }),
     sale,
     badge: sale.label,
   };
@@ -156,6 +158,7 @@ function applySaleToProduct(product) {
 
 function cleanProductForStorage(product) {
   const { inventory: _inventory, ...cleanProduct } = product;
+  const isPricePerSquareMeter = Boolean(cleanProduct.pricePerSquareMeter);
   delete cleanProduct.craftsmanshipText;
   delete cleanProduct.technicalTitle;
   delete cleanProduct.technicalDescription;
@@ -169,11 +172,13 @@ function cleanProductForStorage(product) {
   }
 
   if (Object.hasOwn(cleanProduct, 'price')) {
-    cleanProduct.price = cleanProduct.price ? createPrice(cleanProduct.price.amount) : createPrice(null);
+    cleanProduct.price = cleanProduct.price
+      ? createPrice(cleanProduct.price.amount, { pricePerSquareMeter: isPricePerSquareMeter })
+      : createPrice(null, { pricePerSquareMeter: isPricePerSquareMeter });
   }
   if (Object.hasOwn(cleanProduct, 'oldPrice')) {
     cleanProduct.oldPrice = cleanProduct.oldPrice?.amount !== null && cleanProduct.oldPrice?.amount !== undefined
-      ? createPrice(cleanProduct.oldPrice.amount)
+      ? createPrice(cleanProduct.oldPrice.amount, { pricePerSquareMeter: isPricePerSquareMeter })
       : null;
   }
 
@@ -197,6 +202,7 @@ function normalizeProductPayload(body) {
   setString('layout');
 
   if (Object.hasOwn(body, 'isActive')) update.isActive = toBoolean(body.isActive, true);
+  if (Object.hasOwn(body, 'pricePerSquareMeter')) update.pricePerSquareMeter = toBoolean(body.pricePerSquareMeter, false);
   if (Object.hasOwn(body, 'roomSlugs')) update.roomSlugs = toStringArray(body.roomSlugs);
   if (Object.hasOwn(body, 'hashtags')) update.hashtags = toStringArray(body.hashtags);
   if (
@@ -227,6 +233,7 @@ function normalizeNewProduct(body) {
   const slug = slugify(body.slug || body.name, `product-${Date.now()}`);
   const price = createPrice(body.priceAmount);
   const categorySlug = toCleanString(body.categorySlug, toCleanString(body.type, ''));
+  const pricePerSquareMeter = toBoolean(body.pricePerSquareMeter, false);
 
   const product = {
     slug,
@@ -239,6 +246,7 @@ function normalizeNewProduct(body) {
     hashtags: toStringArray(body.hashtags),
     price,
     oldPrice: null,
+    pricePerSquareMeter,
     sale: normalizeSale(body),
     badge: toCleanString(body.badge),
     description: toCleanString(body.description),

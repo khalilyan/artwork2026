@@ -1,4 +1,4 @@
-import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
+import { formatAmdPrice, formatAmdPriceByUnit, getPriceAmount } from '../utils/currency.js';
 
 const defaultProductionApiBaseUrl = 'https://api.artwork.am/api';
 const configuredApiBaseUrl = resolveApiBaseUrl();
@@ -136,13 +136,20 @@ export function clearGuestCart() {
 
 export function productToGuestCartItem(product, quantity = 1) {
   const priceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
+  const pricePerSquareMeter = Boolean(product.pricePerSquareMeter);
 
   return {
     productSlug: product.id,
     productSku: product.sku ?? null,
     name: product.name,
     image: product.gallery?.[0] ?? product.image,
-    price: { display: formatAmdPrice(priceAmount), amount: priceAmount || null, currency: 'AMD' },
+    pricePerSquareMeter,
+    price: {
+      display: formatAmdPriceByUnit(priceAmount, pricePerSquareMeter),
+      amount: priceAmount || null,
+      currency: 'AMD',
+      pricePerSquareMeter,
+    },
     roomSlugs: product.roomSlugs ?? [],
     categorySlug: product.categorySlug ?? product.type ?? null,
     type: product.type ?? null,

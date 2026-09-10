@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
-import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
+import { formatAmdPrice, formatAmdPriceByUnit, formatCatalogProductPrice, getPriceAmount } from '../utils/currency.js';
 import { getProductBadgeLabel } from '../utils/productBadge.js';
 import { defaultSeoImage } from '../utils/seo.js';
 
@@ -50,6 +50,10 @@ function ProductCard({ product, href, index }) {
   const hoverImage = product.hoverImage ?? product.images?.hover ?? primaryImage;
   const viewCount = Number(product.views ?? 0).toLocaleString('hy-AM');
   const badgeLabel = getProductBadgeLabel(product);
+  const priceLabel = formatCatalogProductPrice(product);
+  const oldPriceLabel = product.oldPrice
+    ? formatAmdPriceByUnit(product.oldPrice, Boolean(product.pricePerSquareMeter))
+    : null;
 
   return (
     <a
@@ -71,8 +75,8 @@ function ProductCard({ product, href, index }) {
       <div className="products-form-meta">
         <div>
           <span className="label-caps">Գին</span>
-          {product.oldPrice ? <del>{formatAmdPrice(product.oldPrice)}</del> : null}
-          <strong>{formatAmdPrice(product.price?.amount ?? product.priceAmount ?? product.price)}</strong>
+          {oldPriceLabel ? <del>{oldPriceLabel}</del> : null}
+          <strong>{priceLabel}</strong>
         </div>
         <Icon name="arrow_forward" />
       </div>
@@ -366,6 +370,10 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const furnitureTypeName = getFurnitureTypeName(category);
   const isRoomCategoryPage = Boolean(room && category);
   const roomHeadingTitle = room?.roomName ?? room?.title ?? room?.name ?? 'Բոլոր ապրանքները';
+  const roomEyebrowLabel = room ? `${roomHeadingTitle}ային կահույք` : 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ';
+  const productsEyebrow = isRoomCategoryPage
+    ? `${roomHeadingTitle} - ${furnitureTypeName || 'Բոլոր ապրանքները'}`
+    : roomEyebrowLabel;
   const seoTitle = query
     ? `"${query}" որոնման արդյունքներ | ARTWORK`
     : isRoomAllPage
@@ -393,13 +401,13 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       <header className="products-header container">
         <div className="products-header-inner" data-products-header>
           <div>
-            <span className="label-caps products-eyebrow">{isRoomCategoryPage ? 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ - ԼԱՅՆ ԸՆՏՐԱՆԻ' : 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ'}</span>
-            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${furnitureTypeName}ների լայն տեսականի` : isRoomAllPage ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Սենյակ'} • բոլոր ապրանքները` : 'Ցանկալի առարկաներ'}</h1>
+            <span className="label-caps products-eyebrow">{productsEyebrow}</span>
+            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${roomHeadingTitle} - ${furnitureTypeName}` : isRoomAllPage ? `${roomHeadingTitle} • ամբողջ տեսականին` : 'Ցանկալի առարկաներ'}</h1>
             <p>
               {isRoomCategoryPage
                 ? `Ձեռագործ ${furnitureTypeName}ներ, որոնք համադրում են բարձրակարգ նյութերը, վարպետական մշակումը և ժամանակակից դիզայնը՝ ստեղծելով ներդաշնակ ինտերիեր`
                 : isRoomAllPage
-                  ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Այս սենյակի'} համար հասանելի բոլոր ապրանքները մեկ էջում՝ առանց կահույքի տեսակի ընտրության։`
+                  ? `${roomHeadingTitle}ի համար նախատեսված կահույքի ամբողջ տեսականին՝ մեկ էջում`
                 : 'Գտեք ձեր նախընտրած կահույքը՝ որոնելով և դասավորելով ամբողջ տեսականին ըստ անվան, գնի, նորույթի կամ ընտրած գնային միջակայքի։'}
             </p>
           </div>

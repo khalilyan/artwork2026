@@ -42,6 +42,7 @@ export function formatProduct(product, options = {}) {
   return {
     ...publicProduct,
     id: product.slug,
+    pricePerSquareMeter: Boolean(product.pricePerSquareMeter),
     priceAmount: product.price?.amount ?? null,
     currency: product.price?.currency ?? 'AMD',
     price: product.price?.display ?? 'Գինը անհատական',
@@ -248,7 +249,11 @@ export async function removeProductReview(productSlug, reviewId) {
 
 export function createProductSnapshot(product) {
   const priceAmount = product.price?.amount ?? product.priceAmount ?? null;
+  const pricePerSquareMeter = Boolean(product.pricePerSquareMeter);
   const priceDisplay = product.price?.display ?? (typeof product.price === 'string' ? product.price : null);
+  const normalizedDisplay = priceDisplay && pricePerSquareMeter && !priceDisplay.includes('/քմ')
+    ? `${priceDisplay}/քմ`
+    : priceDisplay;
   const gallery = Array.from(new Set([
     product.images?.primary,
     ...(product.images?.gallery ?? []),
@@ -263,12 +268,14 @@ export function createProductSnapshot(product) {
     name: product.name,
     image: gallery[0] ?? null,
     gallery,
+    pricePerSquareMeter,
     price: {
       amount: priceAmount,
       currency: product.price?.currency ?? product.currency ?? 'AMD',
-      display: priceDisplay ?? (priceAmount === null || priceAmount === undefined
+      display: normalizedDisplay ?? (priceAmount === null || priceAmount === undefined
         ? 'Գինը անհատական'
-        : new Intl.NumberFormat('hy-AM', { style: 'currency', currency: product.price?.currency ?? product.currency ?? 'AMD', maximumFractionDigits: 0 }).format(priceAmount)),
+        : `${new Intl.NumberFormat('hy-AM', { style: 'currency', currency: product.price?.currency ?? product.currency ?? 'AMD', maximumFractionDigits: 0 }).format(priceAmount)}${pricePerSquareMeter ? '/քմ' : ''}`),
+      pricePerSquareMeter,
     },
     roomSlugs: product.roomSlugs ?? [],
     categorySlug: product.categorySlug ?? product.type ?? null,

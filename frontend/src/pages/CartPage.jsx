@@ -2,12 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/ui/Icon.jsx';
 import { api, clearGuestCart, getGuestCart, isAuthorized, setGuestCart } from '../services/api.js';
-import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
+import { formatAmdPrice, formatAmdPriceByUnit, getPriceAmount } from '../utils/currency.js';
 
 const cartRemoveAnimationMs = 950;
 
 function displayPrice(item) {
-  return formatAmdPrice(item.price?.amount ?? item.price ?? item.snapshot?.price?.amount ?? item.snapshot?.price);
+  const isPricePerSquareMeter = Boolean(
+    item.pricePerSquareMeter
+    ?? item.price?.pricePerSquareMeter
+    ?? item.snapshot?.pricePerSquareMeter
+    ?? item.snapshot?.price?.pricePerSquareMeter,
+  );
+
+  return formatAmdPriceByUnit(
+    item.price?.amount ?? item.price ?? item.snapshot?.price?.amount ?? item.snapshot?.price,
+    isPricePerSquareMeter,
+  );
 }
 
 function displayImage(item) {

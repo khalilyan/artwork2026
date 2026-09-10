@@ -118,6 +118,7 @@ function productFormState(product = {}) {
     categorySlug: product.categorySlug ?? '',
     type: product.type ?? '',
     priceAmount: basePriceAmount,
+    pricePerSquareMeter: Boolean(product.pricePerSquareMeter),
     saleIsActive: Boolean(product.sale?.isActive),
     salePercent: product.sale?.percent ?? 0,
     primaryImage: product.images?.primary ?? product.image ?? '',
@@ -1072,6 +1073,7 @@ export default function AdminPage() {
                   <AdminEditorInput label="Հեշթեգներ" value={productForm.hashtags} onChange={(value) => setProductForm((current) => ({ ...current, hashtags: value }))} />
                   <div className="admin-checks">
                     <label><input type="checkbox" checked={productForm.saleIsActive} onChange={(event) => setProductForm((current) => ({ ...current, saleIsActive: event.target.checked }))} /> Զեղչը ակտիվ է</label>
+                    <label><input type="checkbox" checked={productForm.pricePerSquareMeter} onChange={(event) => setProductForm((current) => ({ ...current, pricePerSquareMeter: event.target.checked }))} /> Քառակուսու գինը (֏/քմ)</label>
                   </div>
                 </form>
                 {selectedProduct ? (

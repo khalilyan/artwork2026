@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Icon from '../components/ui/Icon.jsx';
 import { api, clearAuthSession, isAuthorized } from '../services/api.js';
-import { formatAmdPrice } from '../utils/currency.js';
+import { formatAmdPriceByUnit } from '../utils/currency.js';
 
 const accountNavItems = [
   { id: 'dashboard', label: 'Կառավարում' },
@@ -82,6 +82,23 @@ function getOrderTitle(order) {
   if (!firstItem) return 'Հավաքածուի պատվեր';
   if ((order.items?.length ?? 0) === 1) return firstItem.name ?? 'Հավաքածուի պատվեր';
   return `${firstItem.name ?? 'Ապրանք'} ևս ${(order.items?.length ?? 1) - 1}`;
+}
+
+function isSquareMeterPrice(item) {
+  return Boolean(
+    item.pricePerSquareMeter
+    ?? item.price?.pricePerSquareMeter
+    ?? item.unitPrice?.pricePerSquareMeter
+    ?? item.snapshot?.pricePerSquareMeter
+    ?? item.snapshot?.price?.pricePerSquareMeter,
+  );
+}
+
+function formatItemPrice(item) {
+  return formatAmdPriceByUnit(
+    item.unitPrice?.amount ?? item.unitPrice ?? item.price?.amount ?? item.price ?? item.snapshot?.price?.amount ?? item.snapshot?.price,
+    isSquareMeterPrice(item),
+  );
 }
 
 function getSavedItemHref(item) {
@@ -321,7 +338,7 @@ export default function AccountPage() {
                               <div>
                                 <h4>{itemHref ? <a href={itemHref}>{itemName}</a> : itemName}</h4>
                                 <p className="label-caps">Քանակ՝ {Number(item.quantity) || 1}</p>
-                                <p>{formatAmdPrice(item.unitPrice ?? item.price)}</p>
+                                <p>{formatItemPrice(item)}</p>
                               </div>
                             </div>
                           );
@@ -351,7 +368,7 @@ export default function AccountPage() {
                       </button>
                     </div>
                     <h3><a href={productHref}>{item.name}</a></h3>
-                    <p className="label-caps">{formatAmdPrice(item.price?.amount ?? item.price)}</p>
+                    <p className="label-caps">{formatItemPrice(item)}</p>
                   </article>
                 );
               }) : <p>Պահպանված առարկաներ դեռ չկան։</p>}
