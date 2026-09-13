@@ -6786,6 +6786,56 @@ body:has(.restoration-lens:hover) .custom-cursor {
   transform: scale(0.98);
 }
 
+.auth-social-stack {
+  margin-top: 18px;
+}
+
+.auth-social-divider {
+  margin: 0 0 12px;
+  color: var(--on-surface-variant);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.auth-social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.auth-social-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 1px solid rgba(99, 48, 5, 0.16);
+  background: #fff;
+  color: var(--on-surface);
+  font-size: 14px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.auth-social-button:hover {
+  border-color: var(--primary);
+}
+
+.auth-social-button:active {
+  transform: scale(0.98);
+}
+
+.auth-social-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(99, 48, 5, 0.08);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .auth-footer {
   margin-top: 40px;
   padding-top: 24px;
@@ -8345,6 +8395,10 @@ body:has(.restoration-lens:hover) .custom-cursor {
     overflow: visible;
     flex: 1;
     padding: 56px 20px 28px;
+  }
+
+  .auth-social-grid {
+    grid-template-columns: 1fr;
   }
 
   .auth-footer {

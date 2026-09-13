@@ -26,6 +26,7 @@
     "express": "^5.2.1",
     "googleapis": "^173.0.0",
     "mongodb": "^7.3.0",
+    "nodemailer": "^10.0.9",
     "web-push": "^3.6.7"
   }
 }

@@ -69,6 +69,14 @@ function composeRequestUrl(baseUrl, path) {
   return `${normalizedBase}${path}`;
 }
 
+export function getApiBaseUrl() {
+  return normalizeBaseUrl(resolvedApiBaseUrl ?? configuredApiBaseUrl);
+}
+
+export function createApiUrl(path) {
+  return composeRequestUrl(getApiBaseUrl(), path);
+}
+
 function toRequestError(response, data) {
   const error = new Error(data.error?.message ?? 'Request failed.');
   error.status = response.status;

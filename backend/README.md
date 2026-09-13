@@ -24,6 +24,12 @@ Default API URL: `http://localhost:4000/api`
 - `AUTH_SECRET`: HMAC secret for bearer tokens
 - `AUTH_TOKEN_TTL_SECONDS`: token lifetime, defaults to 7 days
 - `ADMIN_EMAILS`: comma-separated emails that should receive admin access
+- `GOOGLE_AUTH_CLIENT_ID`: optional Google OAuth web client ID for Google social login; falls back to `GMAIL_CLIENT_ID`
+- `GOOGLE_AUTH_CLIENT_SECRET`: optional Google OAuth web client secret for Google social login; falls back to `GMAIL_CLIENT_SECRET`
+- `GOOGLE_AUTH_REDIRECT_URI`: Google callback URL, for example `https://api.artwork.am/api/auth/google/callback`
+- `FACEBOOK_APP_ID`: Facebook app ID for Facebook social login
+- `FACEBOOK_APP_SECRET`: Facebook app secret
+- `FACEBOOK_AUTH_REDIRECT_URI`: Facebook callback URL, for example `https://api.artwork.am/api/auth/facebook/callback`
 - `OPENAI_API_KEY`: required for AI room preview image generation
 - `OPENAI_IMAGE_MODEL`: optional OpenAI model for room previews, defaults to `gpt-image-1`
 - `CLOUDINARY_CLOUD_NAME`: optional Cloudinary cloud name for admin image uploads
@@ -62,6 +68,10 @@ Authorization: Bearer <token>
 - `POST /api/auth/signup` creates an account only if the email does not already exist; requires name, email, password, phone, and shipping address.
 - `POST /api/auth/login` validates email/password and returns a bearer token.
 - `GET /api/auth/me` returns the authorized user.
+- `GET /api/auth/google` starts Google OAuth login/signup.
+- `GET /api/auth/google/callback` handles Google OAuth callback and redirects to frontend `/auth` with session.
+- `GET /api/auth/facebook` starts Facebook OAuth login/signup.
+- `GET /api/auth/facebook/callback` handles Facebook OAuth callback and redirects to frontend `/auth` with session.
 - `GET /api/account` returns account details, cart, saved items, and orders.
 - `PATCH /api/account/details` updates name, email, phone, and shipping address.
 - `PATCH /api/account/password` updates password after checking current password.

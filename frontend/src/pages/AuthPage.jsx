@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react';
 import { images } from '../data/homepage.js';
 import Icon from '../components/ui/Icon.jsx';
-import { api, isAuthorized, setAuthSession } from '../services/api.js';
+import { api, createApiUrl, isAuthorized, setAuthSession } from '../services/api.js';
 import usePageAssets from '../hooks/usePageAssets.js';
+
+function decodeBase64UrlJson(value) {
+  try {
+    const normalized = String(value ?? '').replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '='.repeat((4 - (normalized.length % 4 || 4)) % 4);
+    const binary = window.atob(padded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    return null;
+  }
+}
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login');
@@ -12,6 +24,29 @@ export default function AuthPage() {
   const isLogin = mode === 'login';
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const socialToken = params.get('socialToken');
+    const socialUserEncoded = params.get('socialUser');
+    const socialError = params.get('socialError');
+
+    if (socialError) {
+      setStatusMessage(socialError);
+      return;
+    }
+
+    if (socialToken && socialUserEncoded) {
+      const socialUser = decodeBase64UrlJson(socialUserEncoded);
+
+      if (socialUser) {
+        setAuthSession({ token: socialToken, user: socialUser });
+        window.location.href = getRedirectTarget();
+        return;
+      }
+
+      setStatusMessage('Սոցիալական մուտքը չհաջողվեց, փորձեք կրկին։');
+      return;
+    }
+
     if (isAuthorized()) {
       window.location.replace('/account');
     }
@@ -62,6 +97,31 @@ export default function AuthPage() {
     setStatusMessage('');
   };
 
+  const startSocialAuth = (provider) => {
+    const params = new URLSearchParams({
+      redirect: getRedirectTarget(),
+      origin: window.location.origin,
+    });
+
+    window.location.href = createApiUrl(`/auth/${provider}?${params.toString()}`);
+  };
+
+  const renderSocialActions = () => (
+    <div className="auth-social-stack">
+      <p className="auth-social-divider label-caps">ԿԱՄ ՄՈՒՏՔ ԳՈՐԾԵՔ ՍՈՑԻԱԼԱԿԱՆ ՑԱՆՑԵՐՈՎ</p>
+      <div className="auth-social-grid">
+        <button className="auth-social-button" type="button" onClick={() => startSocialAuth('google')}>
+          <span className="auth-social-badge" aria-hidden="true">G</span>
+          <span>Google</span>
+        </button>
+        <button className="auth-social-button" type="button" onClick={() => startSocialAuth('facebook')}>
+          <span className="auth-social-badge" aria-hidden="true">f</span>
+          <span>Facebook</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <main className="auth-page" lang="hy">
       <a className="auth-logo" href="/" aria-label="ARTWORK տուն">
@@ -109,6 +169,7 @@ export default function AuthPage() {
                 <Icon name="arrow_forward" />
               </button>
             </form>
+            {renderSocialActions()}
           </div>
 
           <div className={`auth-form-shell auth-signup-shell ${!isLogin ? 'is-visible' : ''}`}>
@@ -141,6 +202,7 @@ export default function AuthPage() {
                 <Icon name="person_add" />
               </button>
             </form>
+            {renderSocialActions()}
           </div>
 
           <footer className="auth-footer">
