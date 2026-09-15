@@ -14590,8 +14590,8 @@ body.has-mobile-menu-open {
     margin-block: 18px 24px;
     font-size: clamp(38px, 9.5vw, 58px);
     line-height: 1.04;
-    overflow-wrap: normal;
-    word-break: keep-all;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .products-header p:not(.label-caps) {
@@ -14658,6 +14658,9 @@ body.has-mobile-menu-open {
   .products-group-heading h2 {
     font-size: clamp(30px, 11vw, 80px);
     line-height: 0.92;
+    text-wrap: balance;
+    white-space: normal;
+    word-break: break-word;
   }
 
   .products-collage {
@@ -14719,6 +14722,36 @@ body.has-mobile-menu-open {
 
   .products-form-meta strong {
     font-size: clamp(24px, 7vw, 30px);
+  }
+}
+
+@media (max-width: 599px) {
+  .products-group-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .products-collage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .products-card-feature,
+  .products-card-narrow-drop,
+  .products-card-square-left,
+  .products-card-wide-mid,
+  .products-card-narrow,
+  .products-card-large-square,
+  .products-card-list {
+    grid-column: auto;
+    margin-top: 0;
+  }
+
+  .products-form-meta {
+    flex-wrap: wrap;
+  }
+
+  .products-form-meta > .material-symbols-outlined {
+    margin-left: auto;
   }
 }
 
