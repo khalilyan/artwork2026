@@ -14938,6 +14938,7 @@ body.has-mobile-menu-open {
 
 .details-main-image {
   min-height: clamp(420px, 52vw, 720px);
+  touch-action: pan-y;
 }
 
 .details-gallery {
@@ -14952,6 +14953,8 @@ body.has-mobile-menu-open {
 
 .details-parallax-image[role="button"] {
   cursor: zoom-in;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .details-image-preview {
@@ -14963,6 +14966,8 @@ body.has-mobile-menu-open {
   padding: clamp(18px, 4vw, 56px);
   background: rgba(20, 18, 16, 0.86);
   backdrop-filter: blur(10px);
+  overscroll-behavior: contain;
+  touch-action: none;
   animation: detailsPreviewIn 0.24s ease both;
 }
 
@@ -14970,6 +14975,8 @@ body.has-mobile-menu-open {
   max-width: min(100%, 1180px);
   max-height: min(82vh, 920px);
   object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
   animation: detailsPreviewImageIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

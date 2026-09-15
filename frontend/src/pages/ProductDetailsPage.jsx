@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/ui/Icon.jsx';
 import DirectCheckoutModal from '../components/ui/DirectCheckoutModal.jsx';
@@ -13,6 +13,8 @@ import { getAbsoluteUrl, resolvePublicAssetUrl, siteName } from '../utils/seo.js
 
 const initialReviewLimit = 3;
 const minimumSkeletonMs = 1700;
+const horizontalSwipeThresholdPx = 44;
+const downwardSwipeCloseThresholdPx = 96;
 const emptyProduct = {
   id: '',
   name: '',
@@ -328,6 +330,9 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [isImageGenerationEnabled, setIsImageGenerationEnabled] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isProductLoading, setIsProductLoading] = useState(true);
+  const mainImageTouchRef = useRef(null);
+  const previewTouchRef = useRef(null);
+  const suppressGalleryOpenRef = useRef(false);
   const dimensionsText = product.dimensionsText ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
   const productPrice = formatAmdPriceByUnit(productPriceAmount, Boolean(product.pricePerSquareMeter));
@@ -448,6 +453,97 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
     if (!productGallery.length) return;
 
     setActiveImageIndex((nextIndex + productGallery.length) % productGallery.length);
+  };
+
+  const trackTouchStart = (touchRef, event) => {
+    if (event.touches.length !== 1) {
+      touchRef.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    touchRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const getTouchDelta = (touchRef, event) => {
+    const start = touchRef.current;
+    if (!start || event.changedTouches.length !== 1) {
+      touchRef.current = null;
+      return null;
+    }
+
+    const touch = event.changedTouches[0];
+    touchRef.current = null;
+    return {
+      deltaX: touch.clientX - start.x,
+      deltaY: touch.clientY - start.y,
+    };
+  };
+
+  const handleMainImageTouchStart = (event) => {
+    trackTouchStart(mainImageTouchRef, event);
+  };
+
+  const handleMainImageTouchEnd = (event) => {
+    const delta = getTouchDelta(mainImageTouchRef, event);
+    if (!delta) return;
+
+    const { deltaX, deltaY } = delta;
+    const isHorizontalSwipe = Math.abs(deltaX) >= horizontalSwipeThresholdPx
+      && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+
+    if (isHorizontalSwipe) {
+      suppressGalleryOpenRef.current = true;
+      showImage(activeImageIndex + (deltaX < 0 ? 1 : -1));
+    }
+  };
+
+  const handlePreviewTouchStart = (event) => {
+    if (event.target.closest('button')) {
+      previewTouchRef.current = null;
+      return;
+    }
+
+    trackTouchStart(previewTouchRef, event);
+  };
+
+  const handlePreviewTouchEnd = (event) => {
+    if (event.target.closest('button')) {
+      previewTouchRef.current = null;
+      return;
+    }
+
+    const delta = getTouchDelta(previewTouchRef, event);
+    if (!delta) return;
+
+    const { deltaX, deltaY } = delta;
+    const isDownwardClose = deltaY >= downwardSwipeCloseThresholdPx
+      && Math.abs(deltaY) > Math.abs(deltaX) * 1.1;
+
+    if (isDownwardClose) {
+      setIsGalleryPreviewOpen(false);
+      return;
+    }
+
+    const isHorizontalSwipe = Math.abs(deltaX) >= horizontalSwipeThresholdPx
+      && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+
+    if (isHorizontalSwipe) {
+      showImage(activeImageIndex + (deltaX < 0 ? 1 : -1));
+    }
+  };
+
+  const handleReviewPreviewTouchEnd = (event) => {
+    const delta = getTouchDelta(previewTouchRef, event);
+    if (!delta) return;
+
+    const { deltaX, deltaY } = delta;
+    const isDownwardClose = deltaY >= downwardSwipeCloseThresholdPx
+      && Math.abs(deltaY) > Math.abs(deltaX) * 1.1;
+
+    if (isDownwardClose) {
+      setPreviewReviewImage('');
+    }
   };
 
   const openGalleryPreview = () => {
@@ -716,7 +812,17 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   ) : null;
 
   const galleryPreviewDialog = isGalleryPreviewOpen && typeof document !== 'undefined' ? createPortal(
-    <div className="details-image-preview" role="dialog" aria-modal="true" aria-label="Դիտել ապրանքի նկարը">
+    <div
+      className="details-image-preview"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Դիտել ապրանքի նկարը"
+      onTouchStart={handlePreviewTouchStart}
+      onTouchEnd={handlePreviewTouchEnd}
+      onTouchCancel={() => {
+        previewTouchRef.current = null;
+      }}
+    >
       <button className="details-preview-close" type="button" onClick={() => setIsGalleryPreviewOpen(false)} aria-label="Փակել նկարը">
         <Icon name="close" />
       </button>
@@ -732,7 +838,17 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   ) : null;
 
   const reviewImagePreviewDialog = previewReviewImage && typeof document !== 'undefined' ? createPortal(
-    <div className="details-image-preview" role="dialog" aria-modal="true" aria-label="Դիտել հաճախորդի նկարը">
+    <div
+      className="details-image-preview"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Դիտել հաճախորդի նկարը"
+      onTouchStart={(event) => trackTouchStart(previewTouchRef, event)}
+      onTouchEnd={handleReviewPreviewTouchEnd}
+      onTouchCancel={() => {
+        previewTouchRef.current = null;
+      }}
+    >
       <button className="details-preview-close" type="button" onClick={() => setPreviewReviewImage('')} aria-label="Փակել նկարը">
         <Icon name="close" />
       </button>
@@ -777,7 +893,14 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       />
       <section className="details-hero container">
         <div className="details-gallery">
-          <div className="details-main-image parallax-container">
+          <div
+            className="details-main-image parallax-container"
+            onTouchStart={handleMainImageTouchStart}
+            onTouchEnd={handleMainImageTouchEnd}
+            onTouchCancel={() => {
+              mainImageTouchRef.current = null;
+            }}
+          >
             <img
               className="details-parallax-image"
               data-detail-parallax
@@ -786,7 +909,14 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
               key={productGallery[activeImageIndex] ?? product.image}
               role="button"
               tabIndex="0"
-              onClick={openGalleryPreview}
+              onClick={() => {
+                if (suppressGalleryOpenRef.current) {
+                  suppressGalleryOpenRef.current = false;
+                  return;
+                }
+
+                openGalleryPreview();
+              }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
