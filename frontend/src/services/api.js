@@ -2,6 +2,7 @@ import { formatAmdPrice, formatAmdPriceByUnit, getPriceAmount } from '../utils/c
 
 const defaultProductionApiBaseUrl = 'https://api.artwork.am/api';
 const configuredApiBaseUrl = resolveApiBaseUrl();
+const configuredFallbackApiBaseUrls = resolveFallbackApiBaseUrls();
 const authTokenKey = 'artworkAuthToken';
 const authUserKey = 'artworkAuthUser';
 const guestCartKey = 'artworkGuestCart';
@@ -21,6 +22,16 @@ function resolveApiBaseUrl() {
   }
 
   return envBaseUrl;
+}
+
+function resolveFallbackApiBaseUrls() {
+  const fallbackList = String(import.meta.env.VITE_API_FALLBACK_URLS ?? '').trim();
+  if (!fallbackList) return [];
+
+  return fallbackList
+    .split(',')
+    .map((url) => normalizeBaseUrl(url.trim()))
+    .filter(Boolean);
 }
 
 function readStoredJson(key, fallbackValue) {
@@ -44,6 +55,22 @@ function normalizeBaseUrl(value) {
   return String(value).replace(/\/+$/, '');
 }
 
+function parseUrlSafely(value) {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+}
+
+function isArtworkApiHost(baseUrl) {
+  const parsed = parseUrlSafely(baseUrl);
+  if (!parsed) return false;
+
+  const hostname = parsed.hostname.toLowerCase();
+  return hostname === 'api.artwork.am' || hostname === 'www.api.artwork.am';
+}
+
 function createBaseCandidates(baseUrl) {
   const normalizedBase = normalizeBaseUrl(baseUrl);
   const candidates = [];
@@ -58,6 +85,14 @@ function createBaseCandidates(baseUrl) {
     pushCandidate(normalizedBase.slice(0, -4));
   } else {
     pushCandidate(`${normalizedBase}/api`);
+  }
+
+  if (import.meta.env.PROD) {
+    if (isArtworkApiHost(normalizedBase)) {
+      pushCandidate('https://www.api.artwork.am/api');
+    }
+
+    configuredFallbackApiBaseUrls.forEach((fallbackBase) => pushCandidate(fallbackBase));
   }
 
   return candidates.filter((candidate) => candidate || candidate === '');
@@ -245,11 +280,19 @@ async function apiRequest(path, options = {}) {
           ...(requestOptions.headers ?? {}),
         },
       });
-      const data = await response.json().catch(() => ({}));
+      const contentType = String(response.headers.get('content-type') ?? '').toLowerCase();
+      const isJsonResponse = contentType.includes('application/json');
+      const data = isJsonResponse ? await response.json().catch(() => ({})) : {};
 
-      if (response.ok) {
+      if (response.ok && isJsonResponse) {
         resolvedApiBaseUrl = candidate;
         return data;
+      }
+
+      if (response.ok && !isJsonResponse) {
+        const nonJsonError = new Error('Unexpected API response format.');
+        nonJsonError.status = response.status;
+        throw nonJsonError;
       }
 
       const canRetryOn404 = response.status === 404 && index < baseCandidates.length - 1;
