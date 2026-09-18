@@ -7,6 +7,8 @@ const authTokenKey = 'artworkAuthToken';
 const authUserKey = 'artworkAuthUser';
 const guestCartKey = 'artworkGuestCart';
 const guestIdKey = 'artworkGuestId';
+const preferredApiBaseUrlKey = 'artworkApiBaseUrl';
+const requestTimeoutMs = 12000;
 let resolvedApiBaseUrl = null;
 
 function resolveApiBaseUrl() {
@@ -55,6 +57,23 @@ function normalizeBaseUrl(value) {
   return String(value).replace(/\/+$/, '');
 }
 
+function getStoredPreferredApiBaseUrl() {
+  if (typeof window === 'undefined') return '';
+  return normalizeBaseUrl(window.localStorage.getItem(preferredApiBaseUrlKey));
+}
+
+function setStoredPreferredApiBaseUrl(baseUrl) {
+  if (typeof window === 'undefined') return;
+
+  const normalized = normalizeBaseUrl(baseUrl);
+  if (!normalized) {
+    window.localStorage.removeItem(preferredApiBaseUrlKey);
+    return;
+  }
+
+  window.localStorage.setItem(preferredApiBaseUrlKey, normalized);
+}
+
 function parseUrlSafely(value) {
   try {
     return new URL(value);
@@ -79,6 +98,10 @@ function createBaseCandidates(baseUrl) {
     if (!candidates.includes(normalized)) candidates.push(normalized);
   };
 
+  if (import.meta.env.PROD) {
+    pushCandidate(getStoredPreferredApiBaseUrl());
+  }
+
   pushCandidate(normalizedBase);
 
   if (normalizedBase.endsWith('/api')) {
@@ -90,6 +113,7 @@ function createBaseCandidates(baseUrl) {
   if (import.meta.env.PROD) {
     if (isArtworkApiHost(normalizedBase)) {
       pushCandidate('https://www.api.artwork.am/api');
+      pushCandidate('https://www.api.artwork.am');
     }
 
     configuredFallbackApiBaseUrls.forEach((fallbackBase) => pushCandidate(fallbackBase));
@@ -102,6 +126,24 @@ function composeRequestUrl(baseUrl, path) {
   const normalizedBase = normalizeBaseUrl(baseUrl);
   if (!normalizedBase) return path;
   return `${normalizedBase}${path}`;
+}
+
+async function fetchWithTimeout(url, requestOptions) {
+  if (requestOptions.signal) {
+    return fetch(url, requestOptions);
+  }
+
+  const abortController = new AbortController();
+  const timeoutId = window.setTimeout(() => abortController.abort(), requestTimeoutMs);
+
+  try {
+    return await fetch(url, {
+      ...requestOptions,
+      signal: abortController.signal,
+    });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 }
 
 export function getApiBaseUrl() {
@@ -273,7 +315,7 @@ async function apiRequest(path, options = {}) {
         ...(includeAuth && token ? { Authorization: `Bearer ${token}` } : {}),
       };
 
-      const response = await fetch(composeRequestUrl(candidate, path), {
+      const response = await fetchWithTimeout(composeRequestUrl(candidate, path), {
         ...requestOptions,
         headers: {
           ...baseHeaders,
@@ -286,6 +328,7 @@ async function apiRequest(path, options = {}) {
 
       if (response.ok && isJsonResponse) {
         resolvedApiBaseUrl = candidate;
+        setStoredPreferredApiBaseUrl(candidate);
         return data;
       }
 
