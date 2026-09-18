@@ -57,15 +57,35 @@ function normalizeBaseUrl(value) {
   return String(value).replace(/\/+$/, '');
 }
 
+function ensureProductionApiBasePath(baseUrl) {
+  const normalized = normalizeBaseUrl(baseUrl);
+  if (!normalized || !import.meta.env.PROD) return normalized;
+
+  const parsed = parseUrlSafely(normalized);
+  if (!parsed) return normalized;
+
+  const pathname = parsed.pathname.replace(/\/+$/, '');
+  if (pathname.endsWith('/api')) return normalized;
+
+  if (isArtworkApiHost(normalized) || !pathname || pathname === '/') {
+    parsed.pathname = '/api';
+    parsed.search = '';
+    parsed.hash = '';
+    return normalizeBaseUrl(parsed.toString());
+  }
+
+  return normalized;
+}
+
 function getStoredPreferredApiBaseUrl() {
   if (typeof window === 'undefined') return '';
-  return normalizeBaseUrl(window.localStorage.getItem(preferredApiBaseUrlKey));
+  return ensureProductionApiBasePath(window.localStorage.getItem(preferredApiBaseUrlKey));
 }
 
 function setStoredPreferredApiBaseUrl(baseUrl) {
   if (typeof window === 'undefined') return;
 
-  const normalized = normalizeBaseUrl(baseUrl);
+  const normalized = ensureProductionApiBasePath(baseUrl);
   if (!normalized) {
     window.localStorage.removeItem(preferredApiBaseUrlKey);
     return;
@@ -91,10 +111,10 @@ function isArtworkApiHost(baseUrl) {
 }
 
 function createBaseCandidates(baseUrl) {
-  const normalizedBase = normalizeBaseUrl(baseUrl);
+  const normalizedBase = ensureProductionApiBasePath(baseUrl);
   const candidates = [];
   const pushCandidate = (candidate) => {
-    const normalized = normalizeBaseUrl(candidate);
+    const normalized = ensureProductionApiBasePath(candidate);
     if (!candidates.includes(normalized)) candidates.push(normalized);
   };
 
@@ -104,16 +124,17 @@ function createBaseCandidates(baseUrl) {
 
   pushCandidate(normalizedBase);
 
-  if (normalizedBase.endsWith('/api')) {
-    pushCandidate(normalizedBase.slice(0, -4));
-  } else {
-    pushCandidate(`${normalizedBase}/api`);
+  if (!import.meta.env.PROD) {
+    if (normalizedBase.endsWith('/api')) {
+      pushCandidate(normalizedBase.slice(0, -4));
+    } else {
+      pushCandidate(`${normalizedBase}/api`);
+    }
   }
 
   if (import.meta.env.PROD) {
     if (isArtworkApiHost(normalizedBase)) {
       pushCandidate('https://www.api.artwork.am/api');
-      pushCandidate('https://www.api.artwork.am');
     }
 
     configuredFallbackApiBaseUrls.forEach((fallbackBase) => pushCandidate(fallbackBase));
