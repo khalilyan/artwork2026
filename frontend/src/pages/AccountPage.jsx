@@ -352,7 +352,7 @@ export default function AccountPage() {
           </section>
 
           <section id="saved-items" className="account-section reveal-section is-active" data-reveal>
-            <AccountSectionHeader title="Պահպանված առարկաներ" meta={`${savedItems.length} պահպանված`} />
+            <AccountSectionHeader title="Պահպանված կահույք" meta={`${savedItems.length} պահպանված`} />
             <div className="account-saved-grid">
               {savedItems.length ? savedItems.map((item) => {
                 const productHref = getSavedItemHref(item);
@@ -371,7 +371,7 @@ export default function AccountPage() {
                     <p className="label-caps">{formatItemPrice(item)}</p>
                   </article>
                 );
-              }) : <p>Պահպանված առարկաներ դեռ չկան։</p>}
+              }) : <p>Պահպանված կահույք դեռ չկա։</p>}
             </div>
           </section>
 

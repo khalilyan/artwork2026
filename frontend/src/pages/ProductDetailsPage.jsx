@@ -251,7 +251,7 @@ function ComplementaryProduct({ product, fallbackRoomSlug, fallbackCategorySlug 
           Դիտումներ՝ {viewCount}
         </p>
         <h3>{product.name}</h3>
-        <p>{product.description ?? product.type ?? 'ARTWORK ԱՌԱՐԿԱ'}</p>
+        <p>{product.description ?? product.type ?? 'ARTWORK ԿԱՀՈՒՅՔ'}</p>
       </div>
       <div className="details-similar-meta">
         <div>
@@ -984,7 +984,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
             </>
           ) : null}
           <button className="details-share-button" type="button" onClick={shareProduct}>
-            Կիսվել այս առարկայով
+            Կիսվել այս կահույքով
             <Icon name="ios_share" />
           </button>
           {shareDialog}
@@ -1021,7 +1021,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
             </label>
             <label>
               <span className="label-caps">Ձեր կարծիքը</span>
-              <textarea name="review" rows="3" placeholder="Գրեք ձեր տպավորությունը այս առարկայի մասին..." required />
+              <textarea name="review" rows="3" placeholder="Գրեք ձեր տպավորությունը այս կահույքի մասին..." required />
             </label>
             <div className="details-review-upload">
               <span className="label-caps">Սենյակի նկարներ</span>
@@ -1103,7 +1103,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
 
       <section className="details-complementary container">
         <div className="details-complementary-header">
-          <h2>Նման առարկաներ</h2>
+          <h2>Նման կահույք</h2>
           <a className="label-caps" href={`/rooms/${roomSlug}/${furnitureSlug}`}>ԴԻՏԵԼ ԱՄԲՈՂՋ ԲԱԺԻՆԸ</a>
         </div>
         <div className="details-complementary-grid">

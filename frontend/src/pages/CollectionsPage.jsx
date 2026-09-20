@@ -25,7 +25,7 @@ function normalizeCollectionSections(collections) {
       ...collection,
       title: collection.title ?? collection.name ?? `Հավաքածու ${index + 1}`,
       subtitle: collection.subtitle ?? 'Կուրացված շարք',
-      description: collection.description ?? 'Բացահայտեք այս հավաքածուի ընտրված առարկաները։',
+      description: collection.description ?? 'Բացահայտեք այս հավաքածուի ընտրված կահույքը։',
       slug,
       image: collection.image ?? collection.heroImage ?? '',
       number: `${String(index + 1).padStart(2, '0')} / ՀԱՎԱՔԱԾՈՒ`,
@@ -93,7 +93,7 @@ export default function CollectionsPage() {
     <main className="collections-redesign-page" lang="hy">
       <SeoMeta
         title="ARTWORK հավաքածուներ | Դիզայներական կահույք"
-        description="Բացահայտեք ARTWORK-ի կուրացված հավաքածուները` դիզայներական առարկաներ, նուրբ նյութեր և ամբողջական ինտերիերի համադրություններ։"
+        description="Բացահայտեք ARTWORK-ի կուրացված հավաքածուները` դիզայներական կահույք, նուրբ նյութեր և ամբողջական ինտերիերի համադրություններ։"
         image={pageImages.hero}
         url="/collections"
         keywords="կահույքի հավաքածուներ, կուրացված կահույք Հայաստան, դիզայներական կահույքի շարքեր, ARTWORK հավաքածուներ"

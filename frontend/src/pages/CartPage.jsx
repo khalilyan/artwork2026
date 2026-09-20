@@ -55,7 +55,7 @@ function CartItem({ item, isRemoving, onQuantityChange, onRemove }) {
             <h2><a href={productHref}>{item.name}</a></h2>
             <p>{displayPrice(item)}</p>
           </div>
-          <p className="label-caps cart-item-material">{item.itemType === 'collection' ? 'ՀԱՎԱՔԱԾՈՒԻ ՓԱԹԵԹ' : item.productSku ?? item.material ?? 'ARTWORK ԱՌԱՐԿԱ'}</p>
+          <p className="label-caps cart-item-material">{item.itemType === 'collection' ? 'ՀԱՎԱՔԱԾՈՒԻ ՓԱԹԵԹ' : item.productSku ?? item.material ?? 'ARTWORK ԿԱՀՈՒՅՔ'}</p>
           {includedProducts.length ? (
             <div className="cart-bundle-products">
               {includedProducts.map((product) => (
@@ -189,7 +189,7 @@ export default function CartPage() {
         <button className="checkout-close" type="button" aria-label="Փակել պատվերի պատուհանը" onClick={() => setIsCheckoutOpen(false)}><Icon name="close" /></button>
         <div className="checkout-heading">
           <h2>Ավարտել պատվերը</h2>
-          <div><p>{cartItems.length} առարկա զամբյուղում</p><strong>{formatAmdPrice(total)}</strong></div>
+          <div><p>{cartItems.length} կահույք զամբյուղում</p><strong>{formatAmdPrice(total)}</strong></div>
         </div>
         <form className="checkout-form" onSubmit={submitOrder}>
           <label><span className="label-caps">Անուն*</span><input name="name" required type="text" defaultValue={accountUser?.fullName ?? ''} /></label>

@@ -15,8 +15,95 @@ const sortOptions = [
 ];
 const productLayouts = ['feature', 'narrow-drop', 'square-left', 'wide-mid', 'narrow', 'large-square'];
 const defaultMinPrice = 0;
-const defaultMaxPrice = 1000000;
+const defaultMaxPrice = 2000000;
 const minimumSkeletonMs = 1700;
+const armenianToLatinMap = {
+  ա: 'a', բ: 'b', գ: 'g', դ: 'd', ե: 'e', զ: 'z', է: 'e', ը: 'y', թ: 't', ժ: 'zh', ի: 'i', լ: 'l',
+  խ: 'kh', ծ: 'ts', կ: 'k', հ: 'h', ձ: 'dz', ղ: 'gh', ճ: 'ch', մ: 'm', յ: 'y', ն: 'n', շ: 'sh',
+  ո: 'o', չ: 'ch', պ: 'p', ջ: 'j', ռ: 'r', ս: 's', վ: 'v', տ: 't', ր: 'r', ց: 'ts', ու: 'u',
+  փ: 'p', ք: 'q', օ: 'o', ֆ: 'f', և: 'ev',
+};
+
+function toSearchKey(value) {
+  const normalized = String(value ?? '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  let transliterated = '';
+
+  for (let index = 0; index < normalized.length; index += 1) {
+    const twoLetters = normalized.slice(index, index + 2);
+    if (armenianToLatinMap[twoLetters]) {
+      transliterated += armenianToLatinMap[twoLetters];
+      index += 1;
+      continue;
+    }
+
+    const letter = normalized[index];
+    transliterated += armenianToLatinMap[letter] ?? letter;
+  }
+
+  return transliterated.replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function splitSearchWords(value) {
+  return String(value ?? '').split(/\s+/).filter((word) => word.length > 1);
+}
+
+function levenshteinDistance(left, right) {
+  if (left === right) return 0;
+  if (!left.length) return right.length;
+  if (!right.length) return left.length;
+
+  const previous = new Array(right.length + 1);
+  const current = new Array(right.length + 1);
+
+  for (let column = 0; column <= right.length; column += 1) {
+    previous[column] = column;
+  }
+
+  for (let row = 1; row <= left.length; row += 1) {
+    current[0] = row;
+    for (let column = 1; column <= right.length; column += 1) {
+      const substitutionCost = left[row - 1] === right[column - 1] ? 0 : 1;
+      current[column] = Math.min(
+        previous[column] + 1,
+        current[column - 1] + 1,
+        previous[column - 1] + substitutionCost,
+      );
+    }
+
+    for (let column = 0; column <= right.length; column += 1) {
+      previous[column] = current[column];
+    }
+  }
+
+  return previous[right.length];
+}
+
+function wordsRoughlyMatch(baseWord, queryWord) {
+  if (!baseWord || !queryWord) return false;
+  if (baseWord === queryWord || baseWord.includes(queryWord) || queryWord.includes(baseWord)) return true;
+  if (Math.abs(baseWord.length - queryWord.length) > 1) return false;
+  if (baseWord.length < 4 || queryWord.length < 4) return false;
+  return levenshteinDistance(baseWord, queryWord) <= 1;
+}
+
+function getProductSearchKey(product) {
+  return toSearchKey([
+    product.name,
+    product.slug,
+    product.id,
+    product.sku,
+    product.description,
+    product.type,
+    product.categorySlug,
+    product.group,
+    ...(product.roomSlugs ?? []),
+    ...(product.hashtags ?? []),
+  ].filter(Boolean).join(' '));
+}
+
+function getProductSearchWords(product) {
+  return splitSearchWords(getProductSearchKey(product));
+}
 
 function getProductLayout(index) {
   return productLayouts[index % productLayouts.length];
@@ -70,7 +157,7 @@ function ProductCard({ product, href, index }) {
       <div className="products-form-copy">
         <p className="label-caps products-views-label"><Icon name="visibility" />Դիտումներ՝ {viewCount}</p>
         <h3>{product.name}</h3>
-        <span>{product.description ?? product.type ?? 'ARTWORK ԱՌԱՐԿԱ'}</span>
+        <span>{product.description ?? product.type ?? 'ARTWORK ԿԱՀՈՒՅՔ'}</span>
       </div>
       <div className="products-form-meta">
         <div>
@@ -161,7 +248,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     const loadingStartedAt = performance.now();
 
     setIsProductsLoading(true);
-    api.products({ roomSlug, categorySlug: categoryFilter, q: query })
+    api.products({ roomSlug, categorySlug: categoryFilter })
       .then(({ products: nextProducts }) => {
         if (isCurrentRequest) setProducts(nextProducts ?? []);
       })
@@ -188,9 +275,23 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const visibleProducts = useMemo(() => {
     const low = Math.max(defaultMinPrice, Math.min(minPrice, maxPrice));
     const high = Math.min(defaultMaxPrice, Math.max(minPrice, maxPrice));
+    const queryKey = toSearchKey(query);
+    const queryWords = splitSearchWords(queryKey);
 
     return products
       .filter((product) => {
+        if (queryKey) {
+          const productKey = getProductSearchKey(product);
+          const productWords = getProductSearchWords(product);
+          const hasFuzzyWordMatch = queryWords.length
+            ? queryWords.every((queryWord) => productWords.some((word) => wordsRoughlyMatch(word, queryWord)))
+            : false;
+          const matchesQuery = productKey.includes(queryKey)
+            || queryWords.some((word) => productKey.includes(word))
+            || hasFuzzyWordMatch;
+          if (!matchesQuery) return false;
+        }
+
         if (!isPriceFilterActive) return true;
 
         const price = getProductPrice(product);
@@ -205,7 +306,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         return getProductDate(second.product) - getProductDate(first.product) || second.originalIndex - first.originalIndex;
       })
       .map(({ product }) => product);
-  }, [isPriceFilterActive, maxPrice, minPrice, products, sort]);
+  }, [isPriceFilterActive, maxPrice, minPrice, products, query, sort]);
 
   useEffect(() => {
     if (isProductsLoading || typeof window === 'undefined') return undefined;
@@ -370,7 +471,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const furnitureTypeName = getFurnitureTypeName(category);
   const isRoomCategoryPage = Boolean(room && category);
   const roomHeadingTitle = room?.roomName ?? room?.title ?? room?.name ?? 'Բոլոր ապրանքները';
-  const roomEyebrowLabel = room ? `${roomHeadingTitle}ային կահույք` : 'ԸՆՏՐՎԱԾ ԱՌԱՐԿԱՆԵՐ';
+  const roomEyebrowLabel = room ? `${roomHeadingTitle}ային կահույք` : 'ԸՆՏՐՎԱԾ ԿԱՀՈՒՅՔ';
   const productsEyebrow = isRoomCategoryPage
     ? `${roomHeadingTitle} - ${furnitureTypeName || 'Բոլոր ապրանքները'}`
     : roomEyebrowLabel;
@@ -385,7 +486,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     ? `${room.roomName ?? room.title ?? room.name}-ի համար ARTWORK-ի ${furnitureTypeName}՝ ընտրված նյութերով, վարպետական մշակումով և ժամանակակից ինտերիերի շեշտադրումներով։`
     : isRoomAllPage
       ? `${room?.roomName ?? room?.title ?? room?.name ?? 'Այս սենյակի'} համար դիտեք ARTWORK-ի ամբողջ հասանելի կահույքը մեկ էջում։`
-    : 'Դիտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, բազկաթոռները, լուսավորությունը, մահճակալները, բազմոցները և ինտերիերի այլ առարկաները։';
+    : 'Դիտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, բազկաթոռները, լուսավորությունը, մահճակալները, բազմոցները և ինտերիերի այլ կահույքի տեսակները։';
   const seoUrl = typeof window === 'undefined' ? '/products' : `${window.location.pathname}${window.location.search}`;
   const seoImage = visibleProducts[0]?.image ?? visibleProducts[0]?.images?.primary ?? defaultSeoImage;
 
@@ -402,7 +503,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         <div className="products-header-inner" data-products-header>
           <div>
             <span className="label-caps products-eyebrow">{productsEyebrow}</span>
-            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${roomHeadingTitle} - ${furnitureTypeName}` : isRoomAllPage ? `${roomHeadingTitle} • ամբողջ տեսականին` : 'Ցանկալի առարկաներ'}</h1>
+            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${roomHeadingTitle} - ${furnitureTypeName}` : isRoomAllPage ? `${roomHeadingTitle} • ամբողջ տեսականին` : 'Ցանկալի կահույք'}</h1>
             <p>
               {isRoomCategoryPage
                 ? `Ձեռագործ ${furnitureTypeName}ներ, որոնք համադրում են բարձրակարգ նյութերը, վարպետական մշակումը և ժամանակակից դիզայնը՝ ստեղծելով ներդաշնակ ինտերիեր`
@@ -517,7 +618,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
               ))}
             </div>
           </section>
-        ) : <p className="products-empty">Այս գնի միջակայքում առարկաներ չկան։</p>}
+        ) : <p className="products-empty">Այս գնի միջակայքում կահույք չկա։</p>}
       </section>
     </main>
   );

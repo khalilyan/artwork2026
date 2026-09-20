@@ -2694,7 +2694,28 @@ body:has(.restoration-lens:hover) .custom-cursor {
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.footer-socials svg {
+.footer-socials .social-link-facebook,
+.footer-socials-contact .social-link-facebook {
+  color: #1877f2;
+}
+
+.footer-socials .social-link-facebook:hover,
+.footer-socials-contact .social-link-facebook:hover {
+  color: #1877f2;
+}
+
+.footer-socials .social-link-instagram,
+.footer-socials-contact .social-link-instagram {
+  color: #d62976;
+}
+
+.footer-socials .social-link-instagram:hover,
+.footer-socials-contact .social-link-instagram:hover {
+  color: #d62976;
+}
+
+.footer-socials svg,
+.footer-socials-contact svg {
   display: block;
   width: 22px;
   height: 22px;
@@ -2705,8 +2726,26 @@ body:has(.restoration-lens:hover) .custom-cursor {
   stroke-linejoin: round;
 }
 
-.footer-socials svg path {
+.footer-socials svg path,
+.footer-socials-contact svg path {
   fill: currentColor;
+  stroke: none;
+}
+
+.footer-socials .social-icon-instagram,
+.footer-socials-contact .social-icon-instagram {
+  stroke: url("#footer-instagram-gradient");
+}
+
+.footer-socials .social-icon-instagram path,
+.footer-socials-contact .social-icon-instagram path {
+  fill: none;
+}
+
+.footer-socials .social-icon-facebook,
+.footer-socials-contact .social-icon-facebook {
+  color: #1877f2;
+  fill: #1877f2;
   stroke: none;
 }
 

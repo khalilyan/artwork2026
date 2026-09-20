@@ -22,7 +22,7 @@ function CollectionProductCard({ product, index }) {
   const productId = product.id ?? `collection-product-${index + 1}`;
   const primaryImage = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
   const hoverImage = product.hoverImage ?? product.images?.hover ?? product.images?.gallery?.[1] ?? primaryImage;
-  const name = product.name ?? 'Անանուն առարկա';
+  const name = product.name ?? 'Անանուն կահույք';
   const price = formatAmdPrice(product.price?.amount ?? product.priceAmount ?? product.price);
   const material = product.description ?? 'Պատվերով նյութ';
   const roomSlug = product.roomSlugs?.[0] ?? 'living-room';
@@ -202,7 +202,7 @@ export default function CollectionDetailPage({ collectionSlug }) {
     <main className="spec-collection-page" lang="hy">
       <SeoMeta
         title={`${collection.title} | ARTWORK հավաքածու`}
-        description={collection.description ?? `Բացահայտեք ARTWORK-ի ${collection.title} հավաքածուն՝ կուրացված դիզայներական առարկաներով և նուրբ ինտերիերի լուծումներով։`}
+        description={collection.description ?? `Բացահայտեք ARTWORK-ի ${collection.title} հավաքածուն՝ կուրացված դիզայներական կահույքով և նուրբ ինտերիերի լուծումներով։`}
         image={collection.image ?? collection.heroImage ?? collection.products?.[0]?.image}
         url={`/${collection.slug ?? collectionSlug}`}
         keywords={`${collection.title}, ARTWORK հավաքածու, կուրացված կահույք, դիզայներական կահույք Հայաստան`}

@@ -15,7 +15,7 @@ const shopContact = {
 
 const quickPrompts = [
   'Օգնիր ընտրել սենյակի համար',
-  'Ցույց տուր ամենաէժան ապրանքը',
+  'Ամենաէժան ապրանքները',
   'Ո՞րն է ամենավաճառվողը',
   'Կապի տվյալներ',
 ];
@@ -45,13 +45,85 @@ const defaultAssistantMessage = {
 };
 
 const assistantIntroKey = 'artwork-ai-intro-shown';
+const armenianToLatinMap = {
+  ա: 'a', բ: 'b', գ: 'g', դ: 'd', ե: 'e', զ: 'z', է: 'e', ը: 'y', թ: 't', ժ: 'zh', ի: 'i', լ: 'l',
+  խ: 'kh', ծ: 'ts', կ: 'k', հ: 'h', ձ: 'dz', ղ: 'gh', ճ: 'ch', մ: 'm', յ: 'y', ն: 'n', շ: 'sh',
+  ո: 'o', չ: 'ch', պ: 'p', ջ: 'j', ռ: 'r', ս: 's', վ: 'v', տ: 't', ր: 'r', ց: 'ts', ու: 'u',
+  փ: 'p', ք: 'q', օ: 'o', ֆ: 'f', և: 'ev',
+};
 
 function normalizeText(value) {
   return String(value ?? '').toLowerCase().trim();
 }
 
+function toSearchKey(value) {
+  const normalized = normalizeText(value).normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  let transliterated = '';
+
+  for (let index = 0; index < normalized.length; index += 1) {
+    const twoLetters = normalized.slice(index, index + 2);
+    if (armenianToLatinMap[twoLetters]) {
+      transliterated += armenianToLatinMap[twoLetters];
+      index += 1;
+      continue;
+    }
+
+    const letter = normalized[index];
+    transliterated += armenianToLatinMap[letter] ?? letter;
+  }
+
+  return transliterated.replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function toSearchWords(value) {
+  return toSearchKey(value).split(/\s+/).filter((word) => word.length > 1);
+}
+
+function levenshteinDistance(left, right) {
+  if (left === right) return 0;
+  if (!left.length) return right.length;
+  if (!right.length) return left.length;
+
+  const previous = new Array(right.length + 1);
+  const current = new Array(right.length + 1);
+
+  for (let column = 0; column <= right.length; column += 1) {
+    previous[column] = column;
+  }
+
+  for (let row = 1; row <= left.length; row += 1) {
+    current[0] = row;
+    for (let column = 1; column <= right.length; column += 1) {
+      const substitutionCost = left[row - 1] === right[column - 1] ? 0 : 1;
+      current[column] = Math.min(
+        previous[column] + 1,
+        current[column - 1] + 1,
+        previous[column - 1] + substitutionCost,
+      );
+    }
+
+    for (let column = 0; column <= right.length; column += 1) {
+      previous[column] = current[column];
+    }
+  }
+
+  return previous[right.length];
+}
+
+function wordsRoughlyMatch(baseWord, queryWord) {
+  if (!baseWord || !queryWord) return false;
+  if (baseWord === queryWord || baseWord.includes(queryWord) || queryWord.includes(baseWord)) return true;
+  if (Math.abs(baseWord.length - queryWord.length) > 1) return false;
+  if (baseWord.length < 4 || queryWord.length < 4) return false;
+  return levenshteinDistance(baseWord, queryWord) <= 1;
+}
+
+function textIncludesAny(text, searchText, keys) {
+  return keys.some((key) => text.includes(key) || (searchText && searchText.includes(toSearchKey(key))));
+}
+
 function productSearchText(product) {
-  return normalizeText([
+  const rawText = [
     product.name,
     product.slug,
     product.id,
@@ -62,11 +134,27 @@ function productSearchText(product) {
     product.group,
     ...(product.roomSlugs ?? []),
     ...(product.hashtags ?? []),
-  ].filter(Boolean).join(' '));
+  ].filter(Boolean).join(' ');
+
+  return `${normalizeText(rawText)} ${toSearchKey(rawText)}`;
 }
 
 function productPrice(product) {
-  return getPriceAmount(product.price?.amount, product.priceAmount, product.price, product.oldPrice?.amount);
+  return getPriceAmount(
+    product.price?.amount,
+    product.priceAmount,
+    product.price,
+    product.snapshot?.price?.amount,
+    product.snapshot?.price,
+  );
+}
+
+function hasListedPrice(product) {
+  return productPrice(product) > 0;
+}
+
+function productKey(product) {
+  return String(product.id ?? product.slug ?? product.sku ?? product.name ?? '');
 }
 
 function productImage(product) {
@@ -104,7 +192,8 @@ function getCategoryLabel(category) {
 
 function inferRoomFromMessage(message, rooms) {
   const text = normalizeText(message);
-  const hintedSlug = roomHints.find((hint) => hint.keys.some((key) => text.includes(key)))?.value;
+  const searchText = toSearchKey(message);
+  const hintedSlug = roomHints.find((hint) => textIncludesAny(text, searchText, hint.keys))?.value;
   const roomByHint = hintedSlug ? rooms.find((room) => room.slug === hintedSlug) : null;
   if (roomByHint) return roomByHint;
 
@@ -113,26 +202,28 @@ function inferRoomFromMessage(message, rooms) {
     room.name,
     room.roomName,
     room.title,
-  ].filter(Boolean).some((value) => text.includes(normalizeText(value)))) ?? null;
+  ].filter(Boolean).some((value) => text.includes(normalizeText(value)) || searchText.includes(toSearchKey(value)))) ?? null;
 }
 
 function inferCategoryFromMessage(message, categories = []) {
   const text = normalizeText(message);
+  const searchText = toSearchKey(message);
   const categoryByCatalog = categories.find((category) => [
     category.slug,
     category.title,
     category.name,
     category.label,
-  ].filter(Boolean).some((value) => text.includes(normalizeText(value))));
+  ].filter(Boolean).some((value) => text.includes(normalizeText(value)) || searchText.includes(toSearchKey(value))));
 
   if (categoryByCatalog) return categoryByCatalog;
 
-  const categoryHint = categoryHints.find((hint) => hint.keys.some((key) => text.includes(key)));
+  const categoryHint = categoryHints.find((hint) => textIncludesAny(text, searchText, hint.keys));
   if (!categoryHint) return null;
 
   return categories.find((category) => {
     const categoryText = normalizeText([category.slug, category.title, category.name, category.label].filter(Boolean).join(' '));
-    return categoryHint.terms.some((term) => categoryText.includes(term));
+    const categorySearchText = toSearchKey(categoryText);
+    return categoryHint.terms.some((term) => categoryText.includes(term) || categorySearchText.includes(toSearchKey(term)));
   }) ?? null;
 }
 
@@ -159,6 +250,16 @@ function getRoomProducts(products, roomSlug) {
   return getRoomCategoryProducts(products, roomSlug, '');
 }
 
+function createMoreFurnitureOption({ roomSlug, categorySlug, label, shownProductIds = [] }) {
+  return {
+    label: 'Այլ',
+    roomSlug,
+    categorySlug,
+    categoryLabel: label,
+    shownProductIds,
+  };
+}
+
 function createFurnitureTypeOptions(room) {
   return (room?.categories ?? []).map((category) => ({
     label: getCategoryLabel(category),
@@ -178,8 +279,9 @@ function createRoomOptions(rooms) {
 
 function getSearchProfile(message) {
   const text = normalizeText(message);
-  const categoryHint = categoryHints.find((hint) => hint.keys.some((key) => text.includes(key)));
-  const room = roomHints.find((hint) => hint.keys.some((key) => text.includes(key)))?.value ?? '';
+  const searchText = toSearchKey(message);
+  const categoryHint = categoryHints.find((hint) => textIncludesAny(text, searchText, hint.keys));
+  const room = roomHints.find((hint) => textIncludesAny(text, searchText, hint.keys))?.value ?? '';
   const wantsContact = ['կապ հաստատ', 'կապի տվյալ', 'հեռախոս', 'էլ․ հասցե', 'էլ. հասցե', 'email', 'e-mail', 'contact', 'phone', 'call'].some((key) => text.includes(key));
   const wantsBudget = ['ամենաէժան', 'էժան', 'մատչելի', 'ցածր գին', 'budget', 'cheap', 'cheapest', 'low price'].some((key) => text.includes(key));
   const wantsPremium = ['ամենաթանկ', 'պրեմիում', 'լյուքս', 'թանկ', 'premium', 'luxury', 'expensive'].some((key) => text.includes(key));
@@ -192,6 +294,7 @@ function getSearchProfile(message) {
   return {
     categoryTerms: categoryHint?.terms ?? [],
     room,
+    searchText,
     text,
     wantsBestSeller,
     wantsBudget,
@@ -208,10 +311,11 @@ function scoreProduct(product, profile) {
   const haystack = productSearchText(product);
 
   let score = 0;
-  if (profile.categoryTerms.some((term) => haystack.includes(term))) score += 7;
+  if (profile.categoryTerms.some((term) => haystack.includes(term) || haystack.includes(toSearchKey(term)))) score += 7;
   if (profile.room && (product.roomSlugs ?? []).includes(profile.room)) score += 5;
   if (profile.text && haystack.includes(profile.text)) score += 4;
-  if (normalizeText(product.name).includes(profile.text)) score += 6;
+  if (profile.searchText && haystack.includes(profile.searchText)) score += 5;
+  if (normalizeText(product.name).includes(profile.text) || (profile.searchText && toSearchKey(product.name).includes(profile.searchText))) score += 6;
   if (product.badge) score += 1;
   if (Number(product.views) > 0) score += Math.min(3, Number(product.views) / 1000);
   if (profile.wantsSale && (product.oldPrice || product.oldPriceAmount || product.sale?.isActive)) score += 8;
@@ -227,16 +331,36 @@ function findDirectProductMatches(products, profile) {
     .split(/\s+/)
     .map((word) => word.replace(/[^\p{L}\p{N}-]/gu, ''))
     .filter((word) => word.length > 2 && !['ուզում', 'ցույց', 'տուր', 'կա', 'ունեք', 'համար', 'want', 'show', 'have'].includes(word));
+  const meaningfulSearchWords = profile.searchText
+    .split(/\s+/)
+    .filter((word) => word.length > 2 && !['uzum', 'cuyc', 'tur', 'ka', 'uneq', 'hamar', 'want', 'show', 'have'].includes(word));
+  const queryWords = toSearchWords(profile.text);
 
   return products.filter((product) => {
     const name = normalizeText(product.name);
     const slug = normalizeText(product.slug ?? product.id).replaceAll('-', ' ');
+    const nameSearch = toSearchKey(product.name);
+    const slugSearch = toSearchKey(product.slug ?? product.id);
     const haystack = productSearchText(product);
+    const productSearchWords = toSearchWords([
+      product.name,
+      product.slug,
+      product.id,
+      product.description,
+      product.type,
+      product.categorySlug,
+    ].filter(Boolean).join(' '));
+    const hasFuzzyWordMatch = queryWords.length
+      ? queryWords.every((queryWord) => productSearchWords.some((word) => wordsRoughlyMatch(word, queryWord)))
+      : false;
 
     return name.includes(text)
       || slug.includes(text)
-      || profile.categoryTerms.some((term) => haystack.includes(term))
-      || meaningfulWords.some((word) => name.includes(word) || slug.includes(word));
+      || (profile.searchText && haystack.includes(profile.searchText))
+      || profile.categoryTerms.some((term) => haystack.includes(term) || haystack.includes(toSearchKey(term)))
+      || meaningfulWords.some((word) => name.includes(word) || slug.includes(word))
+      || meaningfulSearchWords.some((word) => nameSearch.includes(word) || slugSearch.includes(word) || haystack.includes(word))
+      || hasFuzzyWordMatch;
   });
 }
 
@@ -258,8 +382,11 @@ function getRecommendations(products, profile) {
   const candidateProducts = directMatches.length ? directMatches : products;
   const saleProducts = candidateProducts.filter((product) => product.oldPrice || product.oldPriceAmount || product.sale?.isActive);
   const activeProducts = profile.wantsSale && saleProducts.length ? saleProducts : candidateProducts;
+  const pricedProducts = profile.wantsBudget
+    ? activeProducts.filter((product) => hasListedPrice(product))
+    : activeProducts;
 
-  const sortedProducts = [...activeProducts]
+  const sortedProducts = [...pricedProducts]
     .filter((product) => hasProductRoute(product) && product.name)
     .sort((first, second) => {
       if (profile.wantsBudget) return productPrice(first) - productPrice(second);
@@ -415,7 +542,7 @@ function ProductSuggestion({ product, onAddToCart }) {
       {productImage(product) ? <img src={productImage(product)} alt={product.name} /> : null}
       <div>
         <h4>{product.name}</h4>
-        <p>{product.description ?? product.type ?? 'ARTWORK առարկա'}</p>
+        <p>{product.description ?? product.type ?? 'ARTWORK կահույք'}</p>
         <strong>{formatAmdPrice(productPrice(product))}</strong>
         <div className="ai-chat-product-actions">
           <a className="label-caps" href={productHref(product)} data-cursor-target>Դիտել</a>
@@ -438,6 +565,7 @@ export default function AiChatAssistant() {
   const [collections, setCollections] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [pendingRoomSlug, setPendingRoomSlug] = useState('');
+  const [lastRandomRequest, setLastRandomRequest] = useState(null);
   const messageListRef = useRef(null);
 
   useEffect(() => {
@@ -505,6 +633,7 @@ export default function AiChatAssistant() {
         contact: Boolean(options.contact),
         options: options.options ?? [],
         roomOptions: options.roomOptions ?? [],
+        moreOption: options.moreOption ?? null,
       },
     ]);
   };
@@ -538,11 +667,20 @@ export default function AiChatAssistant() {
     );
   };
 
-  const showRandomFurniture = ({ roomSlug, categorySlug, label }) => {
+  const showRandomFurniture = ({ roomSlug, categorySlug, label, excludeProductIds = [] }) => {
     const room = rooms.find((item) => item.slug === roomSlug);
     const matchedProducts = getRoomCategoryProducts(products, roomSlug, categorySlug);
-    const recommendations = shuffleProducts(matchedProducts).slice(0, maxRecommendationCount);
+    const excludedIds = new Set(excludeProductIds);
+    const nextProducts = matchedProducts.filter((product) => !excludedIds.has(productKey(product)));
+    const recommendationPool = nextProducts.length >= maxRecommendationCount ? nextProducts : matchedProducts;
+    const recommendations = shuffleProducts(recommendationPool).slice(0, maxRecommendationCount);
+    const shownProductIds = [...new Set([...excludeProductIds, ...recommendations.map((product) => productKey(product))])];
+    const hasMoreUnseenProducts = nextProducts.length > 0 && matchedProducts.length > maxRecommendationCount;
+    const moreOption = hasMoreUnseenProducts
+      ? createMoreFurnitureOption({ roomSlug, categorySlug, label, shownProductIds })
+      : null;
     setPendingRoomSlug('');
+    setLastRandomRequest({ roomSlug, categorySlug, label, shownProductIds });
 
     if (!recommendations.length) {
       const fallbackRecommendations = shuffleProducts(getRoomProducts(products, roomSlug)).slice(0, maxRecommendationCount);
@@ -562,6 +700,7 @@ export default function AiChatAssistant() {
     addAssistantMessage(
       `Ահա ${getRoomLabel(room)} սենյակի համար «${label}» տեսակից տարբերակներ։`,
       recommendations,
+      { moreOption },
     );
   };
 
@@ -615,6 +754,21 @@ export default function AiChatAssistant() {
 
     setMessages((current) => [...current, { id: `user-${Date.now()}`, role: 'user', text: option.label }]);
     window.setTimeout(() => showRandomFurniture(option), 250);
+  };
+
+  const handleMoreFurniture = (option) => {
+    if (isTyping) return;
+
+    const nextOption = option ?? lastRandomRequest;
+    if (!nextOption) return;
+
+    setMessages((current) => [...current, { id: `user-${Date.now()}`, role: 'user', text: 'Այլ' }]);
+    window.setTimeout(() => showRandomFurniture({
+      roomSlug: nextOption.roomSlug,
+      categorySlug: nextOption.categorySlug,
+      label: nextOption.categoryLabel ?? nextOption.label,
+      excludeProductIds: nextOption.shownProductIds ?? [],
+    }), 250);
   };
 
   const handleAddToCart = async (product) => {
@@ -690,6 +844,13 @@ export default function AiChatAssistant() {
                         {option.label}
                       </button>
                     ))}
+                  </div>
+                ) : null}
+                {message.moreOption ? (
+                  <div className="ai-chat-choice-actions">
+                    <button className="label-caps" type="button" onClick={() => handleMoreFurniture(message.moreOption)} data-cursor-target>
+                      {message.moreOption.label}
+                    </button>
                   </div>
                 ) : null}
                 {message.recommendations?.length ? (

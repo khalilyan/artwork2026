@@ -21,7 +21,7 @@ export const heroSlides = [
     image: images.archive,
   },
   {
-    title: 'ՍՏՈՒԴԻԱՅԻ ԱՌԱՐԿԱՆԵՐ',
+    title: 'ՍՏՈՒԴԻԱՅԻ ԿԱՀՈՒՅՔ',
     subtitle: 'ԱՇԽԱՏԱՆՔԱՅԻՆ ՏԱՐԱԾՔԻ ՆՈՐ ՄԱԿԱՐԴԱԿ',
     image: images.studio,
   },
@@ -35,7 +35,7 @@ export const collections = [
     href: '/the-sculptural-series',
   },
   {
-    title: 'ՍՏՈՒԴԻԱՅԻ ԱՌԱՐԿԱՆԵՐ',
+    title: 'ՍՏՈՒԴԻԱՅԻ ԿԱՀՈՒՅՔ',
     subtitle: 'Աշխատանքային տարածքի նոր մակարդակ',
     image: images.studioArtifacts,
     href: '/architectural-monoliths',
