@@ -15009,7 +15009,7 @@ body.has-mobile-menu-open {
 }
 
 .details-main-image {
-  min-height: clamp(420px, 52vw, 720px);
+  min-height: clamp(340px, 44vw, 600px);
   touch-action: pan-y;
 }
 
@@ -15239,11 +15239,11 @@ body.has-mobile-menu-open {
   }
 
   .details-gallery {
-    max-width: min(46vw, 820px);
+    max-width: min(42vw, 740px);
   }
 
   .details-main-image {
-    min-height: clamp(720px, 42vw, 980px);
+    min-height: clamp(620px, 36vw, 860px);
   }
 
   .details-summary {
@@ -15281,11 +15281,11 @@ body.has-mobile-menu-open {
   }
 
   .details-gallery {
-    max-width: min(44vw, 700px);
+    max-width: min(40vw, 620px);
   }
 
   .details-main-image {
-    min-height: clamp(620px, 40vw, 820px);
+    min-height: clamp(520px, 33vw, 700px);
   }
 }
 
@@ -15297,11 +15297,11 @@ body.has-mobile-menu-open {
 
   .details-gallery {
     grid-column: span 7;
-    max-width: 100%;
+    max-width: min(40vw, 560px);
   }
 
   .details-main-image {
-    min-height: clamp(500px, 48vw, 660px);
+    min-height: clamp(400px, 36vw, 540px);
   }
 
   .details-summary {
@@ -15351,7 +15351,7 @@ body.has-mobile-menu-open {
   }
 
   .details-main-image {
-    min-height: clamp(470px, 62vw, 650px);
+    min-height: clamp(400px, 52vw, 560px);
     aspect-ratio: 4 / 5;
   }
 
