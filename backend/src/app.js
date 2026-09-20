@@ -170,7 +170,19 @@ export function createApp() {
   // Some cPanel proxy setups strip '/api' before forwarding to Node.
   app.use(apiRoutes);
   if (fs.existsSync(frontendIndex)) {
-    app.use(express.static(frontendDist, { index: false }));
+    app.use(express.static(frontendDist, {
+      index: false,
+      setHeaders(response, filePath) {
+        if (filePath.endsWith('.html')) {
+          response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          return;
+        }
+
+        if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+          response.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+      },
+    }));
     app.use(async (request, response, next) => {
       if (request.method !== 'GET' || !request.accepts('html')) {
         next();
@@ -180,7 +192,10 @@ export function createApp() {
       try {
         const html = await readFile(frontendIndex, 'utf8');
         const meta = await getRouteMeta(request);
-        response.type('html').send(injectMeta(html, buildMetaTags(request, meta)));
+        response
+          .set('Cache-Control', 'no-cache, no-store, must-revalidate')
+          .type('html')
+          .send(injectMeta(html, buildMetaTags(request, meta)));
       } catch (error) {
         next(error);
       }

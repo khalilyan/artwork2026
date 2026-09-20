@@ -23,7 +23,7 @@ function resolveApiBaseUrl() {
     return defaultProductionApiBaseUrl;
   }
 
-  return envBaseUrl;
+  return import.meta.env.PROD ? canonicalizeProductionApiBaseUrl(envBaseUrl) : envBaseUrl;
 }
 
 function resolveFallbackApiBaseUrls() {
@@ -57,6 +57,26 @@ function normalizeBaseUrl(value) {
   return String(value).replace(/\/+$/, '');
 }
 
+function canonicalizeProductionApiBaseUrl(baseUrl) {
+  const normalized = normalizeBaseUrl(baseUrl);
+  if (!normalized || !import.meta.env.PROD) return normalized;
+
+  const parsed = parseUrlSafely(normalized);
+  if (!parsed) return defaultProductionApiBaseUrl;
+
+  if (isArtworkApiHost(normalized)) {
+    parsed.protocol = 'https:';
+    parsed.hostname = 'api.artwork.am';
+    parsed.port = '';
+    parsed.pathname = '/api';
+    parsed.search = '';
+    parsed.hash = '';
+    return normalizeBaseUrl(parsed.toString());
+  }
+
+  return normalized;
+}
+
 function ensureProductionApiBasePath(baseUrl) {
   const normalized = normalizeBaseUrl(baseUrl);
   if (!normalized || !import.meta.env.PROD) return normalized;
@@ -77,13 +97,13 @@ function ensureProductionApiBasePath(baseUrl) {
   return normalized;
 }
 
-function getStoredPreferredApiBaseUrl() {
-  if (typeof window === 'undefined') return '';
-  return ensureProductionApiBasePath(window.localStorage.getItem(preferredApiBaseUrlKey));
-}
-
 function setStoredPreferredApiBaseUrl(baseUrl) {
   if (typeof window === 'undefined') return;
+
+  if (import.meta.env.PROD) {
+    window.localStorage.removeItem(preferredApiBaseUrlKey);
+    return;
+  }
 
   const normalized = ensureProductionApiBasePath(baseUrl);
   if (!normalized) {
@@ -111,15 +131,19 @@ function isArtworkApiHost(baseUrl) {
 }
 
 function createBaseCandidates(baseUrl) {
-  const normalizedBase = ensureProductionApiBasePath(baseUrl);
+  const normalizedBase = import.meta.env.PROD
+    ? canonicalizeProductionApiBaseUrl(baseUrl)
+    : ensureProductionApiBasePath(baseUrl);
   const candidates = [];
   const pushCandidate = (candidate) => {
-    const normalized = ensureProductionApiBasePath(candidate);
+    const normalized = import.meta.env.PROD
+      ? canonicalizeProductionApiBaseUrl(candidate)
+      : ensureProductionApiBasePath(candidate);
     if (!candidates.includes(normalized)) candidates.push(normalized);
   };
 
   if (import.meta.env.PROD) {
-    pushCandidate(getStoredPreferredApiBaseUrl());
+    window.localStorage.removeItem(preferredApiBaseUrlKey);
   }
 
   pushCandidate(normalizedBase);
@@ -133,10 +157,6 @@ function createBaseCandidates(baseUrl) {
   }
 
   if (import.meta.env.PROD) {
-    if (isArtworkApiHost(normalizedBase)) {
-      pushCandidate('https://www.api.artwork.am/api');
-    }
-
     configuredFallbackApiBaseUrls.forEach((fallbackBase) => pushCandidate(fallbackBase));
   }
 
