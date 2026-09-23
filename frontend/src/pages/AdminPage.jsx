@@ -4,13 +4,6 @@ import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx
 import { api, getStoredAuthUser } from '../services/api.js';
 import { formatAmdPrice, getPriceAmount } from '../utils/currency.js';
 
-const productGroups = ['chairs', 'sofas', 'lighting', 'beds'];
-const productGroupLabels = {
-  chairs: 'Աթոռներ',
-  sofas: 'Բազմոցներ',
-  lighting: 'Լուսավորություն',
-  beds: 'Մահճակալներ',
-};
 const orderStatuses = ['quote_requested', 'processing', 'completed', 'cancelled'];
 const orderStatusLabels = {
   quote_requested: 'Հարցում',
@@ -321,15 +314,48 @@ function ProductPhotoManager({ form, setForm, onUpload }) {
   );
 }
 
-function CollectionProductPicker({ products, selectedSlugs, onChange }) {
+function CollectionProductPicker({ products, rooms, selectedSlugs, onChange }) {
   const selectedSet = new Set(selectedSlugs);
-  const groupedProducts = productGroups.map((group) => ({
-    group,
-    products: products.filter((product) => product.group === group),
-  }));
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [expandedTypes, setExpandedTypes] = useState({});
+
+  const productsBySlug = useMemo(() => new Map(products.map((product) => [product.slug, product])), [products]);
+
+  const groupedProductsByRoom = useMemo(() => rooms.map((room) => {
+    const mapEmbeddedProducts = (items = []) => items
+      .map((embeddedProduct) => productsBySlug.get(embeddedProduct.slug ?? embeddedProduct.productSlug) ?? embeddedProduct)
+      .filter((product) => product?.slug);
+
+    const typeSections = (room.furnitureTypes ?? [])
+      .map((type) => ({ type, products: mapEmbeddedProducts(type.products ?? []) }))
+      .filter((section) => section.products.length > 0);
+
+    const roomLevelProducts = mapEmbeddedProducts(room.products ?? []);
+    if (roomLevelProducts.length) {
+      typeSections.push({
+        type: { slug: 'all-products', title: 'Բոլոր ապրանքները (առանց տեսակի)' },
+        products: roomLevelProducts,
+      });
+    }
+
+    const roomProducts = typeSections
+      .flatMap((section) => section.products)
+      .filter((product, index, items) => items.findIndex((item) => item.slug === product.slug) === index);
+
+    return { room, products: roomProducts, typeSections };
+  }), [productsBySlug, rooms]);
 
   const toggleProduct = (slug) => {
     onChange(selectedSet.has(slug) ? selectedSlugs.filter((item) => item !== slug) : [...selectedSlugs, slug]);
+  };
+
+  const toggleRoom = (roomSlug) => {
+    setExpandedRooms((current) => ({ ...current, [roomSlug]: !current[roomSlug] }));
+  };
+
+  const toggleType = (roomSlug, typeSlug) => {
+    const key = `${roomSlug}:${typeSlug}`;
+    setExpandedTypes((current) => ({ ...current, [key]: !current[key] }));
   };
 
   return (
@@ -350,20 +376,46 @@ function CollectionProductPicker({ products, selectedSlugs, onChange }) {
         })}
       </div>
       <div className="admin-picker-groups">
-        {groupedProducts.map(({ group, products: groupProducts }) => (
-          <section key={group}>
-            <h3>{productGroupLabels[group] ?? group}</h3>
-            <div className="admin-picker-grid">
-              {groupProducts.map((product) => (
-                <button className={selectedSet.has(product.slug) ? 'is-selected' : ''} type="button" key={product.slug} onClick={() => toggleProduct(product.slug)}>
-                  <img src={product.image} alt={product.name} />
-                  <span>{product.name}</span>
-                  <small>{product.slug}</small>
-                </button>
-              ))}
-            </div>
-          </section>
-        ))}
+        {groupedProductsByRoom.map(({ room, products: roomProducts, typeSections }) => {
+          const isRoomExpanded = Boolean(expandedRooms[room.slug]);
+
+          return (
+            <section className="admin-tree-section" key={room.slug}>
+              <button className="admin-tree-header" type="button" onClick={() => toggleRoom(room.slug)}>
+                <Icon name={isRoomExpanded ? 'expand_more' : 'chevron_right'} />
+                <strong>{room.name}</strong>
+                <span>{roomProducts.length}</span>
+              </button>
+              <div className={`admin-tree-children ${isRoomExpanded ? 'is-open' : ''}`}>
+                {typeSections.map(({ type, products: typeProducts }) => {
+                  const typeKey = `${room.slug}:${type.slug}`;
+                  const isTypeExpanded = Boolean(expandedTypes[typeKey]);
+
+                  return (
+                    <section className="admin-tree-section admin-tree-section-child" key={typeKey}>
+                      <button className="admin-tree-header admin-tree-header-child" type="button" onClick={() => toggleType(room.slug, type.slug)}>
+                        <Icon name={isTypeExpanded ? 'expand_more' : 'chevron_right'} />
+                        <strong>{type.title || type.slug}</strong>
+                        <span>{typeProducts.length}</span>
+                      </button>
+                      <div className={`admin-tree-children ${isTypeExpanded ? 'is-open' : ''}`}>
+                        <div className="admin-picker-grid">
+                          {typeProducts.map((product) => (
+                            <button className={selectedSet.has(product.slug) ? 'is-selected' : ''} type="button" key={product.slug} onClick={() => toggleProduct(product.slug)}>
+                              <img src={product.image} alt={product.name} />
+                              <span>{product.name}</span>
+                              <small>{product.slug}</small>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
@@ -1207,7 +1259,7 @@ export default function AdminPage() {
                   <AdminEditorTextarea label="Նկարագրություն" value={collectionForm.description} onChange={(value) => setCollectionForm((current) => ({ ...current, description: value }))} />
                   <AdminEditorTextarea label="Մանրամասն նկարագրություն" value={collectionForm.detailDescription} onChange={(value) => setCollectionForm((current) => ({ ...current, detailDescription: value }))} />
                   <ImageField label="Գլխավոր նկար" value={collectionForm.heroImage} onChange={(value) => setCollectionForm((current) => ({ ...current, heroImage: value }))} onUpload={uploadImage} />
-                  <CollectionProductPicker products={products} selectedSlugs={collectionForm.productSlugs} onChange={(value) => setCollectionForm((current) => ({ ...current, productSlugs: value }))} />
+                  <CollectionProductPicker rooms={rooms} products={products} selectedSlugs={collectionForm.productSlugs} onChange={(value) => setCollectionForm((current) => ({ ...current, productSlugs: value }))} />
                 </form>
               </AdminPanel>
             </div>

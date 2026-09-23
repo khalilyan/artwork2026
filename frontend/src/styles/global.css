@@ -4711,25 +4711,25 @@ body:has(.restoration-lens:hover) .custom-cursor {
   flex-direction: column;
   gap: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(99, 48, 5, 0.2);
+  border-bottom: 1px solid rgba(28, 27, 27, 0.2);
 }
 
 .details-review-form label > span:first-child {
-  color: var(--primary);
+  color: var(--on-surface);
   font-size: 10px;
 }
 
 .details-star-rating {
   display: flex;
   gap: 4px;
-  color: var(--primary);
+  color: var(--on-surface);
 }
 
 .details-star-rating button {
   display: inline-flex;
   padding: 0;
   background: transparent;
-  color: rgba(99, 48, 5, 0.26);
+  color: rgba(28, 27, 27, 0.34);
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
@@ -4794,16 +4794,16 @@ body:has(.restoration-lens:hover) .custom-cursor {
   height: 34px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(99, 48, 5, 0.28);
+  border: 1px solid rgba(28, 27, 27, 0.28);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--primary);
+  color: var(--on-surface);
   transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .details-review-input-icon:hover {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--on-surface);
+  background: var(--on-surface);
   color: var(--on-primary);
 }
 
@@ -4828,7 +4828,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .details-review-upload > span {
-  color: var(--primary);
+  color: var(--on-surface);
   font-size: 10px;
 }
 

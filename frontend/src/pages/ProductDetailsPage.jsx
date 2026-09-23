@@ -313,7 +313,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [isSaved, setIsSaved] = useState(false);
   const [reviewItems, setReviewItems] = useState(() => normalizeReviews([]));
   const [visibleReviewCount, setVisibleReviewCount] = useState(initialReviewLimit);
-  const [selectedRating, setSelectedRating] = useState(5);
+  const [selectedRating, setSelectedRating] = useState(0);
   const [reviewStatus, setReviewStatus] = useState('');
   const [reviewImages, setReviewImages] = useState([]);
   const [previewReviewImage, setPreviewReviewImage] = useState('');
@@ -594,6 +594,12 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    if (selectedRating < 1) {
+      setReviewStatus('Խնդրում ենք ընտրել գնահատականը։');
+      return;
+    }
+
     const payload = { ...Object.fromEntries(formData.entries()), rate: selectedRating, images: reviewImages };
 
     try {
@@ -604,7 +610,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       showArtworkNotification('Կարծիքը ուղարկված է');
       setReviewImages([]);
       form.reset();
-      setSelectedRating(5);
+      setSelectedRating(0);
     } catch (error) {
       setReviewStatus(error.message);
       showArtworkNotification(error.message, 'error');
