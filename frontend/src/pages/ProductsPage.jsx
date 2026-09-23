@@ -131,6 +131,20 @@ function getFurnitureTypeName(category) {
   return category?.title ?? category?.name ?? category?.slug ?? '';
 }
 
+function toPossessiveRoomName(roomName) {
+  const normalizedRoomName = String(roomName ?? '').trim();
+  if (!normalizedRoomName) return '';
+  if (normalizedRoomName.endsWith('ի') || normalizedRoomName.endsWith('Ի')) return normalizedRoomName;
+  return `${normalizedRoomName}ի`;
+}
+
+function toPluralFurnitureName(typeName) {
+  const normalizedTypeName = String(typeName ?? '').trim();
+  if (!normalizedTypeName) return 'Կահույքներ';
+  if (/(ներ|եր)$/u.test(normalizedTypeName)) return normalizedTypeName;
+  return `${normalizedTypeName}ներ`;
+}
+
 function ProductCard({ product, href, index }) {
   const layout = getProductLayout(index);
   const primaryImage = product.image ?? product.images?.primary ?? product.images?.gallery?.[0] ?? '';
@@ -471,10 +485,16 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const furnitureTypeName = getFurnitureTypeName(category);
   const isRoomCategoryPage = Boolean(room && category);
   const roomHeadingTitle = room?.roomName ?? room?.title ?? room?.name ?? 'Բոլոր ապրանքները';
+  const roomPossessiveName = room ? toPossessiveRoomName(roomHeadingTitle) : '';
+  const furniturePluralName = toPluralFurnitureName(furnitureTypeName);
+  const roomCategoryHeading = `${roomPossessiveName} ${furniturePluralName}`.trim();
+  const roomAllHeadingLine = room ? roomPossessiveName : 'Սենյակի';
   const roomEyebrowLabel = room ? `${roomHeadingTitle}ային կահույք` : 'ԸՆՏՐՎԱԾ ԿԱՀՈՒՅՔ';
   const productsEyebrow = isRoomCategoryPage
-    ? `${roomHeadingTitle} - ${furnitureTypeName || 'Բոլոր ապրանքները'}`
-    : roomEyebrowLabel;
+    ? roomCategoryHeading
+    : isRoomAllPage
+      ? roomAllHeadingLine
+      : roomEyebrowLabel;
   const seoTitle = query
     ? `"${query}" որոնման արդյունքներ | ARTWORK`
     : isRoomAllPage
@@ -503,12 +523,25 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         <div className="products-header-inner" data-products-header>
           <div>
             <span className="label-caps products-eyebrow">{productsEyebrow}</span>
-            <h1>{query ? `Որոնում՝ ${query}` : isRoomCategoryPage ? `${roomHeadingTitle} - ${furnitureTypeName}` : isRoomAllPage ? `${roomHeadingTitle} • ամբողջ տեսականին` : 'Ցանկալի կահույք'}</h1>
+            <h1>
+              {query
+                ? `Որոնում՝ ${query}`
+                : isRoomCategoryPage
+                  ? roomCategoryHeading
+                  : isRoomAllPage
+                    ? (
+                      <>
+                        <span className="products-title-line">{roomAllHeadingLine}</span>
+                        <span className="products-title-line">Ամբողջ տեսականին</span>
+                      </>
+                    )
+                    : 'Ցանկալի կահույք'}
+            </h1>
             <p>
               {isRoomCategoryPage
-                ? `Ձեռագործ ${furnitureTypeName}ներ, որոնք համադրում են բարձրակարգ նյութերը, վարպետական մշակումը և ժամանակակից դիզայնը՝ ստեղծելով ներդաշնակ ինտերիեր`
+                ? `${roomPossessiveName} համար ստեղծված ${furniturePluralName.toLocaleLowerCase('hy-AM')}, որոնք համադրում են բարձրակարգ նյութերը, վարպետական մշակումը և ժամանակակից դիզայնը՝ ստեղծելով ներդաշնակ ինտերիեր`
                 : isRoomAllPage
-                  ? `${roomHeadingTitle}ի համար նախատեսված կահույքի ամբողջ տեսականին՝ մեկ էջում`
+                  ? `${roomAllHeadingLine} համար նախատեսված կահույքի ամբողջ տեսականին՝ մեկ էջում`
                 : 'Գտեք ձեր նախընտրած կահույքը՝ որոնելով և դասավորելով ամբողջ տեսականին ըստ անվան, գնի, նորույթի կամ ընտրած գնային միջակայքի։'}
             </p>
           </div>
@@ -604,7 +637,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         {isProductsLoading ? <ProductsSkeleton /> : visibleProducts.length ? (
           <section className="products-group">
             <div className="products-group-heading">
-              <span className="label-caps">{String(visibleProducts.length).padStart(2, '0')} ԱՊՐԱՆՔ</span>
+              <span className="label-caps">{String(visibleProducts.length).padStart(2, '0')} ԿԱՀՈՒՅՔ</span>
               <h2>{roomHeadingTitle}</h2>
             </div>
             <div className="products-collage">

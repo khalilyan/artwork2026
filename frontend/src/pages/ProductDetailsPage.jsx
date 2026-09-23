@@ -1019,22 +1019,24 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
               <StarRating value={selectedRating} onChange={setSelectedRating} />
               <input name="rate" type="hidden" value={selectedRating} readOnly />
             </label>
-            <label>
+            <label className="details-review-comment-field">
               <span className="label-caps">Ձեր կարծիքը</span>
-              <textarea name="review" rows="3" placeholder="Գրեք ձեր տպավորությունը այս կահույքի մասին..." required />
+              <div className="details-review-textarea-wrap">
+                <textarea name="review" rows="3" placeholder="Գրեք ձեր տպավորությունը այս կահույքի մասին..." required />
+                <div className="details-review-input-actions">
+                  <label className="details-review-input-icon" title="Կցել նկարներ">
+                    <Icon name="attach_file" />
+                    <input aria-label="Կցել նկարներ" type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={selectReviewImages} />
+                  </label>
+                  <label className="details-review-input-icon" title="Բացել տեսախցիկը">
+                    <Icon name="photo_camera" />
+                    <input aria-label="Բացել տեսախցիկը" type="file" accept="image/*" capture="environment" onChange={selectReviewImages} />
+                  </label>
+                </div>
+              </div>
             </label>
             <div className="details-review-upload">
-              <span className="label-caps">Սենյակի նկարներ</span>
-              <div className="details-review-upload-actions">
-                <label className="details-review-upload-button label-caps">
-                  Վերբեռնել
-                  <input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={selectReviewImages} />
-                </label>
-                <label className="details-review-upload-button label-caps">
-                  Տեսախցիկ
-                  <input type="file" accept="image/*" capture="environment" onChange={selectReviewImages} />
-                </label>
-              </div>
+              {reviewImages.length ? <span className="label-caps">Կցված նկարներ</span> : null}
               {reviewImages.length ? (
                 <div className="details-review-thumbs">
                   {reviewImages.map((image, index) => (

@@ -1066,14 +1066,19 @@ export default function AdminPage() {
                   <AdminEditorInput label="Նշում" value={productForm.badge} onChange={(value) => setProductForm((current) => ({ ...current, badge: value }))} />
                   <AdminEditorTextarea label="Նկարագրություն" value={productForm.description} onChange={(value) => setProductForm((current) => ({ ...current, description: value }))} />
                   <AdminEditorTextarea label="Չափեր" value={productForm.dimensionsText} onChange={(value) => setProductForm((current) => ({ ...current, dimensionsText: value }))} />
-                  <AdminEditorInput label="Սկզբնական գին" type="number" value={productForm.priceAmount} onChange={(value) => setProductForm((current) => ({ ...current, priceAmount: value }))} />
+                  <div className="admin-price-field">
+                    <AdminEditorInput label="Սկզբնական գին" type="number" value={productForm.priceAmount} onChange={(value) => setProductForm((current) => ({ ...current, priceAmount: value }))} />
+                    <label className="admin-inline-check">
+                      <input type="checkbox" checked={productForm.pricePerSquareMeter} onChange={(event) => setProductForm((current) => ({ ...current, pricePerSquareMeter: event.target.checked }))} />
+                      <span>Քառակուսու գինը (֏/քմ)</span>
+                    </label>
+                  </div>
                   <AdminEditorInput label="Զեղչի տոկոս" type="number" value={productForm.salePercent} onChange={updateProductSalePercent} />
                   <ProductPlacementEditor rooms={rooms} form={productForm} setForm={setProductForm} />
                   <ProductPhotoManager form={productForm} setForm={setProductForm} onUpload={uploadImage} />
                   <AdminEditorInput label="Հեշթեգներ" value={productForm.hashtags} onChange={(value) => setProductForm((current) => ({ ...current, hashtags: value }))} />
                   <div className="admin-checks">
                     <label><input type="checkbox" checked={productForm.saleIsActive} onChange={(event) => setProductForm((current) => ({ ...current, saleIsActive: event.target.checked }))} /> Զեղչը ակտիվ է</label>
-                    <label><input type="checkbox" checked={productForm.pricePerSquareMeter} onChange={(event) => setProductForm((current) => ({ ...current, pricePerSquareMeter: event.target.checked }))} /> Քառակուսու գինը (֏/քմ)</label>
                   </div>
                 </form>
                 {selectedProduct ? (
