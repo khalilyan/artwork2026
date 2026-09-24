@@ -1533,28 +1533,17 @@ img {
   display: inline-flex;
   width: fit-content;
   padding: 20px 48px;
-  border-radius: 8px;
-  background: var(--primary);
-  box-shadow: 0 20px 40px -15px rgba(99, 48, 5, 0.15);
-  color: var(--on-primary);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.15em;
-  transition: background 0.9s cubic-bezier(0.16, 1, 0.3, 1), color 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), background-position 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.primary-button:hover {
-  background: var(--primary-container);
-  color: #fff;
-  transform: translateY(-2px);
 }
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -1565,23 +1554,32 @@ img {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
+  .account-actions button,
+  .order-success-action
 ) {
+  --site-btn-bg: #f6efe6;
+  --site-btn-color: #2a2017;
+  --site-btn-border: rgba(63, 42, 25, 0.28);
+  --site-btn-hover-bg: #3f2a19;
+  --site-btn-hover-color: #fff;
+  --site-btn-hover-border: #3f2a19;
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  background-image: linear-gradient(to top, var(--button-fill, var(--primary)) 50%, var(--button-base, transparent) 50%);
-  background-size: 100% 200%;
-  background-position: top;
-  transition: color 0.9s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.9s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.9s cubic-bezier(0.16, 1, 0.3, 1), background-position 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 999px;
+  border: 1px solid var(--site-btn-border);
+  background: var(--site-btn-bg);
+  color: var(--site-btn-color);
+  box-shadow: 0 14px 28px -22px rgba(28, 27, 27, 0.55);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -1592,25 +1590,24 @@ img {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
-)::after {
+  .account-actions button,
+  .order-success-action
+)::before {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   z-index: -1;
-  width: 100%;
-  height: 0;
-  background: var(--button-fill, var(--primary));
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.28) 50%, transparent 80%);
   content: "";
-  transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-125%);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -1621,17 +1618,18 @@ img {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
-):hover::after {
-  height: 100%;
+  .account-actions button,
+  .order-success-action
+):hover::before {
+  transform: translateX(125%);
 }
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -1642,34 +1640,69 @@ img {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
+  .account-actions button,
+  .order-success-action
 ):hover {
-  background-position: bottom;
-  color: var(--button-hover-color, var(--on-primary));
+  background: var(--site-btn-hover-bg);
+  border-color: var(--site-btn-hover-border);
+  color: var(--site-btn-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 22px 34px -24px rgba(28, 27, 27, 0.72);
 }
 
 .primary-button,
-.rooms-cta-button,
-.about-solid-button {
-  --button-base: var(--primary);
-  --button-fill: var(--primary-container);
-  --button-hover-color: #fff;
-}
-
+.home-restoration-button,
 .details-cart-button,
 .cart-checkout,
 .checkout-form button,
+.about-solid-button,
 .spec-collection-cart-button,
 .auth-submit,
-.account-actions button {
-  --button-base: var(--primary);
-  --button-fill: var(--primary-container);
-  --button-hover-color: #fff;
+.account-actions button,
+.order-success-action {
+  --site-btn-bg: var(--primary-container);
+  --site-btn-color: #fff;
+  --site-btn-border: var(--primary-container);
+  --site-btn-hover-bg: #1f1711;
+  --site-btn-hover-border: #1f1711;
+  --site-btn-hover-color: #fff;
 }
 
-.shop-button {
-  --button-base: var(--surface);
-  --button-fill: var(--primary-container);
+.home-service-button,
+.details-buy-button,
+.details-review-submit,
+.details-load-more,
+.contact-submit,
+.about-outline-button,
+.spec-outline-button {
+  --site-btn-bg: transparent;
+  --site-btn-color: var(--primary-container);
+  --site-btn-border: rgba(99, 48, 5, 0.28);
+  --site-btn-hover-bg: var(--primary-container);
+  --site-btn-hover-border: var(--primary-container);
+  --site-btn-hover-color: #fff;
+}
+
+:where(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+):active {
+  transform: translateY(0);
 }
 
 .collections-section {
@@ -2136,7 +2169,7 @@ body:has(.before-after-compare:hover) .custom-cursor {
   z-index: 2;
   width: 44%;
   height: 42%;
-  border: 10px solid var(--surface);
+  border: 0;
 }
 
 .home-service-trade .home-service-image.is-main {
@@ -2146,7 +2179,7 @@ body:has(.before-after-compare:hover) .custom-cursor {
 .home-service-trade .home-service-image.is-float {
   right: auto;
   left: 0;
-  border-color: #f8f5f1;
+  border: 0;
 }
 
 .home-service-trade .home-service-image.is-new {
@@ -2287,16 +2320,7 @@ body:has(.before-after-compare:hover) .custom-cursor {
   align-items: center;
   justify-content: center;
   padding: 0 24px;
-  border: 1px solid rgba(99, 48, 5, 0.22);
-  background: var(--primary);
-  color: var(--on-primary);
   pointer-events: auto;
-  transition: background 0.35s ease, transform 0.35s ease;
-}
-
-.home-restoration-button:hover {
-  background: var(--secondary);
-  transform: translateY(-2px);
 }
 
 .restoration-lens {
@@ -2452,7 +2476,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
   display: none;
 }
 
-.shop-cta-bg-image {
+.shop-cta-bg-image,
+.shop-cta-bg-video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -5769,7 +5794,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
   color: var(--primary);
 }
 
-.contact-info section:first-child a {
+.contact-info section:first-child > a {
   margin-bottom: 16px;
   font-family: var(--font-serif);
   font-size: 32px;
@@ -5782,6 +5807,41 @@ body:has(.restoration-lens:hover) .custom-cursor {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.contact-messenger-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.contact-info .contact-messenger-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(99, 48, 5, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.66);
+}
+
+.contact-info .contact-messenger-link .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.contact-info .contact-messenger-link strong {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-info .contact-messenger-link span {
+  color: var(--on-surface-variant);
+}
+
+.contact-info .contact-messenger-link:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .contact-closure {
@@ -7662,10 +7722,10 @@ body:has(.restoration-lens:hover) .custom-cursor {
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -7676,20 +7736,18 @@ body:has(.restoration-lens:hover) .custom-cursor {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
+  .account-actions button,
+  .order-success-action
 ) {
-  background-image: linear-gradient(to top, var(--button-fill, var(--primary)) 50%, var(--button-base, transparent) 50%);
-  background-size: 100% 200%;
-  background-position: top;
-  transition: color 0.9s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.9s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.9s cubic-bezier(0.16, 1, 0.3, 1), background-position 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :where(
   .primary-button,
+  .home-restoration-button,
   .home-service-button,
-  .shop-button,
-  .rooms-cta-button,
   .details-cart-button,
+  .details-buy-button,
   .details-review-submit,
   .details-load-more,
   .cart-checkout,
@@ -7700,16 +7758,12 @@ body:has(.restoration-lens:hover) .custom-cursor {
   .spec-collection-cart-button,
   .spec-outline-button,
   .auth-submit,
-  .account-actions button
+  .account-actions button,
+  .order-success-action
 ):hover {
-  background-color: transparent;
-  background-position: bottom;
-  color: var(--button-hover-color, var(--on-primary));
-}
-
-.shop-button,
-.shop-button:hover {
-  background-image: none;
+  background-color: var(--site-btn-hover-bg);
+  border-color: var(--site-btn-hover-border);
+  color: var(--site-btn-hover-color);
 }
 
 :where(
@@ -8907,7 +8961,7 @@ body:has(.restoration-lens:hover) .custom-cursor {
     gap: 44px;
   }
 
-  .contact-info section:first-child a {
+  .contact-info section:first-child > a {
     font-size: 26px;
   }
 
@@ -10744,6 +10798,7 @@ body.has-mobile-menu-open {
 .collection-card-parallax,
 .collection-image img,
 .shop-cta-bg-image,
+.shop-cta-bg-video,
 .hero-slide-image {
   backface-visibility: hidden;
 }
@@ -10760,6 +10815,7 @@ body.has-mobile-menu-open {
 .home-service-image,
 .restoration-lens-image,
 .shop-cta-bg-image,
+.shop-cta-bg-video,
 .hero-slide-image {
   object-fit: cover;
 }
@@ -11354,7 +11410,8 @@ body.has-mobile-menu-open {
     padding-block: 92px;
   }
 
-  .shop-cta-bg-image {
+  .shop-cta-bg-image,
+  .shop-cta-bg-video {
     transform: none !important;
   }
 
@@ -11531,7 +11588,8 @@ body.has-mobile-menu-open {
   .collection-card,
   .collection-image img,
   .hero-slide-image,
-  .shop-cta-bg-image {
+  .shop-cta-bg-image,
+  .shop-cta-bg-video {
     transform: none !important;
   }
 
@@ -12614,7 +12672,8 @@ body.has-mobile-menu-open {
     transform: translate3d(0, var(--parallax-y, 0px), 0) scale(var(--hover-scale, var(--parallax-scale, 1))) !important;
   }
 
-  .shop-cta-bg-image {
+  .shop-cta-bg-image,
+  .shop-cta-bg-video {
     transform: translate3d(var(--cta-parallax-x, 0), var(--cta-parallax-y, 0), 0) scale(1.08) !important;
   }
 
@@ -12640,6 +12699,7 @@ body.has-mobile-menu-open {
   .hero-slide-image,
   .collection-image img,
   .shop-cta-bg-image,
+  .shop-cta-bg-video,
   .home-service-image,
   .home-service-chip {
     transform: none !important;
@@ -14288,7 +14348,7 @@ body.has-mobile-menu-open {
     gap: clamp(56px, 7vw, 72px);
   }
 
-  .contact-info section:first-child a {
+  .contact-info section:first-child > a {
     font-size: clamp(24px, 3vw, 30px);
   }
 
@@ -14379,7 +14439,7 @@ body.has-mobile-menu-open {
     gap: clamp(48px, 12vw, 64px);
   }
 
-  .contact-info section:first-child a {
+  .contact-info section:first-child > a {
     max-width: 100%;
     font-size: clamp(23px, 6.2vw, 30px);
     line-height: 1.25;
@@ -14496,7 +14556,7 @@ body.has-mobile-menu-open {
     letter-spacing: 0.09em;
   }
 
-  .contact-info section:first-child a {
+  .contact-info section:first-child > a {
     font-size: clamp(21px, 5.8vw, 26px);
   }
 

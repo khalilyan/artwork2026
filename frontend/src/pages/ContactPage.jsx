@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
 import { api } from '../services/api.js';
@@ -6,9 +7,17 @@ import { compressImageFiles } from '../utils/imageUpload.js';
 
 const contactLinks = {
   email: 'artworkarmenia@gmail.com',
+  phone: '+374 98 871555',
+  phoneRaw: '+37498871555',
   instagram: 'https://www.instagram.com/artwork_furniture_official?igsh=Z2FiMjlrZnQ4bjRp',
   facebook: 'https://www.facebook.com/share/1EexLxBJow/',
 };
+
+const messengerLinks = [
+  { key: 'whatsapp', label: 'WhatsApp', icon: 'chat', href: 'https://wa.me/37498871555' },
+  { key: 'viber', label: 'Viber', icon: 'forum', href: 'viber://chat?number=%2B37498871555' },
+  { key: 'telegram', label: 'Telegram', icon: 'send', href: 'tel:+37498871555' },
+];
 
 export default function ContactPage() {
   const [buttonText, setButtonText] = useState('ՈՒՂԱՐԿԵԼ ՀԱՐՑՈՒՄԸ');
@@ -150,7 +159,16 @@ export default function ContactPage() {
           <section>
             <h2 className="label-caps">ԿԱՊ</h2>
             <a href={`mailto:${contactLinks.email}`}>{contactLinks.email}</a>
-            <p>+37498871555</p>
+            <a href={`tel:${contactLinks.phoneRaw}`}>{contactLinks.phone}</a>
+            <div className="contact-messenger-list">
+              {messengerLinks.map((messenger) => (
+                <a className="contact-messenger-link" href={messenger.href} target="_blank" rel="noreferrer" key={messenger.key}>
+                  <Icon name={messenger.icon} />
+                  <strong>{messenger.label}</strong>
+                  <span>{contactLinks.phone}</span>
+                </a>
+              ))}
+            </div>
           </section>
           <section>
             <h2 className="label-caps">ՀԵՏԵՎԵԼ</h2>

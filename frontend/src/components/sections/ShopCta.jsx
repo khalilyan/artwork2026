@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { easeOutExpo, fadeUp, staggerGroup, viewportReveal } from '../../utils/motion.js';
-import ctaBackgroundImage from '../../assets/images/cta_background.png';
+
+const ctaBackgroundVideo = 'https://res.cloudinary.com/ddbji4me/video/upload/v1790248818/Render_Comp_5.mp4';
 
 const drawHeading = {
   hidden: {},
@@ -67,7 +68,9 @@ export default function ShopCta({
       viewport={viewportReveal}
     >
       <div className="shop-cta-bg" aria-hidden="true">
-        <img className="shop-cta-bg-image" src={ctaBackgroundImage} alt="" />
+        <video className="shop-cta-bg-video" autoPlay muted loop playsInline preload="metadata">
+          <source src={ctaBackgroundVideo} type="video/mp4" />
+        </video>
       </div>
 
       <motion.div className="container shop-cta-inner" variants={staggerGroup}>
