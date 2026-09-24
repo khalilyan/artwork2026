@@ -215,7 +215,7 @@ export function TradeInSection({ images = tradeImages }) {
         <button className="home-service-privacy-backdrop" type="button" aria-label="Փակել պայմանները" onClick={() => setIsPrivacyOpen(false)} />
         <section className="home-service-privacy-sheet">
           <button className="home-service-privacy-close" type="button" aria-label="Փակել" onClick={() => setIsPrivacyOpen(false)}>x</button>
-          <p className="label-caps">ՏՆԱՅԻՆ ՍՊԱՍԱՐԿՄԱՆ ՊԱՅՄԱՆՆԵՐ</p>
+          <p className="label-caps">ՀԻՆ ԿԱՀՈՒՅՔԸ ՆՈՐԻ ԴԻՄԱՑ</p>
           <h3>Հինը նորով փոխարինելու պայմանները</h3>
           <div className="home-service-privacy-content">
             <p>Փոխանակումն իրականացվում է հետևյալ պայմաններով.</p>

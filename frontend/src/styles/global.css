@@ -16872,11 +16872,13 @@ body.has-mobile-menu-open {
   text-decoration: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .home-service-actions {
     display: grid;
     width: 100%;
     grid-template-columns: 1fr;
+    justify-items: center;
+    margin-bottom: 18px;
   }
 
   .home-service-actions .home-service-button,
@@ -16885,7 +16887,8 @@ body.has-mobile-menu-open {
   }
 
   .home-service-privacy-option {
-    justify-content: flex-start;
+    justify-content: center;
+    margin-bottom: 14px;
   }
 
   .home-service-privacy-sheet {
