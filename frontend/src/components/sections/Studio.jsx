@@ -35,7 +35,7 @@ export default function Studio() {
               <span className="label-caps">ԲՆԱԿԱՆ ԵՎ ԲԱՐՁՐՈՐԱԿ ՆՅՈՒԹԵՐ</span>
             </motion.div>
             <motion.div variants={fadeUp}>
-              <strong>50+</strong>
+              <strong>100+</strong>
               <span className="label-caps">ԱՆՀԱՏԱԿԱՆ ԻՆՏԵՐԻԵՐԱՅԻՆ ՆԱԽԱԳԾԵՐ</span>
             </motion.div>
           </motion.div>

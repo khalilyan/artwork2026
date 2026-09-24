@@ -20,6 +20,18 @@ function SocialIcon({ name }) {
     );
   }
 
+  if (name === 'whatsapp') {
+    return <img className="social-icon-brand" src="https://cdn.simpleicons.org/whatsapp/25D366" alt="" loading="lazy" decoding="async" />;
+  }
+
+  if (name === 'viber') {
+    return <img className="social-icon-brand" src="https://cdn.simpleicons.org/viber/7360F2" alt="" loading="lazy" decoding="async" />;
+  }
+
+  if (name === 'telegram') {
+    return <img className="social-icon-brand" src="https://cdn.simpleicons.org/telegram/26A5E4" alt="" loading="lazy" decoding="async" />;
+  }
+
   return (
     <svg className="social-icon-facebook" aria-hidden="true" viewBox="0 0 24 24">
       <path d="M14 8.2V6.6c0-.8.5-1.2 1.3-1.2h1.4V3.1C16 3 15.2 3 14.2 3c-2.2 0-3.7 1.3-3.7 3.7v1.5H8v2.6h2.5V21H14V10.8h2.4l.4-2.6H14Z" />
@@ -43,6 +55,9 @@ const footerContactLinks = [
 const socialLinks = {
   instagram: 'https://www.instagram.com/artwork_furniture_official?igsh=Z2FiMjlrZnQ4bjRp',
   facebook: 'https://www.facebook.com/share/1EexLxBJow/',
+  whatsapp: 'https://wa.me/37498871555',
+  viber: 'viber://chat?number=%2B37498871555',
+  telegram: 'https://t.me/+37498871555',
 };
 
 export default function Footer() {
@@ -73,6 +88,9 @@ export default function Footer() {
           <div className="footer-socials footer-socials-contact">
             <a className="social-link social-link-instagram" href={socialLinks.instagram} aria-label="Instagram" target="_blank" rel="noreferrer"><SocialIcon name="instagram" /></a>
             <a className="social-link social-link-facebook" href={socialLinks.facebook} aria-label="Facebook" target="_blank" rel="noreferrer"><SocialIcon name="facebook" /></a>
+            <a className="social-link social-link-whatsapp" href={socialLinks.whatsapp} aria-label="WhatsApp" target="_blank" rel="noreferrer"><SocialIcon name="whatsapp" /></a>
+            <a className="social-link social-link-viber" href={socialLinks.viber} aria-label="Viber" target="_blank" rel="noreferrer"><SocialIcon name="viber" /></a>
+            <a className="social-link social-link-telegram" href={socialLinks.telegram} aria-label="Telegram" target="_blank" rel="noreferrer"><SocialIcon name="telegram" /></a>
           </div>
         </section>
       </div>

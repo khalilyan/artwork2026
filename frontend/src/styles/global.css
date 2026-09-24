@@ -2740,6 +2740,36 @@ body:has(.restoration-lens:hover) .custom-cursor {
   color: #d62976;
 }
 
+.footer-socials .social-link-whatsapp,
+.footer-socials-contact .social-link-whatsapp {
+  color: #25d366;
+}
+
+.footer-socials .social-link-whatsapp:hover,
+.footer-socials-contact .social-link-whatsapp:hover {
+  color: #25d366;
+}
+
+.footer-socials .social-link-viber,
+.footer-socials-contact .social-link-viber {
+  color: #7360f2;
+}
+
+.footer-socials .social-link-viber:hover,
+.footer-socials-contact .social-link-viber:hover {
+  color: #7360f2;
+}
+
+.footer-socials .social-link-telegram,
+.footer-socials-contact .social-link-telegram {
+  color: #26a5e4;
+}
+
+.footer-socials .social-link-telegram:hover,
+.footer-socials-contact .social-link-telegram:hover {
+  color: #26a5e4;
+}
+
 .footer-socials svg,
 .footer-socials-contact svg {
   display: block;
@@ -2773,6 +2803,14 @@ body:has(.restoration-lens:hover) .custom-cursor {
   color: #1877f2;
   fill: #1877f2;
   stroke: none;
+}
+
+.footer-socials .social-icon-brand,
+.footer-socials-contact .social-icon-brand {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
 .footer-socials a:hover,
@@ -5707,11 +5745,81 @@ body:has(.restoration-lens:hover) .custom-cursor {
   width: 100%;
 }
 
+.contact-form label:focus-within i {
+  width: 100%;
+}
+
+.contact-message-field {
+  position: relative;
+}
+
+.contact-message-wrap {
+  position: relative;
+}
+
+.contact-message-wrap textarea {
+  min-height: 130px;
+  padding-right: 74px;
+}
+
+.contact-message-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-message-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--primary-container);
+  cursor: pointer;
+  line-height: 0;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.contact-message-icon:hover {
+  color: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.contact-message-icon .material-symbols-outlined {
+  display: block;
+  width: auto;
+  max-width: none;
+  overflow: visible;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.contact-message-icon .contact-message-symbol {
+  position: static;
+  transform: none;
+}
+
+.contact-message-icon .contact-message-symbol--attach {
+  transform: none;
+}
+
+.contact-message-icon input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
 .contact-image-upload {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: -28px;
+  gap: 12px;
+  margin-top: -14px;
 }
 
 .contact-image-upload > span,
@@ -5840,6 +5948,21 @@ body:has(.restoration-lens:hover) .custom-cursor {
 .contact-info .contact-messenger-link:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.contact-info .contact-messenger-link--whatsapp {
+  border-color: rgba(37, 211, 102, 0.28);
+  background: rgba(37, 211, 102, 0.08);
+}
+
+.contact-info .contact-messenger-link--viber {
+  border-color: rgba(115, 96, 242, 0.28);
+  background: rgba(115, 96, 242, 0.08);
+}
+
+.contact-info .contact-messenger-link--telegram {
+  border-color: rgba(38, 165, 228, 0.28);
+  background: rgba(38, 165, 228, 0.08);
 }
 
 .contact-closure {
@@ -16536,7 +16659,7 @@ body.has-mobile-menu-open {
   inset: auto 0 0;
   z-index: -1;
   height: 0;
-  background: var(--on-surface);
+  background: var(--secondary);
   content: "";
   transition: height 0.35s ease;
 }
@@ -16561,8 +16684,9 @@ body.has-mobile-menu-open {
   .account-actions button,
   .order-success-action
 ):hover {
-  color: var(--surface);
-  border-color: rgba(28, 27, 27, 0.34);
+  background: var(--secondary);
+  color: var(--on-primary);
+  border-color: var(--secondary);
   transform: translateY(-2px);
 }
 
@@ -16613,8 +16737,9 @@ body.has-mobile-menu-open {
 }
 
 .details-cart-button.is-added {
-  color: var(--surface);
-  border-color: rgba(28, 27, 27, 0.34);
+  background: var(--secondary);
+  color: var(--on-primary);
+  border-color: var(--secondary);
 }
 
 .details-cart-button.is-added::before {

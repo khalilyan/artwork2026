@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
 import { api } from '../services/api.js';
@@ -16,19 +17,19 @@ const messengerLinks = [
   {
     key: 'whatsapp',
     label: 'WhatsApp',
-    logo: 'https://cdn.simpleicons.org/whatsapp/1c1b1b',
+    logo: 'https://cdn.simpleicons.org/whatsapp/25D366',
     href: 'https://wa.me/37498871555',
   },
   {
     key: 'viber',
     label: 'Viber',
-    logo: 'https://cdn.simpleicons.org/viber/1c1b1b',
+    logo: 'https://cdn.simpleicons.org/viber/7360F2',
     href: 'viber://chat?number=%2B37498871555',
   },
   {
     key: 'telegram',
     label: 'Telegram',
-    logo: 'https://cdn.simpleicons.org/telegram/1c1b1b',
+    logo: 'https://cdn.simpleicons.org/telegram/26A5E4',
     href: 'tel:+37498871555',
   },
 ];
@@ -137,23 +138,25 @@ export default function ContactPage() {
             </select>
             <i />
           </label>
-          <label>
+          <label className="contact-message-field">
             <span className="label-caps">ՀԱՂՈՐԴԱԳՐՈՒԹՅՈՒՆ</span>
-            <textarea name="message" rows="4" placeholder="Նկարագրեք ձեր ցանկությունը..." required />
+            <div className="contact-message-wrap">
+              <textarea name="message" rows="4" placeholder="Նկարագրեք ձեր ցանկությունը..." required />
+              <div className="contact-message-actions">
+                <label className="contact-message-icon" title="Կցել նկարներ">
+                  <Icon name="attach_file" className="contact-message-symbol contact-message-symbol--attach" />
+                  <input aria-label="Կցել նկարներ" type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={selectImages} />
+                </label>
+                <label className="contact-message-icon" title="Բացել տեսախցիկը">
+                  <Icon name="photo_camera" className="contact-message-symbol contact-message-symbol--camera" />
+                  <input aria-label="Բացել տեսախցիկը" type="file" accept="image/*" capture="environment" onChange={selectImages} />
+                </label>
+              </div>
+            </div>
             <i />
           </label>
           <div className="contact-image-upload">
-            <span className="label-caps">Նկարներ</span>
-            <div className="contact-image-actions">
-              <label className="contact-image-button label-caps">
-                Վերբեռնել սարքից
-                <input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={selectImages} />
-              </label>
-              <label className="contact-image-button label-caps">
-                Բացել տեսախցիկը
-                <input type="file" accept="image/*" capture="environment" onChange={selectImages} />
-              </label>
-            </div>
+            {images.length ? <span className="label-caps">Կցված նկարներ</span> : null}
             {imageStatus ? <p>{imageStatus}</p> : null}
             {images.length ? (
               <div className="contact-image-thumbs">
@@ -176,7 +179,7 @@ export default function ContactPage() {
             <a href={`tel:${contactLinks.phoneRaw}`}>{contactLinks.phone}</a>
             <div className="contact-messenger-list">
               {messengerLinks.map((messenger) => (
-                <a className="contact-messenger-link" href={messenger.href} target="_blank" rel="noreferrer" aria-label={`${messenger.label} ${contactLinks.phone}`} key={messenger.key}>
+                <a className={`contact-messenger-link contact-messenger-link--${messenger.key}`} href={messenger.href} target="_blank" rel="noreferrer" aria-label={`${messenger.label} ${contactLinks.phone}`} key={messenger.key}>
                   <img src={messenger.logo} alt="" loading="lazy" decoding="async" />
                   <span>{contactLinks.phone}</span>
                 </a>
