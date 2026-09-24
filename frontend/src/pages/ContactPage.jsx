@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { showArtworkNotification } from '../components/ui/ToastNotifications.jsx';
 import { api } from '../services/api.js';
@@ -14,9 +13,24 @@ const contactLinks = {
 };
 
 const messengerLinks = [
-  { key: 'whatsapp', label: 'WhatsApp', icon: 'chat', href: 'https://wa.me/37498871555' },
-  { key: 'viber', label: 'Viber', icon: 'forum', href: 'viber://chat?number=%2B37498871555' },
-  { key: 'telegram', label: 'Telegram', icon: 'send', href: 'tel:+37498871555' },
+  {
+    key: 'whatsapp',
+    label: 'WhatsApp',
+    logo: 'https://cdn.simpleicons.org/whatsapp/1c1b1b',
+    href: 'https://wa.me/37498871555',
+  },
+  {
+    key: 'viber',
+    label: 'Viber',
+    logo: 'https://cdn.simpleicons.org/viber/1c1b1b',
+    href: 'viber://chat?number=%2B37498871555',
+  },
+  {
+    key: 'telegram',
+    label: 'Telegram',
+    logo: 'https://cdn.simpleicons.org/telegram/1c1b1b',
+    href: 'tel:+37498871555',
+  },
 ];
 
 export default function ContactPage() {
@@ -162,9 +176,8 @@ export default function ContactPage() {
             <a href={`tel:${contactLinks.phoneRaw}`}>{contactLinks.phone}</a>
             <div className="contact-messenger-list">
               {messengerLinks.map((messenger) => (
-                <a className="contact-messenger-link" href={messenger.href} target="_blank" rel="noreferrer" key={messenger.key}>
-                  <Icon name={messenger.icon} />
-                  <strong>{messenger.label}</strong>
+                <a className="contact-messenger-link" href={messenger.href} target="_blank" rel="noreferrer" aria-label={`${messenger.label} ${contactLinks.phone}`} key={messenger.key}>
+                  <img src={messenger.logo} alt="" loading="lazy" decoding="async" />
                   <span>{contactLinks.phone}</span>
                 </a>
               ))}

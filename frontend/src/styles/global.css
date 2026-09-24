@@ -5825,17 +5825,15 @@ body:has(.restoration-lens:hover) .custom-cursor {
   background: rgba(255, 250, 242, 0.66);
 }
 
-.contact-info .contact-messenger-link .material-symbols-outlined {
-  font-size: 18px;
-}
-
-.contact-info .contact-messenger-link strong {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.contact-info .contact-messenger-link img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 .contact-info .contact-messenger-link span {
+  font-family: var(--font-armenian-body);
+  font-size: 15px;
   color: var(--on-surface-variant);
 }
 
@@ -16475,4 +16473,150 @@ body.has-mobile-menu-open {
   .spec-outline-button {
     font-size: 9px;
   }
+}
+
+/* Unified non-CTA action buttons (keeps CTA + slider controls untouched) */
+:is(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .contact-image-button,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 28px;
+  border: 1px solid rgba(28, 27, 27, 0.18);
+  border-radius: 999px;
+  background: rgba(252, 249, 248, 0.72);
+  color: var(--on-surface);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: none;
+  transition: color 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+}
+
+:is(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .contact-image-button,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+)::before {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 0;
+  background: var(--on-surface);
+  content: "";
+  transition: height 0.35s ease;
+}
+
+:is(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .contact-image-button,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+):hover {
+  color: var(--surface);
+  border-color: rgba(28, 27, 27, 0.34);
+  transform: translateY(-2px);
+}
+
+:is(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .contact-image-button,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+):hover::before {
+  height: 100%;
+}
+
+:is(
+  .primary-button,
+  .home-restoration-button,
+  .home-service-button,
+  .details-cart-button,
+  .details-buy-button,
+  .details-review-submit,
+  .details-load-more,
+  .cart-checkout,
+  .checkout-form button,
+  .contact-submit,
+  .contact-image-button,
+  .about-outline-button,
+  .about-solid-button,
+  .spec-collection-cart-button,
+  .spec-outline-button,
+  .auth-submit,
+  .account-actions button,
+  .order-success-action
+):active {
+  transform: translateY(0);
+}
+
+.details-cart-button.is-added {
+  color: var(--surface);
+  border-color: rgba(28, 27, 27, 0.34);
+}
+
+.details-cart-button.is-added::before {
+  height: 100%;
 }
