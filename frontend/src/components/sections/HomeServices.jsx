@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { createResponsiveImageSources } from '../../utils/imageCdn.js';
 import { easeOutExpo, fadeUp, staggerGroup, viewportReveal } from '../../utils/motion.js';
@@ -173,6 +174,7 @@ export function RestorationSection({ images = restorationImages }) {
 }
 
 export function TradeInSection({ images = tradeImages }) {
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const sectionImages = [
     images[0] ?? tradeImages[0],
     images[1] ?? tradeImages[1],
@@ -188,32 +190,90 @@ export function TradeInSection({ images = tradeImages }) {
     quality: 72,
   });
 
-  return (
-    <motion.section
-      className="home-service home-service-trade"
-      aria-label="Փոխանակման ծառայություն"
-      initial="hidden"
-      whileInView="visible"
-      viewport={viewportReveal}
-      variants={staggerGroup}
-    >
-      <div className="home-service-sticky container">
-        <motion.div className="home-service-visual" data-cursor-target variants={fadeUp}>
-          <motion.img className="home-service-image is-main is-new" src={newImageSource.src} srcSet={newImageSource.srcSet} sizes={newImageSource.sizes} alt="Նոր կահույք մինիմալ հյուրասենյակում" loading="lazy" decoding="async" variants={fadeUp} />
-          <motion.img className="home-service-image is-float is-old" src={oldImageSource.src} srcSet={oldImageSource.srcSet} sizes={oldImageSource.sizes} alt="Ժամանակակից բազմոց փոխանակման ծրագրի համար" loading="lazy" decoding="async" variants={fadeUp} />
-          <motion.div className="home-service-chip label-caps" variants={fadeUp}>ՀԻՆ ԿԱՀՈՒՅՔԸ &gt; ՆՈՐԻ ԴԻՄԱՑ</motion.div>
-        </motion.div>
+  useEffect(() => {
+    if (!isPrivacyOpen) return undefined;
 
-        <motion.div className="home-service-copy reveal-section is-active" data-reveal variants={staggerGroup}>
-          <motion.p className="label-caps kicker" variants={fadeUp}>ՓՈԽԱՆԱԿՈՒՄ</motion.p>
-          <motion.h2 variants={fadeUp}>Յուրաքանչյուր ավարտ՝ նոր սկիզբ <em>Յուրաքանչյուր փոխանակում՝ նոր հնարավորություն</em></motion.h2>
-          <motion.p variants={fadeUp}>
-            Փոխանակեք ձեր հին կահույքը նոր ARTWORK կահույքի հետ։ Մեր մասնագետները կգնահատեն դրա վիճակը,
-            նյութերը և ընդհանուր արժեքը, իսկ հաստատումից հետո այն կվերածվի զեղչի կամ կրեդիտի՝ ձեր հաջորդ գնումների համար
-          </motion.p>
-          <motion.a className="home-service-button label-caps" href="/contact" variants={fadeUp}>Գնահատել կահույքը</motion.a>
-        </motion.div>
-      </div>
-    </motion.section>
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsPrivacyOpen(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isPrivacyOpen]);
+
+  const privacyDialog = isPrivacyOpen && typeof document !== 'undefined'
+    ? createPortal(
+      <div className="home-service-privacy-dialog" role="dialog" aria-modal="true" aria-label="Տնային ծառայության պայմաններ">
+        <button className="home-service-privacy-backdrop" type="button" aria-label="Փակել պայմանները" onClick={() => setIsPrivacyOpen(false)} />
+        <section className="home-service-privacy-sheet">
+          <button className="home-service-privacy-close" type="button" aria-label="Փակել" onClick={() => setIsPrivacyOpen(false)}>x</button>
+          <p className="label-caps">ՏՆԱՅԻՆ ՍՊԱՍԱՐԿՄԱՆ ՊԱՅՄԱՆՆԵՐ</p>
+          <h3>Հինը նորով փոխարինելու պայմանները</h3>
+          <div className="home-service-privacy-content">
+            <p>Փոխանակումն իրականացվում է հետևյալ պայմաններով.</p>
+            <ul>
+              <li>Ուղարկում եք ձեր հին կահույքի լուսանկարները` մեսենջերով, WhatsApp-ով կամ կայքի հաղորդագրության միջոցով։</li>
+              <li>Նշում եք ձեր առաջարկած գինը տվյալ կահույքի համար։</li>
+              <li>Մեր մոդելներից ընտրում եք այն տարբերակը, որով ցանկանում եք փոխարինել ձեր հին կահույքը։</li>
+              <li>Մեր մասնագետները գնահատում են ձեր կահույքը, և եթե առաջարկված գինը իրատեսական է, հաստատում են փոխանակման արժեքը։</li>
+              <li>Ձեր գնահատված արժեքը հանում ենք ձեր կողմից ընտրված նոր մոդելի արժեքից։</li>
+              <li>Դրանից հետո գրանցում ենք պատվերը։</li>
+              <li>Ձեր հին կահույքը տեղափոխում ենք միայն այն բանից հետո, երբ նոր կահույքը բերվում է ձեզ։</li>
+            </ul>
+            <p className="home-service-privacy-note">
+              Չի թույլատրվում միաժամանակ մի քանի տեսակի (օրինակ՝ 8 տեսակի) հին կահույք հանձնել և դրա փոխարեն ստանալ միայն 1 նոր կահույք։
+            </p>
+          </div>
+          <a className="home-service-button home-service-privacy-cta label-caps" href="/contact" onClick={() => setIsPrivacyOpen(false)}>
+            ՍԿՍԵԼ ՎԵՐԱՆՈՐՈԳՈՒՄԸ
+          </a>
+        </section>
+      </div>,
+      document.body,
+    )
+    : null;
+
+  return (
+    <>
+      <motion.section
+        className="home-service home-service-trade"
+        aria-label="Փոխանակման ծառայություն"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportReveal}
+        variants={staggerGroup}
+      >
+        <div className="home-service-sticky container">
+          <motion.div className="home-service-visual" data-cursor-target variants={fadeUp}>
+            <motion.img className="home-service-image is-main is-new" src={newImageSource.src} srcSet={newImageSource.srcSet} sizes={newImageSource.sizes} alt="Նոր կահույք մինիմալ հյուրասենյակում" loading="lazy" decoding="async" variants={fadeUp} />
+            <motion.img className="home-service-image is-float is-old" src={oldImageSource.src} srcSet={oldImageSource.srcSet} sizes={oldImageSource.sizes} alt="Ժամանակակից բազմոց փոխանակման ծրագրի համար" loading="lazy" decoding="async" variants={fadeUp} />
+            <motion.div className="home-service-chip label-caps" variants={fadeUp}>ՀԻՆ ԿԱՀՈՒՅՔԸ &gt; ՆՈՐԻ ԴԻՄԱՑ</motion.div>
+          </motion.div>
+
+          <motion.div className="home-service-copy reveal-section is-active" data-reveal variants={staggerGroup}>
+            <motion.p className="label-caps kicker" variants={fadeUp}>ՓՈԽԱՆԱԿՈՒՄ</motion.p>
+            <motion.h2 variants={fadeUp}>Յուրաքանչյուր ավարտ՝ նոր սկիզբ <em>Յուրաքանչյուր փոխանակում՝ նոր հնարավորություն</em></motion.h2>
+            <motion.p variants={fadeUp}>
+              Փոխանակեք ձեր հին կահույքը նոր ARTWORK կահույքի հետ։ Մեր մասնագետները կգնահատեն դրա վիճակը,
+              նյութերը և ընդհանուր արժեքը, իսկ հաստատումից հետո այն կվերածվի զեղչի կամ կրեդիտի՝ ձեր հաջորդ գնումների համար
+            </motion.p>
+            <motion.div className="home-service-actions" variants={fadeUp}>
+              <a className="home-service-button label-caps" href="/contact">ԳՆԱՀԱՏԵԼ ԿԱՀՈՒՅՔԸ</a>
+              <button className="home-service-privacy-option label-caps" type="button" onClick={() => setIsPrivacyOpen(true)}>ՊԱՅՄԱՆՆԵՐ</button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {privacyDialog}
+    </>
   );
 }

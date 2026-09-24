@@ -16745,3 +16745,151 @@ body.has-mobile-menu-open {
 .details-cart-button.is-added::before {
   height: 100%;
 }
+
+/* Home service privacy actions and dialog */
+.home-service-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-service-actions .home-service-button {
+  width: auto;
+}
+
+.home-service-privacy-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--on-surface);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.35s ease, transform 0.35s ease;
+}
+
+.home-service-privacy-option:hover {
+  color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+.home-service-privacy-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2400;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  padding: clamp(14px, 3vw, 28px);
+}
+
+.home-service-privacy-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(28, 27, 27, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.home-service-privacy-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(760px, 100%);
+  max-height: min(90vh, 840px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 12px;
+  padding: clamp(20px, 4vw, 34px);
+  border: 1px solid rgba(99, 48, 5, 0.16);
+  border-radius: 20px;
+  background: #fdfaf6;
+  box-shadow: 0 24px 70px rgba(28, 27, 27, 0.22);
+}
+
+.home-service-privacy-sheet > .label-caps {
+  margin: 0 0 10px;
+  color: var(--primary);
+}
+
+.home-service-privacy-sheet h3 {
+  margin: 0 0 12px;
+  color: var(--on-surface);
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.4vw, 38px);
+  line-height: 1.1;
+}
+
+.home-service-privacy-sheet p {
+  margin: 0 0 12px;
+  color: var(--on-surface-variant);
+  line-height: 1.7;
+}
+
+.home-service-privacy-content {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.home-service-privacy-sheet ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--on-surface);
+  line-height: 1.65;
+}
+
+.home-service-privacy-note {
+  margin-top: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.home-service-privacy-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(99, 48, 5, 0.24);
+  border-radius: 999px;
+  background: rgba(252, 249, 248, 0.94);
+  color: var(--on-surface);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.home-service-privacy-cta {
+  width: 100%;
+  justify-content: center;
+  margin-top: 18px;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .home-service-actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .home-service-actions .home-service-button,
+  .home-service-privacy-option {
+    width: 100%;
+  }
+
+  .home-service-privacy-option {
+    justify-content: flex-start;
+  }
+
+  .home-service-privacy-sheet {
+    border-radius: 16px;
+    max-height: calc(100vh - 24px);
+  }
+}
