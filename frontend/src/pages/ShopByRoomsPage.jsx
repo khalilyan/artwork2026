@@ -121,7 +121,7 @@ export default function ShopByRoomsPage() {
       >
         <div className="rooms-hero-grid">
           <motion.div className="rooms-hero-copy reveal-section is-active" data-reveal variants={staggerGroup}>
-            <motion.h1 variants={fadeUp}>Ինտերիեր դիզայն<br /><em>Ըստ սենյակների</em></motion.h1>
+            <motion.h1 variants={fadeUp}>Կահույքի տեսակները<br /><em>Ըստ սենյակների</em></motion.h1>
             <motion.p variants={fadeUp}>Ձեր տան համար՝ ոճային, որակյալ և ժամանակակից կահույք՝ ստեղծված հարմարավետությունն ու գեղեցկությունը համադրելու համար</motion.p>
           </motion.div>
         </div>
@@ -141,7 +141,7 @@ export default function ShopByRoomsPage() {
         <div className="container">
           <motion.h2 className="reveal-section is-active rooms-cta-title" data-reveal variants={fadeUp}>
             <span>Անհատական</span>
-            <em>պատվերնորի համար</em>
+            <em>պատվերների համար</em>
           </motion.h2>
           <motion.a className="primary-button rooms-cta-button" href="/contact" variants={fadeUp}>Կապ հաստատել</motion.a>
         </div>

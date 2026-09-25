@@ -5,11 +5,28 @@ import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
 import { fadeUp, staggerGroup, viewportReveal } from '../utils/motion.js';
 
+function toPluralFurnitureTypeName(typeName) {
+  const normalizedTypeName = String(typeName ?? '').trim();
+  if (!normalizedTypeName) return 'Կահույքներ';
+  if (/(ներ|եր)$/u.test(normalizedTypeName)) return normalizedTypeName;
+  return `${normalizedTypeName}ներ`;
+}
+
+function toDefinitePluralFurnitureTypeName(typeName) {
+  const pluralTypeName = toPluralFurnitureTypeName(typeName);
+  if (/(ները|երը)$/u.test(pluralTypeName)) return pluralTypeName;
+  if (/(ներ|եր)$/u.test(pluralTypeName)) return `${pluralTypeName}ը`;
+  return pluralTypeName;
+}
+
 function FurnitureCategory({ category, index, roomName }) {
   const categoryHref = `/rooms/${category.roomSlug}/${category.slug}`;
   const cardSide = (index + 1) % 2 === 0 ? 'left' : 'right';
-  const roomLabel = `${roomName.toLocaleUpperCase('hy-AM')}-Ի ՀԱՄԱՐ`;
+  const upperRoomName = roomName.toLocaleUpperCase('hy-AM');
+  const roomLabel = upperRoomName.endsWith('Ի') ? `${upperRoomName} ՀԱՄԱՐ` : `${upperRoomName}Ի ՀԱՄԱՐ`;
   const categoryName = category.title ?? category.name ?? '';
+  const categoryPluralName = toPluralFurnitureTypeName(categoryName);
+  const ctaCategoryName = toDefinitePluralFurnitureTypeName(categoryName).toLocaleUpperCase('hy-AM');
 
   return (
     <motion.article
@@ -26,9 +43,9 @@ function FurnitureCategory({ category, index, roomName }) {
       </motion.a>
       <motion.div className="furniture-category-panel reveal-section is-active" data-reveal variants={staggerGroup}>
         <motion.p className="label-caps" variants={fadeUp}>{roomLabel}</motion.p>
-        <motion.h2 variants={fadeUp}>{category.title}</motion.h2>
+        <motion.h2 variants={fadeUp}>{categoryPluralName}</motion.h2>
         <motion.p variants={fadeUp}>{category.description}</motion.p>
-        <motion.a className="furniture-link label-caps" href={categoryHref} variants={fadeUp}>Տեսնել {categoryName}-ները</motion.a>
+        <motion.a className="furniture-link label-caps" href={categoryHref} variants={fadeUp}>ՏԵՍՆԵԼ {ctaCategoryName}</motion.a>
       </motion.div>
     </motion.article>
   );
