@@ -14,6 +14,7 @@ pnpm-debug.log*
 
 backend/uploads/
 frontend/dist/
+frontend/restavration_needed_files/
 
 .DS_Store
 Thumbs.db
