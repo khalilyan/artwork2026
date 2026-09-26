@@ -33,8 +33,35 @@ function pickBeforeImage(images = []) {
 function pickAfterImage(images = [], beforeImage = '') {
   return images.find((item) => item.src !== beforeImage && !item.src.toLowerCase().includes('_before'))?.src
     ?? images.find((item) => item.src !== beforeImage)?.src
-    ?? beforeImage
+    ?? ''
     ?? '';
+}
+
+function isCombinedBeforeAfterImage(imageSrc = '') {
+  return String(imageSrc).toLowerCase().includes('_before_after');
+}
+
+function isSingleVisualEntry(entry) {
+  if (!entry) return true;
+
+  const beforeImage = String(entry.beforeImage ?? '').trim();
+  const afterImage = String(entry.afterImage ?? '').trim();
+
+  if (!beforeImage && !afterImage) return true;
+  if (!beforeImage || !afterImage) return true;
+  if (beforeImage === afterImage) return true;
+  if (isCombinedBeforeAfterImage(beforeImage) || isCombinedBeforeAfterImage(afterImage)) return true;
+
+  return false;
+}
+
+function getPreviewLabelBySource(imageSrc = '', fallbackLabel = 'ՀԵՏՈ') {
+  const normalizedSource = String(imageSrc).toLowerCase();
+  if (normalizedSource.includes('_before') && !normalizedSource.includes('_before_after')) {
+    return 'ԱՌԱՋ';
+  }
+
+  return fallbackLabel;
 }
 
 function normalizePage(page) {
@@ -102,16 +129,18 @@ function getEntryPreviewImages(entry) {
     previews.push({ src: beforeImage, alt: entry.beforeAlt ?? 'Մինչ վերականգնումը', label: 'ԱՌԱՋ' });
   }
 
-  if (afterImage) {
+  if (afterImage && afterImage !== beforeImage) {
     previews.push({ src: afterImage, alt: entry.afterAlt ?? 'Վերականգնումից հետո', label: 'ՀԵՏՈ' });
   }
 
   additionalImages.forEach((image) => {
     if (previews.some((preview) => preview.src === image.src)) return;
+
+    const imageLabel = getPreviewLabelBySource(image.src);
     previews.push({
       src: image.src,
-      alt: image.alt || entry.afterAlt || entry.beforeAlt || 'Մեծացված նկար',
-      label: `ԼՐԱՑՈՒՑԻՉ ${previews.length - 1}`,
+      alt: image.alt || (imageLabel === 'ԱՌԱՋ' ? entry.beforeAlt : entry.afterAlt) || 'Մեծացված նկար',
+      label: imageLabel,
     });
   });
 
@@ -287,7 +316,6 @@ export default function RestavrationPage() {
           ) : (
             <span className="restavration-preview-counter label-caps">{currentPreview.label}</span>
           )}
-          <span className="restavration-preview-swipe label-caps">ՍԱՀԵՑՐԵՔ ՆԵՐՔԵՎ՝ ՓԱԿԵԼՈՒ ՀԱՄԱՐ</span>
         </div>
       </div>,
       document.body,
@@ -314,23 +342,37 @@ export default function RestavrationPage() {
 
       <section className="restavration-list container" aria-label="Վերականգնման աշխատանքներ">
         {entries.map((entry, index) => {
+          const singleVisual = isSingleVisualEntry(entry);
+
           return (
             <article className="restavration-item" key={entry.id ?? index}>
-              <div className="restavration-visual">
+              <div className={`restavration-visual${singleVisual ? ' is-single' : ''}`}>
                 <figure className="restavration-shot">
-                  <button className="restavration-shot-button" type="button" aria-label="Մեծացնել առաջ նկարը" onClick={() => openPreview(index, 0)}>
-                    <img src={entry.beforeImage} alt={entry.beforeAlt} loading="lazy" decoding="async" />
+                  <button
+                    className="restavration-shot-button"
+                    type="button"
+                    aria-label={singleVisual ? 'Մեծացնել նկարը' : 'Մեծացնել առաջ նկարը'}
+                    onClick={() => openPreview(index, 0)}
+                  >
+                    <img
+                      src={entry.beforeImage || entry.afterImage}
+                      alt={singleVisual ? (entry.beforeAlt || entry.afterAlt) : entry.beforeAlt}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </button>
-                  <figcaption>ԱՌԱՋ</figcaption>
+                  <figcaption>{singleVisual ? 'ԱՌԱՋ / ՀԵՏՈ' : 'ԱՌԱՋ'}</figcaption>
                   <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
                 </figure>
-                <figure className="restavration-shot">
-                  <button className="restavration-shot-button" type="button" aria-label="Մեծացնել հետո նկարը" onClick={() => openPreview(index, 1)}>
-                    <img src={entry.afterImage} alt={entry.afterAlt} loading="lazy" decoding="async" />
-                  </button>
-                  <figcaption>ՀԵՏՈ</figcaption>
-                  <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
-                </figure>
+                {!singleVisual && entry.afterImage ? (
+                  <figure className="restavration-shot">
+                    <button className="restavration-shot-button" type="button" aria-label="Մեծացնել հետո նկարը" onClick={() => openPreview(index, 1)}>
+                      <img src={entry.afterImage} alt={entry.afterAlt} loading="lazy" decoding="async" />
+                    </button>
+                    <figcaption>ՀԵՏՈ</figcaption>
+                    <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
+                  </figure>
+                ) : null}
               </div>
 
               <div className="restavration-content">
