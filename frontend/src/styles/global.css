@@ -2316,11 +2316,20 @@ body:has(.before-after-compare:hover) .custom-cursor {
 
 .home-restoration-button {
   display: inline-flex;
-  min-height: 52px;
+  min-height: 60px;
   align-items: center;
   justify-content: center;
-  padding: 0 24px;
+  padding: 0 32px;
+  border: 2px solid currentColor;
+  background: transparent;
+  color: var(--primary-container);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   pointer-events: auto;
+}
+
+.home-restoration-button:hover {
+  border-color: var(--primary-container);
 }
 
 .restoration-lens {
@@ -17106,6 +17115,35 @@ body.has-mobile-menu-open {
   font-size: 18px;
 }
 
+.restavration-cta-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: clamp(6px, 1.2vw, 16px);
+}
+
+.restavration-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px;
+  padding: 16px 34px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary-container);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.restavration-cta:hover {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
 .restavration-image-preview {
   position: fixed;
   inset: 0;
@@ -17185,6 +17223,14 @@ body.has-mobile-menu-open {
 
   .restavration-description-box {
     padding: 14px 14px 12px 18px;
+  }
+
+  .restavration-cta {
+    width: 100%;
+    min-height: 58px;
+    text-align: center;
+    padding-inline: 18px;
+    font-size: 11.5px;
   }
 
   .restavration-image-preview {

@@ -162,6 +162,10 @@ export default function RestavrationPage() {
             </article>
           );
         })}
+
+        <div className="restavration-cta-wrap">
+          <a className="restavration-cta label-caps" href="/contact">ՍԿՍԵԼ ԿԱՀՈՒՅՔԻ ՎԵՐԱՆՈՐՈԳՈՒՄԸ</a>
+        </div>
       </section>
 
       {previewDialog}
