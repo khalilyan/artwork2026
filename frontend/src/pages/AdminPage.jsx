@@ -32,6 +32,7 @@ const collectionFieldLabels = {
 const tabs = [
   { id: 'overview', label: 'Ընդհանուր', icon: 'dashboard' },
   { id: 'homepage', label: 'Գլխավոր էջ', icon: 'web' },
+  { id: 'restavration', label: 'Վերականգնում', icon: 'design_services' },
   { id: 'products', label: 'Ապրանքներ', icon: 'inventory_2' },
   { id: 'rooms', label: 'Սենյակներ', icon: 'chair' },
   { id: 'collections', label: 'Հավաքածուներ', icon: 'category' },
@@ -172,6 +173,57 @@ function homepageFormState(page = {}) {
       title: slide.title ?? '',
       subtitle: slide.subtitle ?? '',
       image: slide.image ?? '',
+    })),
+  };
+}
+
+function restavrationEntryFormState(entry = {}, index = 0) {
+  return {
+    id: entry.id ?? String(index + 1).padStart(2, '0'),
+    beforeImage: entry.beforeImage ?? '',
+    afterImage: entry.afterImage ?? '',
+    beforeAlt: entry.beforeAlt ?? 'Մինչ վերականգնումը',
+    afterAlt: entry.afterAlt ?? 'Վերականգնումից հետո',
+    price: entry.price ?? '',
+    description: entry.description ?? '',
+    notesText: Array.isArray(entry.notes) ? entry.notes.join('\n') : '',
+  };
+}
+
+function restavrationFormState(page = {}) {
+  const entries = Array.isArray(page.entries) && page.entries.length
+    ? page.entries.map((entry, index) => restavrationEntryFormState(entry, index))
+    : [restavrationEntryFormState({}, 0)];
+
+  return {
+    hero: {
+      eyebrow: page.hero?.eyebrow ?? 'ՎԵՐԱԿԱՆԳՆՄԱՆ ԱՐԽԻՎ',
+      title: page.hero?.title ?? 'Վերականգնման աշխատանքներ',
+      body: page.hero?.body ?? '',
+    },
+    entries,
+  };
+}
+
+function normalizeRestavrationPayload(form = {}) {
+  return {
+    hero: {
+      eyebrow: form.hero?.eyebrow ?? '',
+      title: form.hero?.title ?? '',
+      body: form.hero?.body ?? '',
+    },
+    entries: (form.entries ?? []).map((entry, index) => ({
+      id: entry.id?.trim() || String(index + 1).padStart(2, '0'),
+      beforeImage: entry.beforeImage?.trim() ?? '',
+      afterImage: entry.afterImage?.trim() ?? '',
+      beforeAlt: entry.beforeAlt?.trim() ?? 'Մինչ վերականգնումը',
+      afterAlt: entry.afterAlt?.trim() ?? 'Վերականգնումից հետո',
+      price: entry.price?.trim() ?? '',
+      description: entry.description?.trim() ?? '',
+      notes: (entry.notesText ?? '')
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean),
     })),
   };
 }
@@ -531,6 +583,7 @@ export default function AdminPage() {
   const [seenNotifications, setSeenNotifications] = useState(() => getStoredSeenNotifications());
   const [overview, setOverview] = useState(null);
   const [homePage, setHomePage] = useState(null);
+  const [restavrationPage, setRestavrationPage] = useState(null);
   const [products, setProducts] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [collections, setCollections] = useState([]);
@@ -542,6 +595,7 @@ export default function AdminPage() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [homepageForm, setHomepageForm] = useState(homepageFormState());
+  const [restavrationForm, setRestavrationForm] = useState(restavrationFormState());
   const [productForm, setProductForm] = useState(productFormState());
   const [roomForm, setRoomForm] = useState(roomFormState());
   const [collectionForm, setCollectionForm] = useState(collectionFormState());
@@ -624,9 +678,10 @@ export default function AdminPage() {
     setIsLoading(true);
 
     try {
-      const [overviewData, homepageData, productsData, roomsData, collectionsData, ordersData, contactsData, usersData, aiSettingsData] = await Promise.all([
+      const [overviewData, homepageData, restavrationData, productsData, roomsData, collectionsData, ordersData, contactsData, usersData, aiSettingsData] = await Promise.all([
         api.adminOverview(),
         api.adminHomepage(),
+        api.adminRestavrationPage(),
         api.adminProducts(),
         api.adminRooms(),
         api.adminCollections(),
@@ -642,6 +697,8 @@ export default function AdminPage() {
       setOverview(overviewData);
       setHomePage(homepageData.page);
       setHomepageForm(homepageFormState(homepageData.page));
+      setRestavrationPage(restavrationData.page);
+      setRestavrationForm(restavrationFormState(restavrationData.page));
       setProducts(nextProducts);
       setRooms(nextRooms);
       setCollections(nextCollections);
@@ -719,6 +776,40 @@ export default function AdminPage() {
       ...current,
       heroSlides: current.heroSlides.filter((_, slideIndex) => slideIndex !== index),
     }));
+  };
+
+  const updateRestavrationHero = (field, value) => {
+    setRestavrationForm((current) => ({
+      ...current,
+      hero: {
+        ...current.hero,
+        [field]: value,
+      },
+    }));
+  };
+
+  const updateRestavrationEntry = (index, field, value) => {
+    setRestavrationForm((current) => ({
+      ...current,
+      entries: current.entries.map((entry, entryIndex) => (entryIndex === index ? { ...entry, [field]: value } : entry)),
+    }));
+  };
+
+  const addRestavrationEntry = () => {
+    setRestavrationForm((current) => ({
+      ...current,
+      entries: [...current.entries, restavrationEntryFormState({}, current.entries.length)],
+    }));
+  };
+
+  const removeRestavrationEntry = (index) => {
+    setRestavrationForm((current) => {
+      const nextEntries = current.entries.filter((_, entryIndex) => entryIndex !== index);
+      return {
+        ...current,
+        entries: nextEntries.length ? nextEntries : [restavrationEntryFormState({}, 0)],
+      };
+    });
   };
 
   const toggleProductRoom = (roomSlug) => {
@@ -886,6 +977,21 @@ export default function AdminPage() {
     }
   };
 
+  const saveRestavration = async (event) => {
+    event.preventDefault();
+    notify('Վերականգնման էջը պահպանվում է...', 'info', false);
+
+    try {
+      const payload = normalizeRestavrationPayload(restavrationForm);
+      const { page } = await api.updateAdminRestavrationPage(payload);
+      setRestavrationPage(page);
+      setRestavrationForm(restavrationFormState(page));
+      notify('Վերականգնման էջը պահպանվեց։', 'success');
+    } catch (error) {
+      notifyError(error);
+    }
+  };
+
   const updateOrderStatus = async (order, status) => {
     notify('Պատվերը թարմացվում է...', 'info', false);
     try {
@@ -934,6 +1040,7 @@ export default function AdminPage() {
 
   const activeSaveAction = {
     homepage: { formId: 'admin-homepage-form', label: 'Պահպանել գլխավոր էջը' },
+    restavration: { formId: 'admin-restavration-form', label: 'Պահպանել վերականգնումը' },
     products: { formId: 'admin-product-form', label: selectedProduct ? 'Պահպանել ապրանքը' : 'Ստեղծել ապրանքը' },
     rooms: { formId: 'admin-room-form', label: selectedRoom ? 'Պահպանել սենյակը' : 'Ստեղծել սենյակը' },
     collections: { formId: 'admin-collection-form', label: selectedCollection ? 'Պահպանել հավաքածուն' : 'Ստեղծել հավաքածուն' },
@@ -1045,6 +1152,84 @@ export default function AdminPage() {
                         onChange={(value) => updateHomepageSlide(index, 'image', value)}
                         onUpload={uploadImage}
                       />
+                    </div>
+                  </section>
+                ))}
+              </form>
+            </AdminPanel>
+          ) : null}
+
+          {activeTab === 'restavration' ? (
+            <AdminPanel title="Վերականգնման էջ" action={<button className="admin-add-button" type="button" onClick={addRestavrationEntry}><Icon name="add" /><span>Ավելացնել աշխատանք</span></button>}>
+              <form className="admin-editor" id="admin-restavration-form" onSubmit={saveRestavration}>
+                <section className="admin-nested-item is-wide">
+                  <div className="admin-nested-title">
+                    <strong>Hero</strong>
+                    {restavrationPage?.updatedAt ? <small>{formatDate(restavrationPage.updatedAt)}</small> : null}
+                  </div>
+                  <div className="admin-nested-grid">
+                    <label>
+                      <span>Վերնագիր (eyebrow)</span>
+                      <input value={restavrationForm.hero.eyebrow} onChange={(event) => updateRestavrationHero('eyebrow', event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Գլխավոր վերնագիր</span>
+                      <input value={restavrationForm.hero.title} onChange={(event) => updateRestavrationHero('title', event.target.value)} />
+                    </label>
+                    <label className="is-wide">
+                      <span>Նկարագրություն</span>
+                      <textarea value={restavrationForm.hero.body} onChange={(event) => updateRestavrationHero('body', event.target.value)} />
+                    </label>
+                  </div>
+                </section>
+
+                {restavrationForm.entries.map((entry, index) => (
+                  <section className="admin-nested-item is-wide" key={`restavration-entry-${index}`}>
+                    <div className="admin-nested-title">
+                      <strong>Աշխատանք {index + 1}</strong>
+                      {restavrationForm.entries.length > 1 ? (
+                        <button type="button" onClick={() => removeRestavrationEntry(index)}>
+                          <Icon name="delete" />
+                        </button>
+                      ) : null}
+                    </div>
+                    <div className="admin-nested-grid">
+                      <label>
+                        <span>ID</span>
+                        <input value={entry.id} onChange={(event) => updateRestavrationEntry(index, 'id', event.target.value)} />
+                      </label>
+                      <label>
+                        <span>Գին</span>
+                        <input value={entry.price} onChange={(event) => updateRestavrationEntry(index, 'price', event.target.value)} />
+                      </label>
+                      <label className="is-wide">
+                        <span>Նկարագրություն</span>
+                        <textarea value={entry.description} onChange={(event) => updateRestavrationEntry(index, 'description', event.target.value)} />
+                      </label>
+                      <ImageField
+                        label="Մինչև նկարը"
+                        value={entry.beforeImage}
+                        onChange={(value) => updateRestavrationEntry(index, 'beforeImage', value)}
+                        onUpload={uploadImage}
+                      />
+                      <ImageField
+                        label="Հետո նկարը"
+                        value={entry.afterImage}
+                        onChange={(value) => updateRestavrationEntry(index, 'afterImage', value)}
+                        onUpload={uploadImage}
+                      />
+                      <label>
+                        <span>Մինչև alt</span>
+                        <input value={entry.beforeAlt} onChange={(event) => updateRestavrationEntry(index, 'beforeAlt', event.target.value)} />
+                      </label>
+                      <label>
+                        <span>Հետո alt</span>
+                        <input value={entry.afterAlt} onChange={(event) => updateRestavrationEntry(index, 'afterAlt', event.target.value)} />
+                      </label>
+                      <label className="is-wide">
+                        <span>Նշումներ (ամեն տողը մեկ կետ)</span>
+                        <textarea value={entry.notesText} onChange={(event) => updateRestavrationEntry(index, 'notesText', event.target.value)} />
+                      </label>
                     </div>
                   </section>
                 ))}

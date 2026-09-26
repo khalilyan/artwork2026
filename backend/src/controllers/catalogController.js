@@ -48,6 +48,28 @@ function formatCollection(collection, products = []) {
   };
 }
 
+async function getPageBySlug(slug) {
+  const pagesCollection = getDatabase().collection('pages');
+  const directPage = await pagesCollection.findOne({ slug });
+  if (directPage) return directPage;
+
+  const nestedPageContainer = await pagesCollection.findOne(
+    { [`${slug}.slug`]: slug },
+    { projection: { [slug]: 1 } },
+  );
+  const nestedPage = nestedPageContainer?.[slug];
+  if (nestedPage && typeof nestedPage === 'object') return nestedPage;
+
+  const fallbackContainer = await pagesCollection.findOne(
+    { [slug]: { $exists: true } },
+    { projection: { [slug]: 1 } },
+  );
+  const fallbackPage = fallbackContainer?.[slug];
+  if (fallbackPage && typeof fallbackPage === 'object') return fallbackPage;
+
+  return null;
+}
+
 export async function getRooms(_request, response, next) {
   try {
     const rooms = await getDatabase().collection('rooms').find({ isActive: { $ne: false } }).sort({ sortOrder: 1 }).toArray();
@@ -180,7 +202,7 @@ export async function getPageAssets(request, response, next) {
 export async function getPage(request, response, next) {
   try {
     const slug = toCleanString(request.params.pageSlug);
-    const page = await getDatabase().collection('pages').findOne({ slug });
+    const page = await getPageBySlug(slug);
     if (!page) {
       if (slug === 'home') {
         response.set('Cache-Control', 'no-store');

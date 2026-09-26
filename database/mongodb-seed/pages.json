@@ -1,54 +1,160 @@
-[
-  {
-    "_id": "page_home",
+{
+  "_id": {
+    "$oid": "6a88488fa9bf89dc42b6f1b5"
+  },
+  "home": {
     "slug": "home",
-    "type": "landing",
+    "createdAt": "2026-08-21T12:46:07.418Z",
     "heroSlides": [
       {
-        "title": "ARTWORK FURNITURE",
-        "subtitle": "THE WALNUT & GOLD COLLECTION",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDde5DxRcfKhPmfRd713rQ9Ju9zoxMCiwafMQrh0gTZck2ovnnjgkrLfGxAjuOh5ddARMoNBKh2l60BskAHMs5iPPk-kHjRQFBpSOwMnKzmUI39X0Zom6tg3Y-FOzISnf2bzzGEFtpByHo-BCHGtZcodDZ5pK0i3AwSuHBBj87MB-5WMbzd6uynDsSxeZ9r1QKP2TmVvIxA42R6t_HbmRy4lVV1q-LrqlVD8gEQx8J78G9YJEdtwUUWCupTFlzubUUMvlzYjR8MCA"
+        "title": "Artwork",
+        "subtitle": "Արհեստից դեպի արվեստ՝ ստեղծելով կահույք, որը համադրում է որակը, դիզայնը և վարպետությունը",
+        "image": "https://res.cloudinary.com/fggwurjm/image/upload/v1787148405/slide1.png"
       },
       {
-        "title": "LIVING QUARTERS",
-        "subtitle": "ARCHITECTURAL SEATING & COMFORT",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAQvPa4-s_1zVoBCQhXdX13CoOuP0oJg0tD8u-ogVGPM2l36814pyp255QAraFx2egLOpCwqHp_Vcy6KSFrNhjaaoqhU2riDbVGdhBMm0NwqKyUZ7IGmEf0j74nlZRwtlEeRcUeTQXiwK_zwJeLPjEQeK7IIqZX4I5QZgPJW9r5ZXxOHDYm15AlGnBg0GJwaEVh9MgoKqTe6vVJFEkHl5xLe5NnqZLaUFEU-gSMDuGvWsAmMFzGkKUercGj0RhuWfrGYK-CyXf9Ow"
+        "title": "Artwork",
+        "subtitle": "Պրեմիում դասի կահույք",
+        "image": "https://images.unsplash.com/photo-1664711942326-2c3351e215e6?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8aW50ZXJpb3IlMjBkZXNpZ258ZW58MHx8MHx8fDA%3D"
+      },
+      {
+        "title": "Artwork",
+        "subtitle": "Բարձրորակ, ժամանակակից և մատչելի կահույք, որը կծառայի երկար տարիներ",
+        "image": "https://images6.alphacoders.com/103/1035008.jpg"
       }
     ],
-    "statement": {
-      "title": "A dialogue between matter and void. Each piece is a curated artifact designed for the architectural home.",
-      "body": "In an era of disposable luxury, ARTWORK proposes permanence. Our materials are sourced with ethical precision, crafted by generational artisans.",
-      "buttonText": "OUR PHILOSOPHY",
-      "buttonHref": "/about"
-    },
-    "shopCta": {
-      "eyebrow": "READY TO TRANSFORM",
-      "title": "Curation & Context.",
-      "buttonText": "SHOP",
-      "href": "/rooms"
-    },
-    "adminEditable": ["heroSlides", "statement", "shopCta"]
+    "type": "landing",
+    "updatedAt": "2026-09-24T14:00:13.841Z"
   },
-  {
-    "_id": "page_about",
-    "slug": "about",
+  "restavration": {
+    "slug": "restavration",
     "type": "content",
     "hero": {
-      "title": "The Art of Living Interrupted.",
-      "body": "We don't just furnish spaces; we construct pauses. ARTWORK is an exploration of the physical boundary where discipline meets desire."
+      "eyebrow": "ՎԵՐԱԿԱՆԳՆՄԱՆ ԱՐԽԻՎ",
+      "title": "Վերականգնման աշխատանքներ",
+      "body": "Ահա մեր կատարած վերականգնման աշխատանքների ընտրված օրինակները։ Յուրաքանչյուր աշխատանք ներկայացված է իրական նկարներով, հստակ նկարագրությամբ և կատարված ծախսով։"
     },
-    "sections": [
+    "entries": [
       {
-        "key": "creed",
-        "title": "A curation of disciplined forms and unapologetic craftsmanship.",
-        "body": "True luxury is not loud. It is the silent weight of a solid walnut frame, the grain that tells a century-old story, and the precision of a joint that feels seamless to the touch."
+        "id": "01",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01_alt2.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01_restavrated_alt.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "60 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները։ Աշխատանքն իրականացվել է բարձրորակ հումքով։",
+        "notes": [
+          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
       },
       {
-        "key": "heritage",
-        "title": "From Armenian Roots to Global Modernity.",
-        "body": "Born from a lineage of Armenian master woodworkers, ARTWORK carries the soul of ancient craftsmanship into the digital age."
+        "id": "02",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02_restavrated.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "18 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "notes": [
+          "Գինը հաշվարկված է 1 հատի համար։",
+          "Կտորը տրամադրել է հաճախորդը։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "03",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_alt.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_restavrated_scene.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "220 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը, ռեմենները, ինչպես նաև վերականգնվել են կոտրված փայտյա հատվածները։ Օգտագործվել է բարձրորակ հումք։",
+        "notes": [
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "04",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_alt.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_restavrated.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "18 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "notes": [
+          "Գինը հաշվարկված է 1 հատի համար։",
+          "Կտորը տրամադրել է հաճախորդը։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "05",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05_restavrated_alt.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "18 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "notes": [
+          "Գինը հաշվարկված է 1 հատի համար։",
+          "Կտորը տրամադրել է հաճախորդը։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "06",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06_restavrated_back.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
+        "price": "260 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը, իրականացվել է թարմացում և հիմքի ամրացում։ Օգտագործվել է բարձրորակ հումք։",
+        "notes": [
+          "Գինը վերաբերում է 2 բազմոցի և 2 բազկաթոռի ամբողջական աշխատանքին։",
+          "Կտորը և փափուկ շերտերի նյութերը տրամադրել է հաճախորդը։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "07",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
+        "price": "18 000 ֏",
+        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "notes": [
+          "Գինը հաշվարկված է 1 հատի համար։",
+          "Կտորը տրամադրել է հաճախորդը։",
+          "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ]
+      },
+      {
+        "id": "08",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
+        "price": "80 000 ֏",
+        "description": "Փայտե հատվածները թարմացվել են, երեսամասին ավելացվել է լրացուցիչ շերտ, ամբողջը մաքրվել և լաքապատվել է։ Օգտագործվել է միայն բարձրորակ հումք։",
+        "notes": [
+          "Տեղափոխումը գնի մեջ ներառված չէ։",
+          "Ապրանքը գործարան է հասցրել հաճախորդը։"
+        ]
+      },
+      {
+        "id": "09",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
+        "price": "140 000 ֏",
+        "description": "Փայտե հատվածները թարմացվել են, ավելացվել են պակասող և կոտրված մասերը, այնուհետև ամբողջ մակերեսը մաքրվել և լաքապատվել է։ Օգտագործվել է բարձրորակ հումք։",
+        "notes": [
+          "Տեղափոխումը գնի մեջ ներառված չէ։",
+          "Ապրանքը գործարան է հասցրել հաճախորդը։"
+        ]
       }
-    ],
-    "adminEditable": ["hero", "sections"]
+    ]
   }
-]
+}

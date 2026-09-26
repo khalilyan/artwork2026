@@ -17,6 +17,7 @@ import AccountPage from './pages/AccountPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import CollectionsPage from './pages/CollectionsPage.jsx';
 import CollectionDetailPage from './pages/CollectionDetailPage.jsx';
+import RestavrationPage from './pages/RestavrationPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import { useParallax } from './hooks/useParallax.js';
@@ -37,6 +38,7 @@ export default function App() {
   const isCollections = currentPath === '/collections';
   const isProducts = currentPath === '/products';
   const isAuth = currentPath === '/auth';
+  const isRestavration = currentPath === '/restavration' || currentPath === '/restoration';
   const isHome = currentPath === '/';
   const hasStandaloneShell = isAuth || isAdmin;
   const detailsMatch = currentPath.match(/^\/rooms\/([^/]+)\/([^/]+)\/([^/]+)$/);
@@ -60,6 +62,7 @@ export default function App() {
     if (isCollections) return <CollectionsPage />;
     if (isProducts) return <ProductsPage />;
     if (isAuth) return <AuthPage />;
+    if (isRestavration) return <RestavrationPage />;
     if (detailsMatch) return <ProductDetailsPage roomSlug={detailsMatch[1]} furnitureSlug={detailsMatch[2]} productId={detailsMatch[3]} />;
     if (productsMatch) return <ProductsPage roomSlug={productsMatch[1]} furnitureSlug={productsMatch[2]} />;
     if (roomMatch) return <FurnitureRoomPage roomSlug={roomMatch[1]} />;

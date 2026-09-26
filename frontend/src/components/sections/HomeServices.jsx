@@ -160,7 +160,7 @@ export function RestorationSection({ images = restorationImages }) {
             <p>
               Մակերեսների վերականգնում, գործվածքների փոխարինում, փայտի և մետաղի նորոգում, փայլեցում և կառուցվածքային ամրացում՝ կատարված ARTWORK-ի վարպետների կողմից
             </p>
-            <a className="home-restoration-button label-caps" href="/contact">ՍԿՍԵԼ ՎԵՐԱԿԱՆԳՆՈՒՄԸ</a>
+            <a className="home-restoration-button label-caps" href="/restavration">ՍԿՍԵԼ ՎԵՐԱԿԱՆԳՆՈՒՄԸ</a>
           </motion.div>
         </motion.div>
 

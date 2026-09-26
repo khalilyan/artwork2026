@@ -15,6 +15,16 @@ import { isEmail, normalizeEmail, toCleanString } from '../utils/validators.js';
 const allowedOrderStatuses = ['quote_requested', 'processing', 'completed', 'cancelled'];
 const allowedUserStatuses = ['active', 'disabled'];
 const allowedUserRoles = ['customer', 'admin'];
+const defaultRestavrationPage = {
+  slug: 'restavration',
+  type: 'content',
+  hero: {
+    eyebrow: 'ՎԵՐԱԿԱՆԳՆՄԱՆ ԱՐԽԻՎ',
+    title: 'Վերականգնման աշխատանքներ',
+    body: '',
+  },
+  entries: [],
+};
 const uploadRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'uploads', 'admin');
 
 function canUseCloudinary() {
@@ -351,6 +361,152 @@ function normalizeHeroSlides(value, fallback = []) {
       };
     })
     .filter((slide) => slide.title || slide.subtitle || slide.image);
+}
+
+function normalizeStringList(value, fallback = []) {
+  if (Array.isArray(value)) {
+    return value.map((item) => toCleanString(item)).filter(Boolean);
+  }
+
+  const cleanValue = toCleanString(value);
+  if (!cleanValue) return fallback;
+
+  return cleanValue
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeRestavrationEntries(value, fallback = []) {
+  const entries = parseJsonArray(value, fallback);
+
+  return entries
+    .map((entry, index) => {
+      if (!entry || typeof entry !== 'object') return null;
+
+      return {
+        id: toCleanString(entry.id, String(index + 1).padStart(2, '0')),
+        beforeImage: toCleanString(entry.beforeImage),
+        afterImage: toCleanString(entry.afterImage, toCleanString(entry.beforeImage)),
+        beforeAlt: toCleanString(entry.beforeAlt, 'Մինչ վերականգնումը'),
+        afterAlt: toCleanString(entry.afterAlt, 'Վերականգնումից հետո'),
+        price: toCleanString(entry.price),
+        description: toCleanString(entry.description),
+        notes: normalizeStringList(entry.notes),
+      };
+    })
+    .filter((entry) => entry && (entry.beforeImage || entry.afterImage || entry.price || entry.description));
+}
+
+function normalizeRestavrationPage(body, existingPage = null) {
+  const source = body && typeof body === 'object' ? body : {};
+  const heroSource = source.hero && typeof source.hero === 'object' ? source.hero : {};
+
+  return {
+    slug: 'restavration',
+    type: toCleanString(existingPage?.type, 'content') || 'content',
+    hero: {
+      eyebrow: toCleanString(heroSource.eyebrow, existingPage?.hero?.eyebrow ?? defaultRestavrationPage.hero.eyebrow),
+      title: toCleanString(heroSource.title, existingPage?.hero?.title ?? defaultRestavrationPage.hero.title),
+      body: toCleanString(heroSource.body, existingPage?.hero?.body ?? defaultRestavrationPage.hero.body),
+    },
+    entries: normalizeRestavrationEntries(source.entries, existingPage?.entries ?? defaultRestavrationPage.entries),
+  };
+}
+
+async function resolvePageRecord(pageSlug) {
+  const pagesCollection = getDatabase().collection('pages');
+
+  const directPage = await pagesCollection.findOne({ slug: pageSlug });
+  if (directPage) {
+    return {
+      mode: 'direct',
+      page: directPage,
+      containerId: null,
+    };
+  }
+
+  const nestedContainer = await pagesCollection.findOne(
+    { [`${pageSlug}.slug`]: pageSlug },
+    { projection: { [pageSlug]: 1 } },
+  );
+  if (nestedContainer?.[pageSlug]) {
+    return {
+      mode: 'nested',
+      page: nestedContainer[pageSlug],
+      containerId: nestedContainer._id,
+    };
+  }
+
+  const fallbackContainer = await pagesCollection.findOne(
+    { [pageSlug]: { $exists: true } },
+    { projection: { [pageSlug]: 1 } },
+  );
+  if (fallbackContainer?.[pageSlug]) {
+    return {
+      mode: 'nested',
+      page: fallbackContainer[pageSlug],
+      containerId: fallbackContainer._id,
+    };
+  }
+
+  const defaultNestedContainer = await pagesCollection.findOne(
+    { $or: [{ home: { $exists: true } }, { restavration: { $exists: true } }] },
+    { projection: { _id: 1 } },
+  );
+  if (defaultNestedContainer?._id) {
+    return {
+      mode: 'nested',
+      page: null,
+      containerId: defaultNestedContainer._id,
+    };
+  }
+
+  return {
+    mode: 'none',
+    page: null,
+    containerId: null,
+  };
+}
+
+async function persistPageRecord(pageSlug, pagePayload, resolvedRecord, existingPage, now) {
+  const pagesCollection = getDatabase().collection('pages');
+
+  if (resolvedRecord.mode === 'nested' && resolvedRecord.containerId) {
+    await pagesCollection.updateOne(
+      { _id: resolvedRecord.containerId },
+      {
+        $set: {
+          [pageSlug]: {
+            ...pagePayload,
+            createdAt: existingPage?.createdAt ?? now,
+          },
+          updatedAt: now,
+        },
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: false },
+    );
+    return;
+  }
+
+  if (resolvedRecord.mode === 'direct') {
+    await pagesCollection.updateOne(
+      { slug: pageSlug },
+      { $set: pagePayload, $setOnInsert: { createdAt: now } },
+      { upsert: true },
+    );
+    return;
+  }
+
+  await pagesCollection.insertOne({
+    [pageSlug]: {
+      ...pagePayload,
+      createdAt: now,
+    },
+    createdAt: now,
+    updatedAt: now,
+  });
 }
 
 async function findEmbeddedRoomProductBySlug(slug) {
@@ -766,8 +922,8 @@ export async function getAdminCollections(_request, response, next) {
 
 export async function getAdminHomepage(_request, response, next) {
   try {
-    const page = await getDatabase().collection('pages').findOne({ slug: 'home' });
-    response.json({ page: page ?? { slug: 'home', type: 'landing', heroSlides: [] } });
+    const resolved = await resolvePageRecord('home');
+    response.json({ page: resolved.page ?? { slug: 'home', type: 'landing', heroSlides: [] } });
   } catch (error) {
     next(error);
   }
@@ -775,7 +931,8 @@ export async function getAdminHomepage(_request, response, next) {
 
 export async function updateAdminHomepage(request, response, next) {
   try {
-    const existingPage = await getDatabase().collection('pages').findOne({ slug: 'home' });
+    const resolved = await resolvePageRecord('home');
+    const existingPage = resolved.page;
     const now = new Date().toISOString();
     const requestedSlides = request.body && typeof request.body === 'object'
       ? request.body.heroSlides
@@ -788,11 +945,34 @@ export async function updateAdminHomepage(request, response, next) {
       updatedAt: now,
     };
 
-    await getDatabase().collection('pages').updateOne(
-      { slug: 'home' },
-      { $set: page, $setOnInsert: { createdAt: now } },
-      { upsert: true },
-    );
+    await persistPageRecord('home', page, resolved, existingPage, now);
+
+    response.json({ page });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAdminRestavrationPage(_request, response, next) {
+  try {
+    const resolved = await resolvePageRecord('restavration');
+    response.json({ page: resolved.page ?? defaultRestavrationPage });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateAdminRestavrationPage(request, response, next) {
+  try {
+    const resolved = await resolvePageRecord('restavration');
+    const existingPage = resolved.page;
+    const now = new Date().toISOString();
+    const page = {
+      ...normalizeRestavrationPage(request.body, existingPage),
+      updatedAt: now,
+    };
+
+    await persistPageRecord('restavration', page, resolved, existingPage, now);
 
     response.json({ page });
   } catch (error) {

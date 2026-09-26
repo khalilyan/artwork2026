@@ -11,6 +11,7 @@
     "admin:create": "node scripts/create-admin.js",
     "catalog:sync-room-products": "node scripts/sync-room-products.js",
     "catalog:cleanup-room-products": "node scripts/cleanup-room-products.js",
+    "database:seed-restavration": "node scripts/seed-restavration-page.js",
     "database:optimize": "node scripts/optimize-database.js",
     "email:test": "node scripts/test-admin-email.js",
     "email:test-order": "node scripts/test-order-email.js",

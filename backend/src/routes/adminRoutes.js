@@ -14,6 +14,7 @@ import {
   getAdminCollections,
   getAdminContacts,
   getAdminHomepage,
+  getAdminRestavrationPage,
   getAdminMaterials,
   getAdminOrders,
   getAdminOverview,
@@ -22,6 +23,7 @@ import {
   getAdminUsers,
   updateAdminCollection,
   updateAdminHomepage,
+  updateAdminRestavrationPage,
   updateAdminAiSettings,
   updateAdminMaterial,
   updateAdminOrder,
@@ -58,6 +60,8 @@ router.patch('/collections/:collectionSlug', updateAdminCollection);
 router.delete('/collections/:collectionSlug', deleteAdminCollection);
 router.get('/homepage', getAdminHomepage);
 router.patch('/homepage', updateAdminHomepage);
+router.get('/restavration', getAdminRestavrationPage);
+router.patch('/restavration', updateAdminRestavrationPage);
 router.get('/orders', getAdminOrders);
 router.get('/contacts', getAdminContacts);
 router.patch('/orders/:orderId', updateAdminOrder);

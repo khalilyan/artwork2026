@@ -136,6 +136,7 @@ export default function Header() {
       <nav id="mobile-menu-panel" className="header-menu" aria-label="Հիմնական նավիգացիա">
         <a className={navClass('/')} href="/">ԳԼԽԱՎՈՐ</a>
         <a className={navClass('/rooms')} href="/rooms">ՍԵՆՅԱԿՆԵՐ</a>
+        <a className={navClass('/restavration')} href="/restavration">ՎԵՐԱԿԱՆԳՆՈՒՄ</a>
         <a className={navClass('/collections', 'hide-mobile')} href="/collections">ՀԱՎԱՔԱԾՈՒՆԵՐ</a>
         <a className={navClass('/about', 'hide-mobile')} href="/about">ՄԵՐ ՄԱՍԻՆ</a>
         <a className={navClass('/contact', 'hide-tablet')} href="/contact">ԿԱՊ</a>
