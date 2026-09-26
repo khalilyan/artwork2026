@@ -5,6 +5,38 @@ import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { restavrationFallbackPage } from '../data/restavrationPage.js';
 import { api } from '../services/api.js';
 
+function toCleanImageObject(value) {
+  if (typeof value === 'string') {
+    const src = value.trim();
+    return src ? { src, alt: '' } : null;
+  }
+
+  if (value && typeof value === 'object') {
+    const src = typeof value.src === 'string' ? value.src.trim() : '';
+    if (!src) return null;
+
+    return {
+      src,
+      alt: typeof value.alt === 'string' ? value.alt.trim() : '',
+    };
+  }
+
+  return null;
+}
+
+function pickBeforeImage(images = []) {
+  return images.find((item) => item.src.toLowerCase().includes('_before'))?.src
+    ?? images[0]?.src
+    ?? '';
+}
+
+function pickAfterImage(images = [], beforeImage = '') {
+  return images.find((item) => item.src !== beforeImage && !item.src.toLowerCase().includes('_before'))?.src
+    ?? images.find((item) => item.src !== beforeImage)?.src
+    ?? beforeImage
+    ?? '';
+}
+
 function normalizePage(page) {
   if (!page || typeof page !== 'object') return restavrationFallbackPage;
 
@@ -16,16 +48,41 @@ function normalizePage(page) {
       ...(page.hero ?? {}),
     },
     entries: Array.isArray(page.entries) && page.entries.length
-      ? page.entries.map((entry, index) => ({
-        id: entry.id ?? String(index + 1).padStart(2, '0'),
-        beforeImage: entry.beforeImage ?? restavrationFallbackPage.entries[index]?.beforeImage ?? '',
-        afterImage: entry.afterImage ?? restavrationFallbackPage.entries[index]?.afterImage ?? entry.beforeImage ?? '',
-        beforeAlt: entry.beforeAlt ?? 'Մինչ վերականգնումը',
-        afterAlt: entry.afterAlt ?? 'Վերականգնումից հետո',
-        price: entry.price ?? 'Գինը կհստակեցվի',
-        description: entry.description ?? '',
-        notes: Array.isArray(entry.notes) ? entry.notes.filter(Boolean) : [],
-      }))
+      ? page.entries.map((entry, index) => {
+        const fallbackEntry = restavrationFallbackPage.entries[index] ?? {};
+        const fallbackImages = Array.isArray(fallbackEntry.images) ? fallbackEntry.images : [];
+        const rawImages = Array.isArray(entry.images) && entry.images.length
+          ? entry.images
+          : fallbackImages;
+        const images = rawImages
+          .map(toCleanImageObject)
+          .filter(Boolean);
+
+        const inferredBeforeImage = pickBeforeImage(images);
+        const beforeImage = entry.beforeImage
+          ?? fallbackEntry.beforeImage
+          ?? inferredBeforeImage;
+        const inferredAfterImage = pickAfterImage(images, beforeImage);
+        const afterImage = entry.afterImage
+          ?? fallbackEntry.afterImage
+          ?? inferredAfterImage;
+
+        return {
+          id: entry.id ?? String(index + 1).padStart(2, '0'),
+          beforeImage,
+          afterImage,
+          beforeAlt: entry.beforeAlt ?? 'Մինչ վերականգնումը',
+          afterAlt: entry.afterAlt ?? 'Վերականգնումից հետո',
+          images: images.length
+            ? images
+            : [beforeImage, afterImage]
+              .map(toCleanImageObject)
+              .filter(Boolean),
+          price: entry.price ?? 'Գինը կհստակեցվի',
+          description: entry.description ?? '',
+          notes: Array.isArray(entry.notes) ? entry.notes.filter(Boolean) : [],
+        };
+      })
       : restavrationFallbackPage.entries,
   };
 }
@@ -35,15 +92,30 @@ function getEntryPreviewImages(entry) {
 
   const beforeImage = entry.beforeImage ?? '';
   const afterImage = entry.afterImage ?? '';
+  const additionalImages = (Array.isArray(entry.images) ? entry.images : [])
+    .map(toCleanImageObject)
+    .filter(Boolean);
 
-  if (beforeImage && afterImage && beforeImage === afterImage) {
-    return [{ src: beforeImage, alt: entry.beforeAlt ?? 'Մեծացված նկար', label: 'ԱՌԱՋ / ՀԵՏՈ' }];
+  const previews = [];
+
+  if (beforeImage) {
+    previews.push({ src: beforeImage, alt: entry.beforeAlt ?? 'Մինչ վերականգնումը', label: 'ԱՌԱՋ' });
   }
 
-  const images = [];
-  if (beforeImage) images.push({ src: beforeImage, alt: entry.beforeAlt ?? 'Մինչ վերականգնումը', label: 'ԱՌԱՋ' });
-  if (afterImage) images.push({ src: afterImage, alt: entry.afterAlt ?? 'Վերականգնումից հետո', label: 'ՀԵՏՈ' });
-  return images;
+  if (afterImage) {
+    previews.push({ src: afterImage, alt: entry.afterAlt ?? 'Վերականգնումից հետո', label: 'ՀԵՏՈ' });
+  }
+
+  additionalImages.forEach((image) => {
+    if (previews.some((preview) => preview.src === image.src)) return;
+    previews.push({
+      src: image.src,
+      alt: image.alt || entry.afterAlt || entry.beforeAlt || 'Մեծացված նկար',
+      label: `ԼՐԱՑՈՒՑԻՉ ${previews.length - 1}`,
+    });
+  });
+
+  return previews;
 }
 
 export default function RestavrationPage() {
@@ -242,37 +314,23 @@ export default function RestavrationPage() {
 
       <section className="restavration-list container" aria-label="Վերականգնման աշխատանքներ">
         {entries.map((entry, index) => {
-          const isSingleVisual = entry.beforeImage === entry.afterImage;
-
           return (
             <article className="restavration-item" key={entry.id ?? index}>
-              <div className={`restavration-visual ${isSingleVisual ? 'is-single' : ''}`}>
-                {isSingleVisual ? (
-                  <figure className="restavration-shot">
-                    <button className="restavration-shot-button" type="button" aria-label="Մեծացնել նկար" onClick={() => openPreview(index, 0)}>
-                      <img src={entry.beforeImage} alt={entry.beforeAlt} loading="lazy" decoding="async" />
-                    </button>
-                    <figcaption>ԱՌԱՋ / ՀԵՏՈ</figcaption>
-                    <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
-                  </figure>
-                ) : (
-                  <>
-                    <figure className="restavration-shot">
-                      <button className="restavration-shot-button" type="button" aria-label="Մեծացնել առաջ նկարը" onClick={() => openPreview(index, 0)}>
-                        <img src={entry.beforeImage} alt={entry.beforeAlt} loading="lazy" decoding="async" />
-                      </button>
-                      <figcaption>ԱՌԱՋ</figcaption>
-                      <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
-                    </figure>
-                    <figure className="restavration-shot">
-                      <button className="restavration-shot-button" type="button" aria-label="Մեծացնել հետո նկարը" onClick={() => openPreview(index, 1)}>
-                        <img src={entry.afterImage} alt={entry.afterAlt} loading="lazy" decoding="async" />
-                      </button>
-                      <figcaption>ՀԵՏՈ</figcaption>
-                      <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
-                    </figure>
-                  </>
-                )}
+              <div className="restavration-visual">
+                <figure className="restavration-shot">
+                  <button className="restavration-shot-button" type="button" aria-label="Մեծացնել առաջ նկարը" onClick={() => openPreview(index, 0)}>
+                    <img src={entry.beforeImage} alt={entry.beforeAlt} loading="lazy" decoding="async" />
+                  </button>
+                  <figcaption>ԱՌԱՋ</figcaption>
+                  <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
+                </figure>
+                <figure className="restavration-shot">
+                  <button className="restavration-shot-button" type="button" aria-label="Մեծացնել հետո նկարը" onClick={() => openPreview(index, 1)}>
+                    <img src={entry.afterImage} alt={entry.afterAlt} loading="lazy" decoding="async" />
+                  </button>
+                  <figcaption>ՀԵՏՈ</figcaption>
+                  <span className="restavration-zoom-chip"><Icon name="zoom_in" /></span>
+                </figure>
               </div>
 
               <div className="restavration-content">

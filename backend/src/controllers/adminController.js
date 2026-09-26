@@ -384,15 +384,30 @@ function normalizeRestavrationEntries(value, fallback = []) {
     .map((entry, index) => {
       if (!entry || typeof entry !== 'object') return null;
 
+      const fallbackEntry = fallback[index] && typeof fallback[index] === 'object'
+        ? fallback[index]
+        : {};
+
+      const images = normalizeStringList(entry.images, normalizeStringList(fallbackEntry.images));
+      const beforeImage = toCleanString(
+        entry.beforeImage,
+        toCleanString(fallbackEntry.beforeImage, images[0] ?? ''),
+      );
+      const afterImage = toCleanString(
+        entry.afterImage,
+        toCleanString(fallbackEntry.afterImage, images.find((item) => item !== beforeImage) ?? beforeImage),
+      );
+
       return {
         id: toCleanString(entry.id, String(index + 1).padStart(2, '0')),
-        beforeImage: toCleanString(entry.beforeImage),
-        afterImage: toCleanString(entry.afterImage, toCleanString(entry.beforeImage)),
+        beforeImage,
+        afterImage,
         beforeAlt: toCleanString(entry.beforeAlt, 'Մինչ վերականգնումը'),
         afterAlt: toCleanString(entry.afterAlt, 'Վերականգնումից հետո'),
         price: toCleanString(entry.price),
         description: toCleanString(entry.description),
         notes: normalizeStringList(entry.notes),
+        images,
       };
     })
     .filter((entry) => entry && (entry.beforeImage || entry.afterImage || entry.price || entry.description));

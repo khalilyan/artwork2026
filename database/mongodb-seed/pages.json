@@ -36,123 +36,167 @@
     "entries": [
       {
         "id": "01",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01_alt2.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01_restavrated_alt.png",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01a_before.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01b.png",
         "beforeAlt": "Մինչ վերականգնումը",
         "afterAlt": "Վերականգնումից հետո",
         "price": "60 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները։ Աշխատանքն իրականացվել է բարձրորակ հումքով։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները։ Աշխատանքն ամբողջությամբ կատարվել է բարձրորակ հումքով։",
         "notes": [
-          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գինը 1 հատի համար է՝ 60 000 ֏։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01a_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01b.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/01c.png"
         ]
       },
       {
         "id": "02",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02_restavrated.png",
-        "beforeAlt": "Մինչ վերականգնումը",
-        "afterAlt": "Վերականգնումից հետո",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
         "price": "18 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, ապա ներկվել է սպիտակ գույնով։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
-          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գինը 1 հատի համար է՝ 18 000 ֏։",
           "Կտորը տրամադրել է հաճախորդը։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/02_before_after.png"
         ]
       },
       {
         "id": "03",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_alt.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_restavrated_scene.png",
-        "beforeAlt": "Մինչ վերականգնումը",
-        "afterAlt": "Վերականգնումից հետո",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
         "price": "220 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը, ռեմենները, ինչպես նաև վերականգնվել են կոտրված փայտյա հատվածները։ Օգտագործվել է բարձրորակ հումք։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ինչպես նաև վերականգնվել են կոտրված փայտյա հատվածները։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
+          "Գինը կազմում է 220 000 ֏։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/03_before_after.png"
         ]
       },
       {
         "id": "04",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_alt.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_restavrated.png",
-        "beforeAlt": "Մինչ վերականգնումը",
-        "afterAlt": "Վերականգնումից հետո",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
         "price": "18 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, ապա ներկվել է սպիտակ գույնով։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
-          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գինը 1 հատի համար է՝ 18 000 ֏։",
           "Կտորը տրամադրել է հաճախորդը։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/04_before_after.png"
         ]
       },
       {
         "id": "05",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05_restavrated_alt.png",
-        "beforeAlt": "Մինչ վերականգնումը",
-        "afterAlt": "Վերականգնումից հետո",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05_before_after.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05_before_after.png",
+        "beforeAlt": "Մինչ և հետո համադրություն",
+        "afterAlt": "Մինչ և հետո համադրություն",
         "price": "18 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, ապա ներկվել է սպիտակ գույնով։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
-          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գինը 1 հատի համար է՝ 18 000 ֏։",
           "Կտորը տրամադրել է հաճախորդը։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/05_before_after.png"
         ]
       },
       {
         "id": "06",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06_restavrated_back.png",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06a_before.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06b.png",
         "beforeAlt": "Մինչ վերականգնումը",
         "afterAlt": "Վերականգնումից հետո",
         "price": "260 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը, իրականացվել է թարմացում և հիմքի ամրացում։ Օգտագործվել է բարձրորակ հումք։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, թարմացվել է կտորը, ինչպես նաև ամրացվել է հիմքը։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
-          "Գինը վերաբերում է 2 բազմոցի և 2 բազկաթոռի ամբողջական աշխատանքին։",
+          "Գինը 2 բազմոցի և 2 բազկաթոռի ընդհանուր աշխատանքի համար է՝ 260 000 ֏։",
           "Կտորը և փափուկ շերտերի նյութերը տրամադրել է հաճախորդը։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06a_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06b.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06c_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06d.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/06f.png"
         ]
       },
       {
         "id": "07",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07_before_after.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07_before_after.png",
-        "beforeAlt": "Մինչ և հետո համադրություն",
-        "afterAlt": "Մինչ և հետո համադրություն",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07a_before.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07b.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
         "price": "18 000 ֏",
-        "description": "Փոխարինվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, այնուհետև մակերեսը ներկվել է սպիտակ։",
+        "description": "Փոխվել են նստատեղի և մեջքի փափուկ շերտերը, կտորը և ռեմենները, ամրացվել են թույլ հատվածները, ապա ներկվել է սպիտակ գույնով։ Աշխատանքում օգտագործվել է բարձրորակ հումք։",
         "notes": [
-          "Գինը հաշվարկված է 1 հատի համար։",
+          "Գինը 1 հատի համար է՝ 18 000 ֏։",
           "Կտորը տրամադրել է հաճախորդը։",
           "Գնի մեջ ներառված է երկկողմանի տեղափոխումը (տանել/բերել)։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07a_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07b.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/07c.png"
         ]
       },
       {
         "id": "08",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08_before_after.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08_before_after.png",
-        "beforeAlt": "Մինչ և հետո համադրություն",
-        "afterAlt": "Մինչ և հետո համադրություն",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08a_before.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08b.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
         "price": "80 000 ֏",
-        "description": "Փայտե հատվածները թարմացվել են, երեսամասին ավելացվել է լրացուցիչ շերտ, ամբողջը մաքրվել և լաքապատվել է։ Օգտագործվել է միայն բարձրորակ հումք։",
+        "description": "Թարմացվել են փայտե հատվածները, երեսամասի վրա ավելացվել է լրացուցիչ շերտ, այնուհետև ամբողջ մակերեսը մաքրվել և լաքապատվել է։ Օգտագործվել է միայն բարձրորակ հումք։",
         "notes": [
+          "Գինը կազմում է 80 000 ֏։",
           "Տեղափոխումը գնի մեջ ներառված չէ։",
-          "Ապրանքը գործարան է հասցրել հաճախորդը։"
+          "Ապրանքը հաճախորդն է հասցրել։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08a_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08b.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/08c_before.png"
         ]
       },
       {
         "id": "09",
-        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09_before_after.png",
-        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09_before_after.png",
-        "beforeAlt": "Մինչ և հետո համադրություն",
-        "afterAlt": "Մինչ և հետո համադրություն",
+        "beforeImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09a_before.png",
+        "afterImage": "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09c.png",
+        "beforeAlt": "Մինչ վերականգնումը",
+        "afterAlt": "Վերականգնումից հետո",
         "price": "140 000 ֏",
-        "description": "Փայտե հատվածները թարմացվել են, ավելացվել են պակասող և կոտրված մասերը, այնուհետև ամբողջ մակերեսը մաքրվել և լաքապատվել է։ Օգտագործվել է բարձրորակ հումք։",
+        "description": "Թարմացվել են փայտե հատվածները, ավելացվել են պակասող և կոտրված մասերը, այնուհետև ամբողջ մակերեսը մաքրվել և լաքապատվել է։ Օգտագործվել է միայն բարձրորակ հումք։",
         "notes": [
+          "Գինը կազմում է 140 000 ֏։",
           "Տեղափոխումը գնի մեջ ներառված չէ։",
-          "Ապրանքը գործարան է հասցրել հաճախորդը։"
+          "Ապրանքը հաճախորդն է հասցրել։"
+        ],
+        "images": [
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09a_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09b_before.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09c.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09f.png",
+          "https://res.cloudinary.com/ddbji4me/image/upload/v1788458409/09h_before.png"
         ]
       }
     ]
