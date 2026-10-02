@@ -7,6 +7,10 @@ Options -MultiViews
   # Keep ACME/challenge paths untouched
   RewriteRule ^\.well-known/ - [L]
 
+  # Force HTTPS for all non-ACME traffic
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
   # Serve server-rendered Open Graph tags for social crawlers on product detail URLs.
   RewriteCond %{REQUEST_URI} ^/rooms/[^/]+/[^/]+/[^/]+/?$ [NC]
   RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|facebot|telegrambot|twitterbot|whatsapp|linkedinbot|slackbot|discordbot|skypeuripreview|googlebot|bingbot) [NC]

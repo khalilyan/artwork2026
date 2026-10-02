@@ -962,6 +962,12 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
             <span className="label-caps">ՆԿԱՐԱԳՐՈՒԹՅՈՒՆ</span>
             <p>{product.description}</p>
           </div>
+          {dimensionsText ? (
+            <div className="details-dimensions" aria-label="Չափեր">
+              <span className="label-caps">ՉԱՓԵՐ</span>
+              <p>{dimensionsText}</p>
+            </div>
+          ) : null}
           <div className="details-action-row">
             <button className={`details-cart-button label-caps ${isAdded ? 'is-added' : ''}`} type="button" onClick={addToCart}>
               {isAdded ? 'Ավելացված է' : 'Ավելացնել զամբյուղ'}
@@ -1002,12 +1008,6 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
             items={[{ productSlug: product.id, quantity: 1 }]}
             onClose={() => setIsDirectCheckoutOpen(false)}
           />
-          {dimensionsText ? (
-            <details>
-              <summary><span className="label-caps">ՉԱՓԵՐ</span><Icon name="expand_more" /></summary>
-              <p>{dimensionsText}</p>
-            </details>
-          ) : null}
         </aside>
       </section>
 

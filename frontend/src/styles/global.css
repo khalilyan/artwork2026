@@ -4166,7 +4166,8 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .details-options,
-.details-description {
+.details-description,
+.details-dimensions {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -4179,6 +4180,12 @@ body:has(.restoration-lens:hover) .custom-cursor {
 }
 
 .details-description p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+}
+
+.details-dimensions p {
   margin: 0;
   color: var(--on-surface-variant);
   line-height: 1.6;
@@ -15287,6 +15294,7 @@ body.has-mobile-menu-open {
 .details-similar-copy h3,
 .details-similar-copy p,
 .details-description p,
+.details-dimensions p,
 .details-summary details p,
 .details-review > p,
 .details-technical p {
@@ -15812,11 +15820,13 @@ body.has-mobile-menu-open {
   }
 
   .details-options,
-  .details-description {
+  .details-description,
+  .details-dimensions {
     padding-top: 22px;
   }
 
   .details-description p,
+  .details-dimensions p,
   .details-summary details p {
     font-size: 15px;
     line-height: 1.7;
