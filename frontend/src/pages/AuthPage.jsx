@@ -156,7 +156,7 @@ export default function AuthPage() {
         />
         <div className="auth-visual-copy">
           <p className="label-caps">ARTWORK</p>
-          <h2>Ձևավորելով գաղափարները՝ վերածեք դրանք իրականության</h2>
+          <h2>Արհեստից դեպի արվեստ՝ ստեղծելով կահույք, որը համադրում է որակը, դիզայնը և վարպետությունը</h2>
         </div>
       </section>
 
@@ -173,7 +173,7 @@ export default function AuthPage() {
 
           <div className={`auth-form-shell ${isLogin ? 'is-visible' : ''}`}>
             <h1>Բարի գալուստ</h1>
-            <p>Մուտք գործեք՝ ձեր ընտրյալներն ու գնումների պատմությունը դիտելու համար</p>
+            <p>Մուտք գործեք ձեր հաշիվ՝ դիտելու ձեր նախընտրած կահույքներն ու գնումների պատմությունը, ինչպես նաև պատվերները</p>
             {statusMessage ? <p className="auth-status">{statusMessage}</p> : null}
             <form onSubmit={handleAuthSubmit}>
               <label className="auth-field">
@@ -193,8 +193,8 @@ export default function AuthPage() {
           </div>
 
           <div className={`auth-form-shell auth-signup-shell ${!isLogin ? 'is-visible' : ''}`}>
-            <h1>Միացեք հավաքածուին</h1>
-            <p>Բացահայտեք առցանց ձեռքբերման նոր, հարմար եւ նուրբ փորձառություն։</p>
+            <h1>Միացեք մեզ</h1>
+            <p>Գրանցվեք՝ ստանալու հատուկ առաջարկներ, զեղչեր և օգտվելու ավելի հարմար գնումների հնարավորություններից։</p>
             {statusMessage ? <p className="auth-status">{statusMessage}</p> : null}
             <form onSubmit={handleAuthSubmit}>
               <label className="auth-field">
@@ -226,6 +226,9 @@ export default function AuthPage() {
           </div>
 
           <footer className="auth-footer">
+            <a className="auth-footer-logo" href="/" aria-label="Գլխավոր էջ">
+              <img src={images.logo} alt="ARTWORK լոգո" />
+            </a>
             <p className="label-caps">© 2026 ARTWORK. ԲՈԼՈՐ ԻՐԱՎՈՒՆՔՆԵՐԸ ՊԱՀՊԱՆՎԱԾ ԵՆ</p>
           </footer>
         </div>

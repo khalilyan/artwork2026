@@ -7144,6 +7144,19 @@ body:has(.restoration-lens:hover) .custom-cursor {
   border-top: 1px dashed rgba(99, 48, 5, 0.2);
 }
 
+.auth-footer-logo {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.auth-footer-logo img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
 .auth-footer p {
   margin: 0;
   color: rgba(44, 30, 20, 0.66);
