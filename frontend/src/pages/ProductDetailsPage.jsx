@@ -319,6 +319,8 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [previewReviewImage, setPreviewReviewImage] = useState('');
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isGalleryPreviewOpen, setIsGalleryPreviewOpen] = useState(false);
+  const [previewScale, setPreviewScale] = useState(1);
+  const [previewOffset, setPreviewOffset] = useState({ x: 0, y: 0 });
   const [isDirectCheckoutOpen, setIsDirectCheckoutOpen] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
   const [isRoomPreviewOpen, setIsRoomPreviewOpen] = useState(false);
@@ -332,6 +334,8 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const [isProductLoading, setIsProductLoading] = useState(true);
   const mainImageTouchRef = useRef(null);
   const previewTouchRef = useRef(null);
+  const previewImageRef = useRef(null);
+  const previewGestureRef = useRef({ mode: null });
   const suppressGalleryOpenRef = useRef(false);
   const dimensionsText = product.dimensionsText ?? '';
   const productPriceAmount = getPriceAmount(product.price?.amount, product.priceAmount, product.price);
@@ -455,6 +459,38 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
     setActiveImageIndex((nextIndex + productGallery.length) % productGallery.length);
   };
 
+  const clampPreviewScale = (nextScale) => Math.min(4, Math.max(1, nextScale));
+
+  const getTouchDistance = (firstTouch, secondTouch) => Math.hypot(
+    secondTouch.clientX - firstTouch.clientX,
+    secondTouch.clientY - firstTouch.clientY,
+  );
+
+  const clampPreviewOffset = (nextOffset, scale) => {
+    if (scale <= 1.01) return { x: 0, y: 0 };
+
+    const previewImage = previewImageRef.current;
+    if (!previewImage) return nextOffset;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const imageWidth = previewImage.clientWidth;
+    const imageHeight = previewImage.clientHeight;
+    const maxX = Math.max(0, ((imageWidth * scale) - viewportWidth) / 2);
+    const maxY = Math.max(0, ((imageHeight * scale) - viewportHeight) / 2);
+
+    return {
+      x: Math.max(-maxX, Math.min(maxX, nextOffset.x)),
+      y: Math.max(-maxY, Math.min(maxY, nextOffset.y)),
+    };
+  };
+
+  const resetPreviewTransform = () => {
+    setPreviewScale(1);
+    setPreviewOffset({ x: 0, y: 0 });
+    previewGestureRef.current = { mode: null };
+  };
+
   const trackTouchStart = (touchRef, event) => {
     if (event.touches.length !== 1) {
       touchRef.current = null;
@@ -501,14 +537,107 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
   const handlePreviewTouchStart = (event) => {
     if (event.target.closest('button')) {
       previewTouchRef.current = null;
+      previewGestureRef.current = { mode: null };
       return;
     }
+
+    if (event.touches.length === 2) {
+      const firstTouch = event.touches[0];
+      const secondTouch = event.touches[1];
+      previewTouchRef.current = null;
+      previewGestureRef.current = {
+        mode: 'pinch',
+        startDistance: getTouchDistance(firstTouch, secondTouch),
+        startScale: previewScale,
+      };
+      return;
+    }
+
+    if (previewScale > 1.01 && event.touches.length === 1) {
+      const touch = event.touches[0];
+      previewTouchRef.current = null;
+      previewGestureRef.current = {
+        mode: 'pan',
+        panStartX: touch.clientX,
+        panStartY: touch.clientY,
+        startOffsetX: previewOffset.x,
+        startOffsetY: previewOffset.y,
+      };
+      return;
+    }
+
+    previewGestureRef.current = { mode: null };
 
     trackTouchStart(previewTouchRef, event);
   };
 
+  const handlePreviewTouchMove = (event) => {
+    if (event.target.closest('button')) return;
+
+    const gesture = previewGestureRef.current;
+
+    if (gesture.mode === 'pinch' && event.touches.length === 2) {
+      const firstTouch = event.touches[0];
+      const secondTouch = event.touches[1];
+      const currentDistance = getTouchDistance(firstTouch, secondTouch);
+      const distanceRatio = gesture.startDistance > 0
+        ? currentDistance / gesture.startDistance
+        : 1;
+      const nextScale = clampPreviewScale(gesture.startScale * distanceRatio);
+
+      setPreviewScale(nextScale);
+      setPreviewOffset((currentOffset) => clampPreviewOffset(currentOffset, nextScale));
+      event.preventDefault();
+      return;
+    }
+
+    if (gesture.mode === 'pan' && event.touches.length === 1) {
+      const touch = event.touches[0];
+      const nextOffset = clampPreviewOffset(
+        {
+          x: gesture.startOffsetX + (touch.clientX - gesture.panStartX),
+          y: gesture.startOffsetY + (touch.clientY - gesture.panStartY),
+        },
+        previewScale,
+      );
+
+      setPreviewOffset(nextOffset);
+      event.preventDefault();
+    }
+  };
+
   const handlePreviewTouchEnd = (event) => {
     if (event.target.closest('button')) {
+      previewTouchRef.current = null;
+      previewGestureRef.current = { mode: null };
+      return;
+    }
+
+    const gesture = previewGestureRef.current;
+
+    if (gesture.mode === 'pinch') {
+      if (event.touches.length === 1 && previewScale > 1.01) {
+        const touch = event.touches[0];
+        previewGestureRef.current = {
+          mode: 'pan',
+          panStartX: touch.clientX,
+          panStartY: touch.clientY,
+          startOffsetX: previewOffset.x,
+          startOffsetY: previewOffset.y,
+        };
+        return;
+      }
+
+      previewGestureRef.current = { mode: null };
+
+      if (previewScale <= 1.01) {
+        resetPreviewTransform();
+      }
+      return;
+    }
+
+    if (gesture.mode === 'pan' || previewScale > 1.01) {
+      previewGestureRef.current = { mode: null };
       previewTouchRef.current = null;
       return;
     }
@@ -532,6 +661,15 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       showImage(activeImageIndex + (deltaX < 0 ? 1 : -1));
     }
   };
+
+  useEffect(() => {
+    if (!isGalleryPreviewOpen) {
+      resetPreviewTransform();
+      return;
+    }
+
+    resetPreviewTransform();
+  }, [activeImageIndex, isGalleryPreviewOpen]);
 
   const handleReviewPreviewTouchEnd = (event) => {
     const delta = getTouchDelta(previewTouchRef, event);
@@ -819,14 +957,16 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
 
   const galleryPreviewDialog = isGalleryPreviewOpen && typeof document !== 'undefined' ? createPortal(
     <div
-      className="details-image-preview"
+      className={`details-image-preview${previewScale > 1.01 ? ' is-zoomed' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-label="Դիտել ապրանքի նկարը"
       onTouchStart={handlePreviewTouchStart}
+      onTouchMove={handlePreviewTouchMove}
       onTouchEnd={handlePreviewTouchEnd}
       onTouchCancel={() => {
         previewTouchRef.current = null;
+        previewGestureRef.current = { mode: null };
       }}
     >
       <button className="details-preview-close" type="button" onClick={() => setIsGalleryPreviewOpen(false)} aria-label="Փակել նկարը">
@@ -835,7 +975,12 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
       <button className="details-preview-arrow is-prev" type="button" onClick={() => showImage(activeImageIndex - 1)} aria-label="Նախորդ նկար">
         <Icon name="arrow_back" />
       </button>
-      <img src={productGallery[activeImageIndex] ?? product.image} alt={product.name} />
+      <img
+        ref={previewImageRef}
+        src={productGallery[activeImageIndex] ?? product.image}
+        alt={product.name}
+        style={{ transform: `translate3d(${previewOffset.x}px, ${previewOffset.y}px, 0) scale(${previewScale})` }}
+      />
       <button className="details-preview-arrow is-next" type="button" onClick={() => showImage(activeImageIndex + 1)} aria-label="Հաջորդ նկար">
         <Icon name="arrow_forward" />
       </button>

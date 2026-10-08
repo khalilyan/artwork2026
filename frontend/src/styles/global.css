@@ -2702,6 +2702,11 @@ body:has(.restoration-lens:hover) .custom-cursor {
   grid-column: span 5;
 }
 
+.footer-brand-logo {
+  display: inline-flex;
+  width: fit-content;
+}
+
 .footer-brand img {
   width: auto;
   height: 128px;
@@ -15372,7 +15377,7 @@ body.has-mobile-menu-open {
   background: rgba(20, 18, 16, 0.86);
   backdrop-filter: blur(10px);
   overscroll-behavior: contain;
-  touch-action: pinch-zoom;
+  touch-action: none;
   animation: detailsPreviewIn 0.24s ease both;
 }
 
@@ -15380,10 +15385,17 @@ body.has-mobile-menu-open {
   max-width: min(100%, 1180px);
   max-height: min(82vh, 920px);
   object-fit: contain;
+  transform-origin: center center;
+  touch-action: none;
+  will-change: transform;
   -webkit-user-drag: none;
   user-select: none;
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
   animation: detailsPreviewImageIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.details-image-preview.is-zoomed .details-preview-arrow {
+  opacity: 0.4;
 }
 
 .details-preview-close,

@@ -65,7 +65,9 @@ export default function Footer() {
     <footer className="site-footer" lang="hy">
       <div className="container footer-grid">
         <section className="footer-brand" aria-label="ARTWORK ամփոփում">
-          <img src={images.logo} alt="ARTWORK լոգո" />
+          <a className="footer-brand-logo" href="/" aria-label="Գլխավոր էջ">
+            <img src={images.logo} alt="ARTWORK լոգո" />
+          </a>
           <p>Արհեստից դեպի արվեստ՝ ստեղծելով կահույք, որը համադրում է որակը, դիզայնը և վարպետությունը</p>
         </section>
 
