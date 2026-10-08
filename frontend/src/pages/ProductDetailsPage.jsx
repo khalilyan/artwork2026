@@ -550,6 +550,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
         startDistance: getTouchDistance(firstTouch, secondTouch),
         startScale: previewScale,
       };
+      event.preventDefault();
       return;
     }
 
@@ -563,6 +564,7 @@ export default function ProductDetailsPage({ roomSlug, furnitureSlug, productId 
         startOffsetX: previewOffset.x,
         startOffsetY: previewOffset.y,
       };
+      event.preventDefault();
       return;
     }
 
