@@ -113,14 +113,19 @@ export async function getCategories(_request, response, next) {
 
 export async function getProducts(request, response, next) {
   try {
-    const products = await listProducts({
+    const result = await listProducts({
       roomSlug: toCleanString(request.query.roomSlug),
       categorySlug: toCleanString(request.query.categorySlug),
       q: toCleanString(request.query.q),
       sort: toCleanString(request.query.sort),
+      minPrice: toCleanString(request.query.minPrice),
+      maxPrice: toCleanString(request.query.maxPrice),
+      offset: toCleanString(request.query.offset),
+      limit: toCleanString(request.query.limit),
+      withTotal: true,
     });
 
-    response.json({ products });
+    response.json(result);
   } catch (error) {
     next(error);
   }

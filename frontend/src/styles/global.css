@@ -5057,6 +5057,33 @@ body:has(.restoration-lens:hover) .custom-cursor {
   line-height: 1.7;
 }
 
+.products-infinite-loader {
+  display: flex;
+  justify-content: center;
+  padding-top: 22px;
+}
+
+.products-infinite-loader span {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(99, 48, 5, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 999px;
+  animation: productsInfiniteSpin 0.78s linear infinite;
+}
+
+.products-infinite-trigger {
+  width: 100%;
+  height: 1px;
+  margin-top: 2px;
+}
+
+@keyframes productsInfiniteSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .details-image-stack {
   display: flex;
   flex-direction: column;

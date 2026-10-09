@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../components/ui/Icon.jsx';
 import SeoMeta from '../components/ui/SeoMeta.jsx';
 import { api } from '../services/api.js';
-import { formatAmdPrice, formatAmdPriceByUnit, formatCatalogProductPrice, getPriceAmount } from '../utils/currency.js';
+import { formatAmdPrice, formatAmdPriceByUnit, formatCatalogProductPrice } from '../utils/currency.js';
 import { getProductBadgeLabel } from '../utils/productBadge.js';
 import { defaultSeoImage } from '../utils/seo.js';
 
@@ -17,115 +17,10 @@ const productLayouts = ['feature', 'narrow-drop', 'square-left', 'wide-mid', 'na
 const defaultMinPrice = 0;
 const defaultMaxPrice = 2000000;
 const minimumSkeletonMs = 1700;
-const armenianToLatinMap = {
-  ա: 'a', բ: 'b', գ: 'g', դ: 'd', ե: 'e', զ: 'z', է: 'e', ը: 'y', թ: 't', ժ: 'zh', ի: 'i', լ: 'l',
-  խ: 'kh', ծ: 'ts', կ: 'k', հ: 'h', ձ: 'dz', ղ: 'gh', ճ: 'ch', մ: 'm', յ: 'y', ն: 'n', շ: 'sh',
-  ո: 'o', չ: 'ch', պ: 'p', ջ: 'j', ռ: 'r', ս: 's', վ: 'v', տ: 't', ր: 'r', ց: 'ts', ու: 'u',
-  փ: 'p', ք: 'q', օ: 'o', ֆ: 'f', և: 'ev',
-};
-
-function toSearchKey(value) {
-  const normalized = String(value ?? '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-  let transliterated = '';
-
-  for (let index = 0; index < normalized.length; index += 1) {
-    const twoLetters = normalized.slice(index, index + 2);
-    if (armenianToLatinMap[twoLetters]) {
-      transliterated += armenianToLatinMap[twoLetters];
-      index += 1;
-      continue;
-    }
-
-    const letter = normalized[index];
-    transliterated += armenianToLatinMap[letter] ?? letter;
-  }
-
-  return transliterated.replace(/[^a-z0-9]+/g, ' ').trim();
-}
-
-function splitSearchWords(value) {
-  return String(value ?? '').split(/\s+/).filter((word) => word.length > 1);
-}
-
-function levenshteinDistance(left, right) {
-  if (left === right) return 0;
-  if (!left.length) return right.length;
-  if (!right.length) return left.length;
-
-  const previous = new Array(right.length + 1);
-  const current = new Array(right.length + 1);
-
-  for (let column = 0; column <= right.length; column += 1) {
-    previous[column] = column;
-  }
-
-  for (let row = 1; row <= left.length; row += 1) {
-    current[0] = row;
-    for (let column = 1; column <= right.length; column += 1) {
-      const substitutionCost = left[row - 1] === right[column - 1] ? 0 : 1;
-      current[column] = Math.min(
-        previous[column] + 1,
-        current[column - 1] + 1,
-        previous[column - 1] + substitutionCost,
-      );
-    }
-
-    for (let column = 0; column <= right.length; column += 1) {
-      previous[column] = current[column];
-    }
-  }
-
-  return previous[right.length];
-}
-
-function wordsRoughlyMatch(baseWord, queryWord) {
-  if (!baseWord || !queryWord) return false;
-
-  if (baseWord === queryWord) return true;
-
-  // Allow predictable prefix/sub-string matching only from product word -> query word.
-  if (queryWord.length >= 3 && baseWord.startsWith(queryWord)) return true;
-  if (queryWord.length >= 4 && baseWord.includes(queryWord)) return true;
-
-  // Prevent short fragments from matching everything.
-  if (baseWord.length < 4 || queryWord.length < 4) return false;
-  if (Math.abs(baseWord.length - queryWord.length) > 1) return false;
-
-  // Keep typo-tolerance local to very similar words.
-  if (baseWord[0] !== queryWord[0]) return false;
-
-  return levenshteinDistance(baseWord, queryWord) <= 1;
-}
-
-function getProductSearchKey(product) {
-  return toSearchKey([
-    product.name,
-    product.slug,
-    product.id,
-    product.sku,
-    product.description,
-    product.type,
-    product.categorySlug,
-    product.group,
-    ...(product.roomSlugs ?? []),
-    ...(product.hashtags ?? []),
-  ].filter(Boolean).join(' '));
-}
-
-function getProductSearchWords(product) {
-  return splitSearchWords(getProductSearchKey(product));
-}
+const productsPerPage = 10;
 
 function getProductLayout(index) {
   return productLayouts[index % productLayouts.length];
-}
-
-function getProductPrice(product) {
-  return getPriceAmount(product.price?.amount, product.priceAmount, product.price, product.snapshot?.price);
-}
-
-function getProductDate(product) {
-  return new Date(product.createdAt ?? product.updatedAt ?? 0).getTime() || 0;
 }
 
 function clampPrice(value, fallback) {
@@ -237,6 +132,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const [room, setRoom] = useState(null);
   const [category, setCategory] = useState(null);
   const [products, setProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'newest');
   const [minPrice, setMinPrice] = useState(() => clampPrice(searchParams.get('min'), defaultMinPrice));
@@ -247,7 +143,11 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
   const [isPriceRangeDragging, setIsPriceRangeDragging] = useState(false);
   const [hasPendingPriceCommit, setHasPendingPriceCommit] = useState(false);
   const [isProductsLoading, setIsProductsLoading] = useState(true);
+  const [isLoadingMoreProducts, setIsLoadingMoreProducts] = useState(false);
+  const [hasMoreProducts, setHasMoreProducts] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(() => (typeof window === 'undefined' ? true : window.innerWidth > 1024));
+  const loadMoreTriggerRef = useRef(null);
+  const isLoadingMoreProductsRef = useRef(false);
 
   useEffect(() => {
     if (!roomSlug) {
@@ -267,72 +167,132 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       });
   }, [categoryFilter, roomSlug]);
 
+  const absoluteMaxPrice = defaultMaxPrice;
+  const normalizedQuery = query.trim();
+  const low = Math.max(defaultMinPrice, Math.min(minPrice, maxPrice));
+  const high = Math.min(defaultMaxPrice, Math.max(minPrice, maxPrice));
+
+  const productRequestParams = useMemo(() => ({
+    roomSlug,
+    categorySlug: categoryFilter,
+    q: normalizedQuery,
+    sort,
+    minPrice: isPriceFilterActive ? String(low) : undefined,
+    maxPrice: isPriceFilterActive ? String(high) : undefined,
+  }), [categoryFilter, high, isPriceFilterActive, low, normalizedQuery, roomSlug, sort]);
+
+  const loadMoreProducts = useCallback(async (offset) => {
+    if (isLoadingMoreProductsRef.current) return;
+
+    isLoadingMoreProductsRef.current = true;
+    setIsLoadingMoreProducts(true);
+
+    try {
+      const result = await api.products({
+        ...productRequestParams,
+        offset: String(offset),
+        limit: String(productsPerPage),
+      });
+
+      const nextProducts = Array.isArray(result.products) ? result.products : [];
+      const nextTotal = Number.isFinite(Number(result.total))
+        ? Number(result.total)
+        : offset + nextProducts.length;
+
+      setTotalProducts(nextTotal);
+      setProducts((currentProducts) => {
+        const currentIds = new Set(currentProducts.map((item) => item.id ?? item.slug ?? item.productSlug));
+        const uniqueNextProducts = nextProducts.filter((item) => {
+          const itemId = item.id ?? item.slug ?? item.productSlug;
+          if (!itemId || currentIds.has(itemId)) return false;
+          currentIds.add(itemId);
+          return true;
+        });
+        const mergedProducts = [...currentProducts, ...uniqueNextProducts];
+        setHasMoreProducts(mergedProducts.length < nextTotal);
+        return mergedProducts;
+      });
+    } finally {
+      isLoadingMoreProductsRef.current = false;
+      setIsLoadingMoreProducts(false);
+    }
+  }, [productRequestParams]);
+
   useEffect(() => {
-    let isCurrentRequest = true;
+    let isCancelled = false;
     let loadingTimer = null;
     const loadingStartedAt = performance.now();
 
+    setProducts([]);
+    setTotalProducts(0);
+    setHasMoreProducts(false);
     setIsProductsLoading(true);
-    api.products({ roomSlug, categorySlug: categoryFilter })
-      .then(({ products: nextProducts }) => {
-        if (isCurrentRequest) setProducts(nextProducts ?? []);
+    setIsLoadingMoreProducts(false);
+    isLoadingMoreProductsRef.current = false;
+
+    api.products({
+      ...productRequestParams,
+      offset: '0',
+      limit: String(productsPerPage),
+    })
+      .then((result) => {
+        if (isCancelled) return;
+
+        const nextProducts = Array.isArray(result.products) ? result.products : [];
+        const nextTotal = Number.isFinite(Number(result.total))
+          ? Number(result.total)
+          : nextProducts.length;
+
+        setProducts(nextProducts);
+        setTotalProducts(nextTotal);
+        setHasMoreProducts(nextProducts.length < nextTotal);
       })
       .catch(() => {
-        if (isCurrentRequest) setProducts([]);
+        if (isCancelled) return;
+
+        setProducts([]);
+        setTotalProducts(0);
+        setHasMoreProducts(false);
       })
       .finally(() => {
         const elapsed = performance.now() - loadingStartedAt;
         const remaining = Math.max(0, minimumSkeletonMs - elapsed);
 
         loadingTimer = window.setTimeout(() => {
-          if (isCurrentRequest) setIsProductsLoading(false);
+          if (isCancelled) return;
+          setIsProductsLoading(false);
         }, remaining);
       });
 
     return () => {
-      isCurrentRequest = false;
+      isCancelled = true;
       if (loadingTimer) window.clearTimeout(loadingTimer);
     };
-  }, [categoryFilter, roomSlug]);
+  }, [productRequestParams]);
 
-  const absoluteMaxPrice = defaultMaxPrice;
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (isProductsLoading || isLoadingMoreProducts || !hasMoreProducts) return undefined;
 
-  const visibleProducts = useMemo(() => {
-    const low = Math.max(defaultMinPrice, Math.min(minPrice, maxPrice));
-    const high = Math.min(defaultMaxPrice, Math.max(minPrice, maxPrice));
-    const queryKey = toSearchKey(query);
-    const queryWords = splitSearchWords(queryKey);
+    const triggerNode = loadMoreTriggerRef.current;
+    if (!triggerNode) return undefined;
 
-    return products
-      .filter((product) => {
-        if (queryKey) {
-          const productKey = getProductSearchKey(product);
-          const productWords = getProductSearchWords(product);
-          const matchesFullPhrase = productKey.includes(queryKey);
-          const matchesAllWords = queryWords.length
-            ? queryWords.every((queryWord) => (
-              productWords.some((word) => wordsRoughlyMatch(word, queryWord))
-            ))
-            : false;
-          const matchesQuery = matchesFullPhrase || matchesAllWords;
-          if (!matchesQuery) return false;
-        }
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry?.isIntersecting) return;
+      loadMoreProducts(products.length);
+    }, {
+      root: null,
+      rootMargin: '360px 0px',
+      threshold: 0,
+    });
 
-        if (!isPriceFilterActive) return true;
+    observer.observe(triggerNode);
 
-        const price = getProductPrice(product);
-        return price >= low && price <= high;
-      })
-      .map((product, index) => ({ product, originalIndex: index }))
-      .sort((first, second) => {
-        if (sort === 'price-asc') return getProductPrice(first.product) - getProductPrice(second.product);
-        if (sort === 'price-desc') return getProductPrice(second.product) - getProductPrice(first.product);
-        if (sort === 'az') return first.product.name.localeCompare(second.product.name);
-        if (sort === 'za') return second.product.name.localeCompare(first.product.name);
-        return getProductDate(second.product) - getProductDate(first.product) || second.originalIndex - first.originalIndex;
-      })
-      .map(({ product }) => product);
-  }, [isPriceFilterActive, maxPrice, minPrice, products, query, sort]);
+    return () => observer.disconnect();
+  }, [hasMoreProducts, isLoadingMoreProducts, isProductsLoading, loadMoreProducts, products.length]);
+
+  const visibleProducts = products;
 
   useEffect(() => {
     if (isProductsLoading || typeof window === 'undefined') return undefined;
@@ -650,7 +610,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         {isProductsLoading ? <ProductsSkeleton /> : visibleProducts.length ? (
           <section className="products-group">
             <div className="products-group-heading">
-              <span className="label-caps">{String(visibleProducts.length).padStart(2, '0')} ԿԱՀՈՒՅՔ</span>
+              <span className="label-caps">{String(Math.max(totalProducts, visibleProducts.length)).padStart(2, '0')} ԿԱՀՈՒՅՔ</span>
               <h2>{sectionHeadingTitle}</h2>
             </div>
             <div className="products-collage">
@@ -663,8 +623,14 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
                 />
               ))}
             </div>
+            {isLoadingMoreProducts ? (
+              <div className="products-infinite-loader" aria-live="polite" aria-label="Ապրանքները բեռնվում են">
+                <span aria-hidden="true" />
+              </div>
+            ) : null}
+            {hasMoreProducts ? <div className="products-infinite-trigger" ref={loadMoreTriggerRef} aria-hidden="true" /> : null}
           </section>
-        ) : <p className="products-empty">Այս գնի միջակայքում կահույք չկա։</p>}
+        ) : <p className="products-empty">{query.trim() ? 'Որոնման արդյունքներ չեն գտնվել։' : 'Այս գնի միջակայքում կահույք չկա։'}</p>}
       </section>
     </main>
   );

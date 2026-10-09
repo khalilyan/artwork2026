@@ -1,6 +1,52 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from '../db/mongo.js';
 
+function normalizeSearchText(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
+}
+
+function splitSearchWords(value) {
+  return normalizeSearchText(value).split(/\s+/).filter((word) => word.length > 1);
+}
+
+function getProductSearchText(product) {
+  return normalizeSearchText([
+    product.name,
+    product.slug,
+    product.id,
+    product.sku,
+    product.description,
+    product.type,
+    product.categorySlug,
+    product.group,
+    ...(product.roomSlugs ?? []),
+    ...(product.hashtags ?? []),
+  ].filter(Boolean).join(' '));
+}
+
+function toNonNegativeInteger(value, fallback = 0) {
+  const numericValue = Number(value);
+  if (!Number.isInteger(numericValue) || numericValue < 0) return fallback;
+  return numericValue;
+}
+
+function toPositiveInteger(value, fallback = 0) {
+  const numericValue = Number(value);
+  if (!Number.isInteger(numericValue) || numericValue < 1) return fallback;
+  return numericValue;
+}
+
+function toFiniteNumberOrNull(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
 export function formatProduct(product, options = {}) {
   if (!product) return null;
 
@@ -106,23 +152,41 @@ export async function listRoomProducts(options = {}) {
 export async function listProducts(filters = {}) {
   const allProducts = await listRoomProducts({ includeReviews: Boolean(filters.includeReviews) });
 
-  const query = String(filters.q ?? '').trim().toLowerCase();
+  const query = normalizeSearchText(filters.q ?? '');
+  const queryWords = splitSearchWords(query);
   const sort = String(filters.sort ?? 'relevance').trim().toLowerCase();
+  const minPrice = toFiniteNumberOrNull(filters.minPrice);
+  const maxPrice = toFiniteNumberOrNull(filters.maxPrice);
+  const offset = toNonNegativeInteger(filters.offset, 0);
+  const limit = toPositiveInteger(filters.limit, 0);
+  const hasPriceFilter = minPrice !== null || maxPrice !== null;
+  const lowerPriceBound = minPrice ?? 0;
+  const upperPriceBound = maxPrice ?? Number.MAX_SAFE_INTEGER;
 
   const filteredProducts = allProducts.filter((product) => {
     const roomMatches = filters.roomSlug ? product.roomSlugs?.includes(filters.roomSlug) : true;
     const categoryMatches = filters.categorySlug ? product.categorySlug === filters.categorySlug || product.type === filters.categorySlug : true;
-    const searchableText = [
-      product.name,
-      product.categorySlug,
-      product.type,
-      product.description,
-      ...(product.hashtags ?? []),
-    ].filter(Boolean).join(' ').toLowerCase();
-    const queryMatches = query ? searchableText.includes(query) : true;
+
+    const searchableText = getProductSearchText(product);
+    const searchableWords = query ? splitSearchWords(searchableText) : [];
+    const queryMatches = query
+      ? searchableText.includes(query)
+        || (queryWords.length
+          ? queryWords.every((queryWord) => searchableWords.some((word) => (
+            word === queryWord
+            || (queryWord.length >= 3 && word.startsWith(queryWord))
+            || (queryWord.length >= 4 && word.includes(queryWord))
+          )))
+          : false)
+      : true;
+
+    const productPrice = Number(product.priceAmount);
+    const priceMatches = hasPriceFilter
+      ? Number.isFinite(productPrice) && productPrice >= lowerPriceBound && productPrice <= upperPriceBound
+      : true;
 
     const activeMatches = filters.includeInactive ? true : product.isActive !== false;
-    return activeMatches && roomMatches && categoryMatches && queryMatches;
+    return activeMatches && roomMatches && categoryMatches && queryMatches && priceMatches;
   });
 
   const sortedProducts = [...filteredProducts];
@@ -135,9 +199,26 @@ export async function listProducts(filters = {}) {
     sortedProducts.sort((a, b) => Number(b.averageRating ?? 0) - Number(a.averageRating ?? 0));
   } else if (sort === 'newest') {
     sortedProducts.sort((a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0));
+  } else if (sort === 'az') {
+    sortedProducts.sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? ''), 'hy', { sensitivity: 'base' }));
+  } else if (sort === 'za') {
+    sortedProducts.sort((a, b) => String(b.name ?? '').localeCompare(String(a.name ?? ''), 'hy', { sensitivity: 'base' }));
   }
 
-  return sortedProducts;
+  const pagedProducts = limit > 0
+    ? sortedProducts.slice(offset, offset + limit)
+    : sortedProducts;
+
+  if (filters.withTotal) {
+    return {
+      products: pagedProducts,
+      total: sortedProducts.length,
+      offset,
+      limit,
+    };
+  }
+
+  return pagedProducts;
 }
 
 export async function findProductBySlug(productSlug) {

@@ -419,7 +419,9 @@ export const api = {
   pageAssets: (pageKey) => apiRequest(`/catalog/page-assets/${pageKey}`, { includeAuth: false, includeGuestId: false }),
   page: (pageSlug) => apiRequest(`/catalog/pages/${pageSlug}`, { includeAuth: false, includeGuestId: false }),
   products: (params = {}) => {
-    const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value)).toString();
+    const query = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+    ).toString();
     return apiRequest(`/catalog/products${query ? `?${query}` : ''}`, { includeAuth: false, includeGuestId: false });
   },
   product: (productSlug) => apiRequest(`/catalog/products/${productSlug}`, { includeAuth: false, includeGuestId: false }),
