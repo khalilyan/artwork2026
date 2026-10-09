@@ -80,9 +80,20 @@ function levenshteinDistance(left, right) {
 
 function wordsRoughlyMatch(baseWord, queryWord) {
   if (!baseWord || !queryWord) return false;
-  if (baseWord === queryWord || baseWord.includes(queryWord) || queryWord.includes(baseWord)) return true;
-  if (Math.abs(baseWord.length - queryWord.length) > 1) return false;
+
+  if (baseWord === queryWord) return true;
+
+  // Allow predictable prefix/sub-string matching only from product word -> query word.
+  if (queryWord.length >= 3 && baseWord.startsWith(queryWord)) return true;
+  if (queryWord.length >= 4 && baseWord.includes(queryWord)) return true;
+
+  // Prevent short fragments from matching everything.
   if (baseWord.length < 4 || queryWord.length < 4) return false;
+  if (Math.abs(baseWord.length - queryWord.length) > 1) return false;
+
+  // Keep typo-tolerance local to very similar words.
+  if (baseWord[0] !== queryWord[0]) return false;
+
   return levenshteinDistance(baseWord, queryWord) <= 1;
 }
 
@@ -282,7 +293,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
       isCurrentRequest = false;
       if (loadingTimer) window.clearTimeout(loadingTimer);
     };
-  }, [categoryFilter, query, roomSlug]);
+  }, [categoryFilter, roomSlug]);
 
   const absoluteMaxPrice = defaultMaxPrice;
 
@@ -297,12 +308,13 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
         if (queryKey) {
           const productKey = getProductSearchKey(product);
           const productWords = getProductSearchWords(product);
-          const hasFuzzyWordMatch = queryWords.length
-            ? queryWords.every((queryWord) => productWords.some((word) => wordsRoughlyMatch(word, queryWord)))
+          const matchesFullPhrase = productKey.includes(queryKey);
+          const matchesAllWords = queryWords.length
+            ? queryWords.every((queryWord) => (
+              productWords.some((word) => wordsRoughlyMatch(word, queryWord))
+            ))
             : false;
-          const matchesQuery = productKey.includes(queryKey)
-            || queryWords.some((word) => productKey.includes(word))
-            || hasFuzzyWordMatch;
+          const matchesQuery = matchesFullPhrase || matchesAllWords;
           if (!matchesQuery) return false;
         }
 
