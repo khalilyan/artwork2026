@@ -521,6 +521,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
     : 'Դիտեք ARTWORK-ի դիզայներական կահույքը, հավաքածուները, բազկաթոռները, լուսավորությունը, մահճակալները, բազմոցները և ինտերիերի այլ կահույքի տեսակները։';
   const seoUrl = typeof window === 'undefined' ? '/products' : `${window.location.pathname}${window.location.search}`;
   const seoImage = visibleProducts[0]?.image ?? visibleProducts[0]?.images?.primary ?? defaultSeoImage;
+  const sectionHeadingTitle = query.trim() ? 'Բոլոր արդյունքները' : roomHeadingTitle;
 
   return (
     <main className="products-page" lang="hy">
@@ -650,7 +651,7 @@ export default function ProductsPage({ roomSlug, furnitureSlug }) {
           <section className="products-group">
             <div className="products-group-heading">
               <span className="label-caps">{String(visibleProducts.length).padStart(2, '0')} ԿԱՀՈՒՅՔ</span>
-              <h2>{roomHeadingTitle}</h2>
+              <h2>{sectionHeadingTitle}</h2>
             </div>
             <div className="products-collage">
               {visibleProducts.map((product, index) => (
