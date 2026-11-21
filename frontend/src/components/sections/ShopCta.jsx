@@ -38,6 +38,7 @@ export default function ShopCta({
   accentTitle = 'սկսվում է այստեղ',
   buttonText = 'ՄՈՒՏՔ',
   enterText = 'ԽԱՆՈՒԹ',
+  videoSrc = ctaBackgroundVideo,
 }) {
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
@@ -69,7 +70,7 @@ export default function ShopCta({
     >
       <div className="shop-cta-bg" aria-hidden="true">
         <video className="shop-cta-bg-video" autoPlay muted loop playsInline preload="metadata">
-          <source src={ctaBackgroundVideo} type="video/mp4" />
+          <source src={videoSrc} type="video/mp4" />
         </video>
       </div>
 

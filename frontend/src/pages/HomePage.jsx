@@ -60,6 +60,7 @@ export default function HomePage() {
         accentTitle="սկսվում է այստեղ"
         buttonText="ՄՈՒՏՔ"
         enterText="ԽԱՆՈՒԹ"
+        videoSrc="https://images.artwork.am/artworki_video.mp4"
       />
     </main>
   );
